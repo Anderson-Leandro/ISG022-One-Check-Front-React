@@ -1,7 +1,7 @@
 # CLAUDE.md — OneCheck Front (React + Vite)
 
 Substitui o front PHP em `../front/`, que segue como referência visual e de comportamento até o corte final.
-O plano de migração está em `~/.claude/plans/me-ajude-a-montar-elegant-chipmunk.md`.
+Plano e histórico de progresso: `PLANO_MIGRACAO.md` — ler antes de continuar e atualizar ao concluir etapas.
 
 ## Backend
 - API Python (FastAPI) já rodando em Docker: `http://localhost:8000` (`VITE_API_URL`).

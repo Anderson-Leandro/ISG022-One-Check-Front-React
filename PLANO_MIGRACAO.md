@@ -67,7 +67,7 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - [x] `public/mfa-setup.php` → `pages/auth/ConfigurarMfa.tsx`
 - [x] `public/logout.php` → `useAuth().sair()` (botão na navbar)
 
-### ⏳ Fase 3 — Módulos CRUD (em andamento — próximo: `contratos/`)
+### ⏳ Fase 3 — Módulos CRUD (em andamento — próximo: `problemas/`)
 1. [x] `usuarios/` — index, novo, editar, perfil (`/usuarios/me`), permissoes
    - `pages/usuarios/{ListaDeUsuarios,NovoUsuario,EditarUsuario,MeuPerfil,Permissoes}.tsx`; hooks em `src/api/usuarios.ts`
    - Perfil usa `GET/PATCH /usuarios/me` (`senha_atual`/`senha_nova`) em vez do `PUT /usuarios/{id}` do PHP
@@ -81,7 +81,12 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
    - `historico.php` era vazio no PHP → lista os contratos do imóvel (`GET /contratos?imovel_id=`)
    - Lista ganhou coluna Título e link para detalhes (o PHP só tinha "Editar"); badges seguem `badge_status`
    - Formulários seguem com `useState`; react-hook-form/zod descartado por ora (não fez falta)
-3. [ ] `contratos/` — index, novo, detalhes, anexos, assinatura, encerrar/cancelar, agendamentos
+3. [x] `contratos/` — index, novo, detalhes (encerrar/cancelar), agendamentos
+   - `pages/contratos/*`; hooks em `src/api/contratos.ts`
+   - Lista e detalhes mostram título do imóvel e nome do locatário (o PHP mostrava UUID truncado); cai para o ID se `/usuarios` der 403
+   - Detalhes ganhou agendamentos (CRUD), vistorias (`/contratos/{id}/checklists`) e problemas do contrato
+   - Novo contrato aceita `?imovel_id=` para vir pré-selecionado
+   - `anexos.php` e `assinatura.php` eram vazios e a API não tem endpoints → rotas removidas (ver Pendências)
 4. [ ] `problemas/` — index, novo (`/contratos/{id}/problemas`), detalhes, historico/atualizacoes
 5. [ ] `vistorias/` (= checklists) — index, nova, detalhes, checklist/itens, fotos (`FormData`), comparativo, relatorio/PDF (download em blob)
 
@@ -104,7 +109,9 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - `/auth/mfa/activate` aceita só `{codigo}` (o PHP enviava também `secret`, ignorado).
 
 ## Pendências com a API
-_(nenhuma até agora)_
+- Anexos e assinatura de contrato: telas previstas no PHP (`contratos/anexos.php`, `assinatura.php`, ambas vazias), sem endpoint na API
+- Histórico do imóvel: sem endpoint; a tela usa a lista de contratos do imóvel
+- Tipos válidos de agendamento (`inicial`/`final`/`periodica`) tirados do `mock_data.php` — confirmar com o time da API
 
 ## Verificação (a cada fase)
 - API: `curl http://localhost:8000/api/v1/health`; front: `npm run dev` (porta 5173)
@@ -118,4 +125,5 @@ _(nenhuma até agora)_
 | 2026-10-24 | Plano definido (React + Vite, só web) | — | Backend PHP descartado; API Python em Docker |
 | 2026-10-24 | Fases 1 e 2 concluídas | `bf07170` | Build e lint ok (3 warnings de fast-refresh). Login testado manualmente pelo usuário: ok |
 | 2026-10-24 | Fase 3.1 — módulo `usuarios/` | `cc86b35` | Build e lint ok. Testado manualmente pelo usuário: ok |
-| 2026-10-24 | Fase 3.2 — módulo `imoveis/` | `a019646` | Build e lint ok. Pendente: teste manual contra a API |
+| 2026-10-24 | Fase 3.2 — módulo `imoveis/` | `a019646` | Build e lint ok. Testado manualmente pelo usuário: ok |
+| 2026-10-24 | Fase 3.3 — módulo `contratos/` | _(este commit)_ | Build e lint ok. Pendente: teste manual contra a API |

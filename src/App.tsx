@@ -19,6 +19,9 @@ import { DetalhesDoImovel } from './pages/imoveis/DetalhesDoImovel';
 import { ComodosDoImovel } from './pages/imoveis/ComodosDoImovel';
 import { HistoricoDoImovel } from './pages/imoveis/HistoricoDoImovel';
 import { MapaDeImoveis } from './pages/imoveis/MapaDeImoveis';
+import { ListaDeContratos } from './pages/contratos/ListaDeContratos';
+import { NovoContrato } from './pages/contratos/NovoContrato';
+import { DetalhesDoContrato } from './pages/contratos/DetalhesDoContrato';
 import { useAuth } from './auth/AuthContext';
 import { rotaInicial } from './auth/permissoes';
 
@@ -81,11 +84,9 @@ export function App() {
         </Route>
 
         <Route element={<RotaProtegida pagina="contratos" />}>
-          <Route path="/contratos" element={<EmMigracao titulo="Contratos" origemPhp="contratos/index.php" />} />
-          <Route path="/contratos/novo" element={<EmMigracao titulo="Novo contrato" origemPhp="contratos/novo.php" />} />
-          <Route path="/contratos/:id" element={<EmMigracao titulo="Contrato" origemPhp="contratos/detalhes.php" />} />
-          <Route path="/contratos/:id/anexos" element={<EmMigracao titulo="Anexos" origemPhp="contratos/anexos.php" />} />
-          <Route path="/contratos/:id/assinatura" element={<EmMigracao titulo="Assinatura" origemPhp="contratos/assinatura.php" />} />
+          <Route path="/contratos" element={<ListaDeContratos />} />
+          <Route path="/contratos/novo" element={<NovoContrato />} />
+          <Route path="/contratos/:id" element={<DetalhesDoContrato />} />
         </Route>
 
         <Route element={<RotaProtegida pagina="problemas" />}>

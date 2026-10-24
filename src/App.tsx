@@ -26,6 +26,13 @@ import { ListaDeProblemas } from './pages/problemas/ListaDeProblemas';
 import { NovoProblema } from './pages/problemas/NovoProblema';
 import { DetalhesDoProblema } from './pages/problemas/DetalhesDoProblema';
 import { HistoricoDoProblema } from './pages/problemas/HistoricoDoProblema';
+import { ListaDeVistorias } from './pages/vistorias/ListaDeVistorias';
+import { NovaVistoria } from './pages/vistorias/NovaVistoria';
+import { DetalhesDaVistoria } from './pages/vistorias/DetalhesDaVistoria';
+import { ChecklistDaVistoria } from './pages/vistorias/ChecklistDaVistoria';
+import { FotosDaVistoria } from './pages/vistorias/FotosDaVistoria';
+import { ComparativoDaVistoria } from './pages/vistorias/ComparativoDaVistoria';
+import { RelatorioDaVistoria } from './pages/vistorias/RelatorioDaVistoria';
 import { useAuth } from './auth/AuthContext';
 import { rotaInicial } from './auth/permissoes';
 
@@ -78,13 +85,13 @@ export function App() {
         </Route>
 
         <Route element={<RotaProtegida pagina="vistorias" />}>
-          <Route path="/vistorias" element={<EmMigracao titulo="Vistorias" origemPhp="vistorias/index.php" />} />
-          <Route path="/vistorias/nova" element={<EmMigracao titulo="Nova vistoria" origemPhp="vistorias/nova.php" />} />
-          <Route path="/vistorias/:id" element={<EmMigracao titulo="Vistoria" origemPhp="vistorias/detalhes.php" />} />
-          <Route path="/vistorias/:id/checklist" element={<EmMigracao titulo="Checklist" origemPhp="vistorias/checklist.php" />} />
-          <Route path="/vistorias/:id/fotos" element={<EmMigracao titulo="Fotos" origemPhp="vistorias/fotos.php" />} />
-          <Route path="/vistorias/:id/comparativo" element={<EmMigracao titulo="Comparativo" origemPhp="vistorias/comparativo.php" />} />
-          <Route path="/vistorias/:id/relatorio" element={<EmMigracao titulo="Relatório" origemPhp="vistorias/relatorio.php" />} />
+          <Route path="/vistorias" element={<ListaDeVistorias />} />
+          <Route path="/vistorias/nova" element={<NovaVistoria />} />
+          <Route path="/vistorias/:id" element={<DetalhesDaVistoria />} />
+          <Route path="/vistorias/:id/checklist" element={<ChecklistDaVistoria />} />
+          <Route path="/vistorias/:id/fotos" element={<FotosDaVistoria />} />
+          <Route path="/vistorias/:id/comparativo" element={<ComparativoDaVistoria />} />
+          <Route path="/vistorias/:id/relatorio" element={<RelatorioDaVistoria />} />
         </Route>
 
         <Route element={<RotaProtegida pagina="contratos" />}>

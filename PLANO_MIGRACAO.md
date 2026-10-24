@@ -67,7 +67,7 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - [x] `public/mfa-setup.php` → `pages/auth/ConfigurarMfa.tsx`
 - [x] `public/logout.php` → `useAuth().sair()` (botão na navbar)
 
-### ⏳ Fase 3 — Módulos CRUD (em andamento — próximo: `vistorias/`)
+### ✅ Fase 3 — Módulos CRUD
 1. [x] `usuarios/` — index, novo, editar, perfil (`/usuarios/me`), permissoes
    - `pages/usuarios/{ListaDeUsuarios,NovoUsuario,EditarUsuario,MeuPerfil,Permissoes}.tsx`; hooks em `src/api/usuarios.ts`
    - Perfil usa `GET/PATCH /usuarios/me` (`senha_atual`/`senha_nova`) em vez do `PUT /usuarios/{id}` do PHP
@@ -96,9 +96,17 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
    - Vistoriador recebe 403 em `GET /contratos/{id}/problemas` → a lista avisa em vez de mostrar vazio
    - Atualizações mostram o nome do autor (`autor_id` → `/usuarios`)
    - Endpoints de problema não têm corpo no OpenAPI → `corpoNaoTipado()` em `src/api/client.ts`
-5. [ ] `vistorias/` (= checklists) — index, nova, detalhes, checklist/itens, fotos (`FormData`), comparativo, relatorio/PDF (download em blob)
+5. [x] `vistorias/` (= checklists) — index, nova, detalhes, checklist/itens, fotos, comparativo, relatorio
+   - `pages/vistorias/*`; hooks e regras em `src/api/vistorias.ts` (`permissoesDaVistoria`, `useNomesDaVistoria`)
+   - `detalhes.php` + `checklist.php` (visualização) unificados em `DetalhesDaVistoria`; ações de status + aceite/rejeição (com motivo) + PDF
+   - `/vistorias/:id/checklist` virou o **preenchimento pela web** (adicionar/editar itens, enviar/remover fotos); no PHP era só pelo app
+   - Fluxo confirmado na API: `em_preenchimento` →submeter (≥1 item)→ `pendente_aceite` →aceitar/rejeitar→ `aceito`/`rejeitado` (finais, sem edição)
+   - Permissões confirmadas: itens/submeter = admin/gestor/vistoriador designado; enviar-para-aceite = admin/gestor; aceitar/rejeitar = admin/gestor/locatário
+   - Aceitar/rejeitar usam PATCH (o PHP usava POST, que a API não expõe)
+   - `comparativo.php` e `relatorio.php` eram vazios no PHP → comparativo item a item entrada × saída (destaca o que piorou) e PDF embutido
+   - Upload multipart e PDF (`parseAs: 'blob'`) testados com o próprio openapi-fetch no Node contra a API
 
-### ⬜ Fase 4 — Dashboards
+### ⏳ Fase 4 — Dashboards (próxima)
 - [ ] `dashboard/index, analytics, financeiro, operacional` (`GET /dashboard`) e `logs` (`GET /logs`) com Chart.js
 
 ### ⬜ Fase 5 — Área do locatário
@@ -122,6 +130,9 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - Corpo de `POST /problemas/{id}/atualizacoes` não documentado no OpenAPI; `{descricao}` **confirmado** em teste
 - Corpos de `POST /contratos/{id}/problemas` e `PATCH /problemas/{id}/status` também não documentados (seguem o que o PHP enviava)
 - Tipos de agendamento: a API só aceita `inicial` e `encerramento` (confirmado; `mock_data.php` estava errado)
+- `POST /contratos/{id}/checklists` com `vistoriador_id` inexistente devolve **500** em vez de 422
+- `enviar-para-aceite` em `em_preenchimento` faz o mesmo que `submeter` (sem exigir item); o status `pendente_revisao` não apareceu em nenhum fluxo — confirmar quando ele é usado
+- Checklists não têm DELETE (dados de teste ficam)
 - **Segurança:** `GET /usuarios` responde 200 para o perfil locatário, listando todos os usuários (e-mails). Reportar ao time da API
 - Vistoriador sem acesso a `GET /contratos/{id}/problemas` (403), embora possa abrir um problema pelo ID — confirmar se é intencional
 
@@ -130,7 +141,8 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 - Login + MFA (TOTP calculado a partir do secret do seed) para admin, vistoriador e locatário: ok
 - Escritas como admin, com os mesmos payloads do front: 27/29 ok. As 2 falhas eram os tipos `final`/`periodica` de agendamento, já corrigidos
 - Permissões testadas para vistoriador e locatário (ver Pendências com a API)
-- Dados de teste que ficaram (a API não tem DELETE): contrato `fce07282…` (cancelado) e problema "TESTE-AUTO Problema", com uma atualização. Usuário, imóvel, cômodo e agendamentos de teste foram removidos
+- Dados de teste que ficaram (a API não tem DELETE): contratos `fce07282…` e `105c33bb…` (cancelados), problema "TESTE-AUTO Problema" e 4 checklists do contrato `105c33bb…`. Usuários, imóveis, cômodos, agendamentos e fotos de teste foram removidos
+- Vistorias: fluxo completo testado com admin, vistoriador e locatário (criar, itens, foto, submeter, aceitar, rejeitar, PDF)
 
 ## Verificação (a cada fase)
 - API: `curl http://localhost:8000/api/v1/health`; front: `npm run dev` (porta 5173)
@@ -148,3 +160,4 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 | 2026-10-24 | Fase 3.3 — módulo `contratos/` | `b7af71f` | Build e lint ok. Testado manualmente pelo usuário: ok |
 | 2026-10-24 | Fase 3.4 — módulo `problemas/` | `d5ae3cc` | Build e lint ok |
 | 2026-10-24 | Testes de API com usuários de seed + correções | `740b7ea` | Tipos de agendamento corrigidos, permissões de problema ajustadas à API, aviso de 403 na lista, autor nas atualizações |
+| 2026-10-24 | Fase 3.5 — módulo `vistorias/` (Fase 3 concluída) | _(este commit)_ | Build e lint ok; fluxo e permissões testados contra a API com os usuários de seed |

@@ -115,10 +115,15 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - Financeiro = receita **contratada** (`valor_mensal` dos contratos ativos); a API não tem pagamentos
 - Testes: unitários em `src/__testes__/regras.test.ts` (`npm test`, sem API); telas renderizadas em jsdom com dados reais por um teste fora do repositório
 
-### ⏳ Fase 5 — Área do locatário (próxima)
-- [ ] `locatario/index.php` (aceitar/rejeitar checklist, problemas)
+### ✅ Fase 5 — Área do locatário
+- [x] `locatario/index.php` → `pages/locatario/AreaDoLocatario.tsx` (dados em `src/api/locatario.ts`)
+  - Por contrato ativo: imóvel e endereço, vigência e aluguel, vistorias aguardando aceite (aceitar / rejeitar com motivo), histórico de vistorias, problemas + "Registrar"
+  - Agendamentos ficam de fora: a API devolve 403 para o locatário
+- [x] `LayoutConformePerfil`: o locatário abre vistorias, problemas e perfil **dentro do layout dele**, com abas Início/Vistorias/Problemas/Meu perfil. No PHP esses links levavam ao layout administrativo
+- [x] Placeholder `EmMigracao` removido: **todas as telas do PHP estão migradas**
+- Testado em jsdom com dados reais: aceite e rejeição feitos pela tela e confirmados na API (com `motivo_rejeicao`); layout correto nas rotas; admin segue com o layout administrativo
 
-### ⬜ Fase 6 — Corte final
+### ⏳ Fase 6 — Corte final (próxima)
 - [ ] Nginx servindo `dist/` com fallback SPA (`try_files $uri /index.html`), substituindo `Dockerfile.web`/`docker-compose.yml`/`render.yaml`
 - [ ] Code splitting por rota (`React.lazy`) — bundle em ~800 kB com Leaflet + Chart.js
 - [ ] Solicitar ao time da API a origem de produção no CORS
@@ -148,7 +153,7 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 - Login + MFA (TOTP calculado a partir do secret do seed) para admin, vistoriador e locatário: ok
 - Escritas como admin, com os mesmos payloads do front: 27/29 ok. As 2 falhas eram os tipos `final`/`periodica` de agendamento, já corrigidos
 - Permissões testadas para vistoriador e locatário (ver Pendências com a API)
-- Dados de teste que ficaram (a API não tem DELETE): contratos `fce07282…` e `105c33bb…` (cancelados), problema "TESTE-AUTO Problema" e 4 checklists do contrato `105c33bb…`. Usuários, imóveis, cômodos, agendamentos e fotos de teste foram removidos
+- Dados de teste que ficaram (a API não tem DELETE): contratos `fce07282…`, `105c33bb…` e `cd90cb98…` (cancelados), problema "TESTE-AUTO Problema", 4 checklists do contrato `105c33bb…` e 2 do `cd90cb98…` (aceito/rejeitado). Usuários, imóveis, cômodos, agendamentos e fotos de teste foram removidos
 - Vistorias: fluxo completo testado com admin, vistoriador e locatário (criar, itens, foto, submeter, aceitar, rejeitar, PDF)
 
 ## Verificação (a cada fase)
@@ -169,3 +174,4 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 | 2026-10-24 | Testes de API com usuários de seed + correções | `740b7ea` | Tipos de agendamento corrigidos, permissões de problema ajustadas à API, aviso de 403 na lista, autor nas atualizações |
 | 2026-10-24 | Fase 3.5 — módulo `vistorias/` (Fase 3 concluída) | `b0714b5` | Build e lint ok; fluxo e permissões testados contra a API com os usuários de seed |
 | 2026-10-24 | Fase 4 — dashboards e logs | `7907789` | Build, lint e 12 testes unitários ok; 9 telas renderizadas com dados reais (admin, vistoriador, locatário) |
+| 2026-10-24 | Fase 5 — área do locatário (todas as telas migradas) | _(este commit)_ | Build, lint e testes ok; aceite/rejeição testados pela tela contra a API |

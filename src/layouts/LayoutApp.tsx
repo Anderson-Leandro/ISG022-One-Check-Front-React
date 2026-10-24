@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Offcanvas } from 'react-bootstrap';
 import { useAuth } from '../auth/AuthContext';
-import { itensDeMenuPara } from '../auth/permissoes';
+import { itensDeMenuPara, rotaInicial } from '../auth/permissoes';
 import { ExibirFlash, useFlash } from '../components/Flash';
 import { Marca } from '../components/Marca';
 
@@ -53,7 +53,7 @@ export function LayoutApp() {
             >
               <i className="bi bi-list" />
             </button>
-            <Link className="navbar-brand" to="/dashboard" style={{ fontWeight: 700, letterSpacing: '-.3px', fontSize: 16 }}>
+            <Link className="navbar-brand" to={rotaInicial(usuario)} style={{ fontWeight: 700, letterSpacing: '-.3px', fontSize: 16 }}>
               <Marca />
             </Link>
           </div>

@@ -1,12 +1,12 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { RotaProtegida, RotaPublica } from './auth/RotaProtegida';
-import { LayoutApp } from './layouts/LayoutApp';
+import { LayoutConformePerfil } from './layouts/LayoutConformePerfil';
 import { LayoutLocatario } from './layouts/LayoutLocatario';
 import { Login } from './pages/auth/Login';
 import { VerificarMfa } from './pages/auth/VerificarMfa';
 import { ConfigurarMfaNoLogin } from './pages/auth/ConfigurarMfaNoLogin';
 import { ConfigurarMfa } from './pages/auth/ConfigurarMfa';
-import { EmMigracao } from './pages/EmMigracao';
+import { AreaDoLocatario } from './pages/locatario/AreaDoLocatario';
 import { ListaDeUsuarios } from './pages/usuarios/ListaDeUsuarios';
 import { NovoUsuario } from './pages/usuarios/NovoUsuario';
 import { EditarUsuario } from './pages/usuarios/EditarUsuario';
@@ -62,11 +62,11 @@ export function App() {
 
       <Route element={<RotaProtegida pagina="locatario" />}>
         <Route element={<LayoutLocatario />}>
-          <Route path="/locatario" element={<EmMigracao titulo="Área do locatário" origemPhp="locatario/index.php" />} />
+          <Route path="/locatario" element={<AreaDoLocatario />} />
         </Route>
       </Route>
 
-      <Route element={<LayoutApp />}>
+      <Route element={<LayoutConformePerfil />}>
         <Route element={<RotaProtegida pagina="dashboard" />}>
           <Route path="/dashboard" element={<PainelGeral />} />
           <Route path="/dashboard/analytics" element={<PainelAnalytics />} />

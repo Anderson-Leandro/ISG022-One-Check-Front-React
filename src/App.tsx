@@ -33,6 +33,11 @@ import { ChecklistDaVistoria } from './pages/vistorias/ChecklistDaVistoria';
 import { FotosDaVistoria } from './pages/vistorias/FotosDaVistoria';
 import { ComparativoDaVistoria } from './pages/vistorias/ComparativoDaVistoria';
 import { RelatorioDaVistoria } from './pages/vistorias/RelatorioDaVistoria';
+import { PainelGeral } from './pages/dashboard/PainelGeral';
+import { PainelOperacional } from './pages/dashboard/PainelOperacional';
+import { PainelFinanceiro } from './pages/dashboard/PainelFinanceiro';
+import { PainelAnalytics } from './pages/dashboard/PainelAnalytics';
+import { Logs } from './pages/dashboard/Logs';
 import { useAuth } from './auth/AuthContext';
 import { rotaInicial } from './auth/permissoes';
 
@@ -63,13 +68,13 @@ export function App() {
 
       <Route element={<LayoutApp />}>
         <Route element={<RotaProtegida pagina="dashboard" />}>
-          <Route path="/dashboard" element={<EmMigracao titulo="Dashboard" origemPhp="dashboard/index.php" />} />
-          <Route path="/dashboard/analytics" element={<EmMigracao titulo="Analytics" origemPhp="dashboard/analytics.php" />} />
-          <Route path="/dashboard/financeiro" element={<EmMigracao titulo="Financeiro" origemPhp="dashboard/financeiro.php" />} />
-          <Route path="/dashboard/operacional" element={<EmMigracao titulo="Operacional" origemPhp="dashboard/operacional.php" />} />
+          <Route path="/dashboard" element={<PainelGeral />} />
+          <Route path="/dashboard/analytics" element={<PainelAnalytics />} />
+          <Route path="/dashboard/financeiro" element={<PainelFinanceiro />} />
+          <Route path="/dashboard/operacional" element={<PainelOperacional />} />
         </Route>
         <Route element={<RotaProtegida pagina="logs" />}>
-          <Route path="/dashboard/logs" element={<EmMigracao titulo="Logs" origemPhp="dashboard/logs.php" />} />
+          <Route path="/dashboard/logs" element={<Logs />} />
         </Route>
 
         <Route element={<RotaProtegida pagina="imoveis" />}>

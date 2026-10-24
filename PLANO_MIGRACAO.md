@@ -28,8 +28,8 @@ Se faltar endpoint, anotar em "Pendências com a API" abaixo.
 - `openapi-typescript` + `openapi-fetch` (`npm run gen:api` → `src/api/schema.d.ts`)
 - React Router 6, TanStack Query 5
 - Bootstrap 5.3 + react-bootstrap + bootstrap-icons; `src/styles/style.css` copiado do PHP
-- Instalados: leaflet + react-leaflet 5
-- A instalar quando chegar a fase: react-chartjs-2, @tanstack/react-table, vitest + testing-library
+- Instalados: leaflet + react-leaflet 5, chart.js 4 + react-chartjs-2 5; dev: vitest 3 + jsdom + Testing Library
+- Dispensado até agora: @tanstack/react-table (as tabelas são simples, com paginação/filtros da API)
 
 ## Mapeamento PHP → React
 | PHP | React |
@@ -106,15 +106,21 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
    - `comparativo.php` e `relatorio.php` eram vazios no PHP → comparativo item a item entrada × saída (destaca o que piorou) e PDF embutido
    - Upload multipart e PDF (`parseAs: 'blob'`) testados com o próprio openapi-fetch no Node contra a API
 
-### ⏳ Fase 4 — Dashboards (próxima)
-- [ ] `dashboard/index, analytics, financeiro, operacional` (`GET /dashboard`) e `logs` (`GET /logs`) com Chart.js
+### ✅ Fase 4 — Dashboards
+- [x] `dashboard/index` → `PainelGeral`; `operacional`, `financeiro` e `analytics` (vazios no PHP) → `PainelOperacional`, `PainelFinanceiro`, `PainelAnalytics`, com abas entre eles
+- [x] `dashboard/logs` → `Logs`, com os filtros da API (`acao`, `entidade`, `de`, `ate`) e o nome do usuário
+- Dados: `src/api/painel.ts` (`useDadosDoPainel` junta imóveis, contratos, checklists, problemas e agendamentos em paralelo; conta os 403)
+- Gráficos: Chart.js 4 + react-chartjs-2 (`src/components/graficos/`). Paleta categórica em ordem fixa, **validada** contra a superfície `#151D2E` (luminosidade, croma, daltonismo ΔE ≥ 8, contraste ≥ 3:1). Legenda HTML com contagens e "Ver tabela" em todo gráfico
+- `GET /dashboard` é global (mesmos números para todos os perfis), enquanto as listas vêm filtradas → os cartões são calculados das listas; só "vistorias agendadas" vem do `/dashboard`
+- Financeiro = receita **contratada** (`valor_mensal` dos contratos ativos); a API não tem pagamentos
+- Testes: unitários em `src/__testes__/regras.test.ts` (`npm test`, sem API); telas renderizadas em jsdom com dados reais por um teste fora do repositório
 
-### ⬜ Fase 5 — Área do locatário
+### ⏳ Fase 5 — Área do locatário (próxima)
 - [ ] `locatario/index.php` (aceitar/rejeitar checklist, problemas)
 
 ### ⬜ Fase 6 — Corte final
 - [ ] Nginx servindo `dist/` com fallback SPA (`try_files $uri /index.html`), substituindo `Dockerfile.web`/`docker-compose.yml`/`render.yaml`
-- [ ] Code splitting por rota (`React.lazy`) — bundle passou de 500 kB com o Leaflet
+- [ ] Code splitting por rota (`React.lazy`) — bundle em ~800 kB com Leaflet + Chart.js
 - [ ] Solicitar ao time da API a origem de produção no CORS
 - [ ] Aposentar `../front/`
 
@@ -133,6 +139,7 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - `POST /contratos/{id}/checklists` com `vistoriador_id` inexistente devolve **500** em vez de 422
 - `enviar-para-aceite` em `em_preenchimento` faz o mesmo que `submeter` (sem exigir item); o status `pendente_revisao` não apareceu em nenhum fluxo — confirmar quando ele é usado
 - Checklists não têm DELETE (dados de teste ficam)
+- `GET /dashboard` não considera o perfil: o vistoriador vê "2 imóveis locados", mas só 1 imóvel na lista
 - **Segurança:** `GET /usuarios` responde 200 para o perfil locatário, listando todos os usuários (e-mails). Reportar ao time da API
 - Vistoriador sem acesso a `GET /contratos/{id}/problemas` (403), embora possa abrir um problema pelo ID — confirmar se é intencional
 
@@ -161,3 +168,4 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 | 2026-10-24 | Fase 3.4 — módulo `problemas/` | `d5ae3cc` | Build e lint ok |
 | 2026-10-24 | Testes de API com usuários de seed + correções | `740b7ea` | Tipos de agendamento corrigidos, permissões de problema ajustadas à API, aviso de 403 na lista, autor nas atualizações |
 | 2026-10-24 | Fase 3.5 — módulo `vistorias/` (Fase 3 concluída) | `b0714b5` | Build e lint ok; fluxo e permissões testados contra a API com os usuários de seed |
+| 2026-10-24 | Fase 4 — dashboards e logs | _(este commit)_ | Build, lint e 12 testes unitários ok; 9 telas renderizadas com dados reais (admin, vistoriador, locatário) |

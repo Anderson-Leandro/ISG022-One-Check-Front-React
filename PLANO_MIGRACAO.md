@@ -39,7 +39,7 @@ Se faltar endpoint, anotar em "Pendências com a API" abaixo.
 | `includes/header/navbar/sidebar/footer.php` | `src/layouts/LayoutApp.tsx` |
 | `locatario/_header.php`/`_footer.php` | `src/layouts/LayoutLocatario.tsx` |
 | `flash_set`/`flash_render` | `src/components/Flash.tsx` (`useFlash`) |
-| `includes/partials.php`, `functions.php` | `src/components/*` + `src/utils/formatar.ts` (a criar) |
+| `includes/partials.php`, `functions.php` | `src/components/*` (`CabecalhoDaPagina`, `Paginacao`, `EstadoDaConsulta`, `BadgePerfil`) + `src/utils/formatar.ts` |
 | `config/imoveis.php`, `config/permissions.php` | `src/config/*` (a criar) |
 | `includes/Geocoder.php`, `Mfa.php`, `ImovelService.php` | endpoints da API quando existirem; senão util TS |
 | `config/mock_data.php` | descartar / fixture de teste |
@@ -66,8 +66,12 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - [x] `public/mfa-setup.php` → `pages/auth/ConfigurarMfa.tsx`
 - [x] `public/logout.php` → `useAuth().sair()` (botão na navbar)
 
-### ⏳ Fase 3 — Módulos CRUD (próxima)
-1. [ ] `usuarios/` — index, novo, editar, perfil (`/usuarios/me`), permissoes
+### ⏳ Fase 3 — Módulos CRUD (em andamento — próximo: `imoveis/`)
+1. [x] `usuarios/` — index, novo, editar, perfil (`/usuarios/me`), permissoes
+   - `pages/usuarios/{ListaDeUsuarios,NovoUsuario,EditarUsuario,MeuPerfil,Permissoes}.tsx`; hooks em `src/api/usuarios.ts`
+   - Perfil usa `GET/PATCH /usuarios/me` (`senha_atual`/`senha_nova`) em vez do `PUT /usuarios/{id}` do PHP
+   - `permissoes.php` era vazio no PHP → virou matriz somente leitura das regras de `permissoes.ts`
+   - Formulários com `useState` (simples); react-hook-form + zod entra no form grande de imóveis
 2. [ ] `imoveis/` — index, novo/editar (`_form_campos.php` → componente compartilhado), detalhes, comodos, historico, mapa (Leaflet)
 3. [ ] `contratos/` — index, novo, detalhes, anexos, assinatura, encerrar/cancelar, agendamentos
 4. [ ] `problemas/` — index, novo (`/contratos/{id}/problemas`), detalhes, historico/atualizacoes
@@ -104,3 +108,4 @@ _(nenhuma até agora)_
 |---|---|---|---|
 | 2026-10-24 | Plano definido (React + Vite, só web) | — | Backend PHP descartado; API Python em Docker |
 | 2026-10-24 | Fases 1 e 2 concluídas | `bf07170` | Build e lint ok (3 warnings de fast-refresh). Login testado manualmente pelo usuário: ok |
+| 2026-10-24 | Fase 3.1 — módulo `usuarios/` | _(este commit)_ | Build e lint ok. Pendente: teste manual com admin/gestor contra a API |

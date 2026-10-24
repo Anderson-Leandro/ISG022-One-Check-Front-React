@@ -7,6 +7,11 @@ import { VerificarMfa } from './pages/auth/VerificarMfa';
 import { ConfigurarMfaNoLogin } from './pages/auth/ConfigurarMfaNoLogin';
 import { ConfigurarMfa } from './pages/auth/ConfigurarMfa';
 import { EmMigracao } from './pages/EmMigracao';
+import { ListaDeUsuarios } from './pages/usuarios/ListaDeUsuarios';
+import { NovoUsuario } from './pages/usuarios/NovoUsuario';
+import { EditarUsuario } from './pages/usuarios/EditarUsuario';
+import { MeuPerfil } from './pages/usuarios/MeuPerfil';
+import { Permissoes } from './pages/usuarios/Permissoes';
 import { useAuth } from './auth/AuthContext';
 import { rotaInicial } from './auth/permissoes';
 
@@ -84,13 +89,13 @@ export function App() {
         </Route>
 
         <Route element={<RotaProtegida />}>
-          <Route path="/usuarios/perfil" element={<EmMigracao titulo="Meu perfil" origemPhp="usuarios/perfil.php" />} />
+          <Route path="/usuarios/perfil" element={<MeuPerfil />} />
         </Route>
         <Route element={<RotaProtegida pagina="usuarios" />}>
-          <Route path="/usuarios" element={<EmMigracao titulo="Usuários" origemPhp="usuarios/index.php" />} />
-          <Route path="/usuarios/novo" element={<EmMigracao titulo="Novo usuário" origemPhp="usuarios/novo.php" />} />
-          <Route path="/usuarios/:id/editar" element={<EmMigracao titulo="Editar usuário" origemPhp="usuarios/editar.php" />} />
-          <Route path="/usuarios/:id/permissoes" element={<EmMigracao titulo="Permissões" origemPhp="usuarios/permissoes.php" />} />
+          <Route path="/usuarios" element={<ListaDeUsuarios />} />
+          <Route path="/usuarios/novo" element={<NovoUsuario />} />
+          <Route path="/usuarios/:id/editar" element={<EditarUsuario />} />
+          <Route path="/usuarios/:id/permissoes" element={<Permissoes />} />
         </Route>
       </Route>
 

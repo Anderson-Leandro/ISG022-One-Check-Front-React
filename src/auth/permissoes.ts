@@ -14,7 +14,7 @@ export type Pagina =
 
 export type RecursoCriavel = 'imoveis' | 'contratos' | 'vistorias' | 'problemas' | 'usuarios';
 
-const PERFIS_POR_PAGINA: Record<Pagina, string[]> = {
+export const PERFIS_POR_PAGINA: Record<Pagina, string[]> = {
   dashboard: ['admin', 'gestor', 'vistoriador', 'visualizador'],
   imoveis: ['admin', 'gestor', 'vistoriador', 'visualizador'],
   vistorias: ['admin', 'gestor', 'vistoriador', 'visualizador', 'locatario'],
@@ -26,7 +26,7 @@ const PERFIS_POR_PAGINA: Record<Pagina, string[]> = {
   locatario: ['locatario'],
 };
 
-const PERFIS_QUE_CRIAM: Record<RecursoCriavel, string[]> = {
+export const PERFIS_QUE_CRIAM: Record<RecursoCriavel, string[]> = {
   imoveis: ['admin', 'gestor'],
   contratos: ['admin', 'gestor'],
   vistorias: ['admin', 'gestor', 'vistoriador'],

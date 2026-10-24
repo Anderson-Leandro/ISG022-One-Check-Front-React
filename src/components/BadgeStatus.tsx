@@ -5,8 +5,8 @@ const CORES_POR_GRUPO: Record<string, Record<string, string>> = {
   imovel: { disponivel: 'success', locado: 'primary', ocupado: 'primary', em_vistoria: 'info', manutencao: 'warning', inativo: 'secondary' },
   vistoria: { rascunho: 'secondary', em_andamento: 'info', concluida: 'success', cancelada: 'dark' },
   contrato: { rascunho: 'secondary', ativo: 'success', encerrado: 'dark', cancelado: 'danger' },
-  problema: { aberto: 'danger', em_analise: 'warning', resolvido: 'success', cancelado: 'secondary' },
-  prioridade: { baixa: 'secondary', media: 'info', alta: 'warning', urgente: 'danger' },
+  problema: { aberto: 'danger', em_andamento: 'warning', em_analise: 'warning', resolvido: 'success', cancelado: 'secondary' },
+  prioridade: { baixa: 'secondary', normal: 'info', media: 'info', alta: 'warning', urgente: 'danger' },
 };
 
 export type GrupoDeStatus = 'imovel' | 'vistoria' | 'contrato' | 'problema' | 'prioridade';

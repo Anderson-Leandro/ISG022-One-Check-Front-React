@@ -22,6 +22,10 @@ import { MapaDeImoveis } from './pages/imoveis/MapaDeImoveis';
 import { ListaDeContratos } from './pages/contratos/ListaDeContratos';
 import { NovoContrato } from './pages/contratos/NovoContrato';
 import { DetalhesDoContrato } from './pages/contratos/DetalhesDoContrato';
+import { ListaDeProblemas } from './pages/problemas/ListaDeProblemas';
+import { NovoProblema } from './pages/problemas/NovoProblema';
+import { DetalhesDoProblema } from './pages/problemas/DetalhesDoProblema';
+import { HistoricoDoProblema } from './pages/problemas/HistoricoDoProblema';
 import { useAuth } from './auth/AuthContext';
 import { rotaInicial } from './auth/permissoes';
 
@@ -90,10 +94,10 @@ export function App() {
         </Route>
 
         <Route element={<RotaProtegida pagina="problemas" />}>
-          <Route path="/problemas" element={<EmMigracao titulo="Problemas" origemPhp="problemas/index.php" />} />
-          <Route path="/problemas/novo" element={<EmMigracao titulo="Novo problema" origemPhp="problemas/novo.php" />} />
-          <Route path="/problemas/:id" element={<EmMigracao titulo="Problema" origemPhp="problemas/detalhes.php" />} />
-          <Route path="/problemas/:id/historico" element={<EmMigracao titulo="Histórico" origemPhp="problemas/historico.php" />} />
+          <Route path="/problemas" element={<ListaDeProblemas />} />
+          <Route path="/problemas/novo" element={<NovoProblema />} />
+          <Route path="/problemas/:id" element={<DetalhesDoProblema />} />
+          <Route path="/problemas/:id/historico" element={<HistoricoDoProblema />} />
         </Route>
 
         <Route element={<RotaProtegida />}>

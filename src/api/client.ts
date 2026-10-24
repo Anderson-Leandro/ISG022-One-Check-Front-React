@@ -137,3 +137,18 @@ export async function obterDados<T>(
 ): Promise<T> {
   return (await desembrulhar<T>(chamada)).dados;
 }
+
+/**
+ * Para endpoints cujo corpo não está descrito no OpenAPI (requestBody: never),
+ * mas que a API lê como JSON — o openapi-fetch serializa normalmente.
+ */
+export function corpoNaoTipado(corpo: Record<string, unknown>): { body?: never } {
+  return { body: corpo as never };
+}
+
+/** Fotos/arquivos podem vir com caminho relativo (/api/v1/uploads/...) ou URL completa. */
+export function urlDeArquivo(caminho: string | null | undefined): string {
+  if (!caminho) return '';
+  if (/^https?:\/\//i.test(caminho)) return caminho;
+  return `${URL_DA_API}${caminho.startsWith('/') ? '' : '/'}${caminho}`;
+}

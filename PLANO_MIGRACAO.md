@@ -67,7 +67,7 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - [x] `public/mfa-setup.php` → `pages/auth/ConfigurarMfa.tsx`
 - [x] `public/logout.php` → `useAuth().sair()` (botão na navbar)
 
-### ⏳ Fase 3 — Módulos CRUD (em andamento — próximo: `problemas/`)
+### ⏳ Fase 3 — Módulos CRUD (em andamento — próximo: `vistorias/`)
 1. [x] `usuarios/` — index, novo, editar, perfil (`/usuarios/me`), permissoes
    - `pages/usuarios/{ListaDeUsuarios,NovoUsuario,EditarUsuario,MeuPerfil,Permissoes}.tsx`; hooks em `src/api/usuarios.ts`
    - Perfil usa `GET/PATCH /usuarios/me` (`senha_atual`/`senha_nova`) em vez do `PUT /usuarios/{id}` do PHP
@@ -87,7 +87,13 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
    - Detalhes ganhou agendamentos (CRUD), vistorias (`/contratos/{id}/checklists`) e problemas do contrato
    - Novo contrato aceita `?imovel_id=` para vir pré-selecionado
    - `anexos.php` e `assinatura.php` eram vazios e a API não tem endpoints → rotas removidas (ver Pendências)
-4. [ ] `problemas/` — index, novo (`/contratos/{id}/problemas`), detalhes, historico/atualizacoes
+4. [x] `problemas/` — index, novo, detalhes (status), historico/atualizacoes
+   - `pages/problemas/*`; hooks em `src/api/problemas.ts`
+   - Lista: como no PHP, busca contratos e os problemas de cada um (agora em paralelo); filtro de status local; coluna Imóvel e link para detalhes
+   - Novo problema aceita `?contrato_id=`; após salvar abre os detalhes
+   - Detalhes ganhou linha do tempo de atualizações (`/problemas/{id}/atualizacoes`); `historico.php` (vazio no PHP) mostra essa linha do tempo
+   - Mudar status / registrar andamento: só admin, gestor e vistoriador (no PHP qualquer perfil logado via a tela)
+   - Endpoints de problema não têm corpo no OpenAPI → `corpoNaoTipado()` em `src/api/client.ts`
 5. [ ] `vistorias/` (= checklists) — index, nova, detalhes, checklist/itens, fotos (`FormData`), comparativo, relatorio/PDF (download em blob)
 
 ### ⬜ Fase 4 — Dashboards
@@ -111,6 +117,8 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 ## Pendências com a API
 - Anexos e assinatura de contrato: telas previstas no PHP (`contratos/anexos.php`, `assinatura.php`, ambas vazias), sem endpoint na API
 - Histórico do imóvel: sem endpoint; a tela usa a lista de contratos do imóvel
+- Corpo de `POST /problemas/{id}/atualizacoes` não documentado; o front envia `{descricao}` (constante `CAMPO_DO_TEXTO_DA_ATUALIZACAO`) — confirmar
+- Corpos de `POST /contratos/{id}/problemas` e `PATCH /problemas/{id}/status` também não documentados (seguem o que o PHP enviava)
 - Tipos válidos de agendamento (`inicial`/`final`/`periodica`) tirados do `mock_data.php` — confirmar com o time da API
 
 ## Verificação (a cada fase)
@@ -126,4 +134,5 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 | 2026-10-24 | Fases 1 e 2 concluídas | `bf07170` | Build e lint ok (3 warnings de fast-refresh). Login testado manualmente pelo usuário: ok |
 | 2026-10-24 | Fase 3.1 — módulo `usuarios/` | `cc86b35` | Build e lint ok. Testado manualmente pelo usuário: ok |
 | 2026-10-24 | Fase 3.2 — módulo `imoveis/` | `a019646` | Build e lint ok. Testado manualmente pelo usuário: ok |
-| 2026-10-24 | Fase 3.3 — módulo `contratos/` | `b7af71f` | Build e lint ok. Pendente: teste manual contra a API |
+| 2026-10-24 | Fase 3.3 — módulo `contratos/` | `b7af71f` | Build e lint ok. Testado manualmente pelo usuário: ok |
+| 2026-10-24 | Fase 3.4 — módulo `problemas/` | _(este commit)_ | Build e lint ok. Pendente: teste manual (atenção ao campo das atualizações) |

@@ -178,4 +178,4 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 | 2026-10-24 | Fase 3.5 — módulo `vistorias/` (Fase 3 concluída) | `b0714b5` | Build e lint ok; fluxo e permissões testados contra a API com os usuários de seed |
 | 2026-10-24 | Fase 4 — dashboards e logs | `7907789` | Build, lint e 12 testes unitários ok; 9 telas renderizadas com dados reais (admin, vistoriador, locatário) |
 | 2026-10-24 | Fase 5 — área do locatário (todas as telas migradas) | `8f42256` | Build, lint e testes ok; aceite/rejeição testados pela tela contra a API |
-| 2026-10-24 | Fase 6 (parcial) — code splitting + proteção de MFA | _(este commit)_ | Build, lint e 14 testes unitários ok; 18 rotas sob demanda renderizadas com dados reais. Deploy, CORS e aposentar `front/` adiados |
+| 2026-10-24 | Fase 6 (parcial) — code splitting + proteção de MFA | `860acf8` | Build, lint e 14 testes unitários ok; 18 rotas sob demanda renderizadas com dados reais. Deploy, CORS e aposentar `front/` adiados |

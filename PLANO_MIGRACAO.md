@@ -118,4 +118,4 @@ _(nenhuma até agora)_
 | 2026-10-24 | Plano definido (React + Vite, só web) | — | Backend PHP descartado; API Python em Docker |
 | 2026-10-24 | Fases 1 e 2 concluídas | `bf07170` | Build e lint ok (3 warnings de fast-refresh). Login testado manualmente pelo usuário: ok |
 | 2026-10-24 | Fase 3.1 — módulo `usuarios/` | `cc86b35` | Build e lint ok. Testado manualmente pelo usuário: ok |
-| 2026-10-24 | Fase 3.2 — módulo `imoveis/` | _(este commit)_ | Build e lint ok. Pendente: teste manual contra a API |
+| 2026-10-24 | Fase 3.2 — módulo `imoveis/` | `a019646` | Build e lint ok. Pendente: teste manual contra a API |

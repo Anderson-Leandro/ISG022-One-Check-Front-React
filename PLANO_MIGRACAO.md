@@ -174,4 +174,4 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 | 2026-10-24 | Testes de API com usuários de seed + correções | `740b7ea` | Tipos de agendamento corrigidos, permissões de problema ajustadas à API, aviso de 403 na lista, autor nas atualizações |
 | 2026-10-24 | Fase 3.5 — módulo `vistorias/` (Fase 3 concluída) | `b0714b5` | Build e lint ok; fluxo e permissões testados contra a API com os usuários de seed |
 | 2026-10-24 | Fase 4 — dashboards e logs | `7907789` | Build, lint e 12 testes unitários ok; 9 telas renderizadas com dados reais (admin, vistoriador, locatário) |
-| 2026-10-24 | Fase 5 — área do locatário (todas as telas migradas) | _(este commit)_ | Build, lint e testes ok; aceite/rejeição testados pela tela contra a API |
+| 2026-10-24 | Fase 5 — área do locatário (todas as telas migradas) | `8f42256` | Build, lint e testes ok; aceite/rejeição testados pela tela contra a API |

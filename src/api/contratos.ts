@@ -48,11 +48,10 @@ export const ROTULO_DO_STATUS_DO_CONTRATO: Record<string, string> = {
   cancelado: 'Cancelado',
 };
 
-/** Tipos de agendamento/vistoria usados no front PHP (mock_data.php e vistorias/nova.php). */
+/** Tipos aceitos pela API (confirmado: "Deve ser 'inicial' ou 'encerramento'"), os mesmos de vistorias/nova.php. */
 export const ROTULO_DO_TIPO_DE_AGENDAMENTO: Record<string, string> = {
-  inicial: 'Vistoria inicial',
-  final: 'Vistoria final',
-  periodica: 'Vistoria periódica',
+  inicial: 'Vistoria de entrada (inicial)',
+  encerramento: 'Vistoria de saída (encerramento)',
 };
 
 export function idCurto(id: string | null | undefined): string {

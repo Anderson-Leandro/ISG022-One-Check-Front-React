@@ -16,7 +16,8 @@ export function ListaDeProblemas() {
   const { nomeDoImovel } = useNomesParaContratos();
   const [statusFiltrado, setStatusFiltrado] = useState('');
 
-  const todos = consulta.data ?? [];
+  const todos = consulta.data?.problemas ?? [];
+  const contratosNegados = consulta.data?.contratosNegados ?? 0;
   const problemas = statusFiltrado ? todos.filter((problema) => problema.status === statusFiltrado) : todos;
 
   return (
@@ -53,6 +54,13 @@ export function ListaDeProblemas() {
           </div>
         </div>
       </div>
+
+      {contratosNegados > 0 && (
+        <div className="alert alert-warning">
+          <i className="bi bi-lock me-2" />
+          Seu perfil não tem permissão na API para listar os problemas de {contratosNegados} contrato(s).
+        </div>
+      )}
 
       <div className="card">
         <div className="card-body p-0">

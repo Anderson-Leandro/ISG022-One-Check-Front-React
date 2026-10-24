@@ -92,7 +92,9 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
    - Lista: como no PHP, busca contratos e os problemas de cada um (agora em paralelo); filtro de status local; coluna Imóvel e link para detalhes
    - Novo problema aceita `?contrato_id=`; após salvar abre os detalhes
    - Detalhes ganhou linha do tempo de atualizações (`/problemas/{id}/atualizacoes`); `historico.php` (vazio no PHP) mostra essa linha do tempo
-   - Mudar status / registrar andamento: só admin, gestor e vistoriador (no PHP qualquer perfil logado via a tela)
+   - Mudar status / registrar andamento: só admin e gestor (a API devolve 403 para vistoriador e locatário)
+   - Vistoriador recebe 403 em `GET /contratos/{id}/problemas` → a lista avisa em vez de mostrar vazio
+   - Atualizações mostram o nome do autor (`autor_id` → `/usuarios`)
    - Endpoints de problema não têm corpo no OpenAPI → `corpoNaoTipado()` em `src/api/client.ts`
 5. [ ] `vistorias/` (= checklists) — index, nova, detalhes, checklist/itens, fotos (`FormData`), comparativo, relatorio/PDF (download em blob)
 
@@ -117,9 +119,18 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 ## Pendências com a API
 - Anexos e assinatura de contrato: telas previstas no PHP (`contratos/anexos.php`, `assinatura.php`, ambas vazias), sem endpoint na API
 - Histórico do imóvel: sem endpoint; a tela usa a lista de contratos do imóvel
-- Corpo de `POST /problemas/{id}/atualizacoes` não documentado; o front envia `{descricao}` (constante `CAMPO_DO_TEXTO_DA_ATUALIZACAO`) — confirmar
+- Corpo de `POST /problemas/{id}/atualizacoes` não documentado no OpenAPI; `{descricao}` **confirmado** em teste
 - Corpos de `POST /contratos/{id}/problemas` e `PATCH /problemas/{id}/status` também não documentados (seguem o que o PHP enviava)
-- Tipos válidos de agendamento (`inicial`/`final`/`periodica`) tirados do `mock_data.php` — confirmar com o time da API
+- Tipos de agendamento: a API só aceita `inicial` e `encerramento` (confirmado; `mock_data.php` estava errado)
+- **Segurança:** `GET /usuarios` responde 200 para o perfil locatário, listando todos os usuários (e-mails). Reportar ao time da API
+- Vistoriador sem acesso a `GET /contratos/{id}/problemas` (403), embora possa abrir um problema pelo ID — confirmar se é intencional
+
+## Testes automatizados de API (sessão de 2026-10-24)
+Script local fora do repositório (não versionado). Credenciais dos usuários de seed passadas só por variável de ambiente, nunca gravadas.
+- Login + MFA (TOTP calculado a partir do secret do seed) para admin, vistoriador e locatário: ok
+- Escritas como admin, com os mesmos payloads do front: 27/29 ok. As 2 falhas eram os tipos `final`/`periodica` de agendamento, já corrigidos
+- Permissões testadas para vistoriador e locatário (ver Pendências com a API)
+- Dados de teste que ficaram (a API não tem DELETE): contrato `fce07282…` (cancelado) e problema "TESTE-AUTO Problema", com uma atualização. Usuário, imóvel, cômodo e agendamentos de teste foram removidos
 
 ## Verificação (a cada fase)
 - API: `curl http://localhost:8000/api/v1/health`; front: `npm run dev` (porta 5173)
@@ -135,4 +146,5 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 | 2026-10-24 | Fase 3.1 — módulo `usuarios/` | `cc86b35` | Build e lint ok. Testado manualmente pelo usuário: ok |
 | 2026-10-24 | Fase 3.2 — módulo `imoveis/` | `a019646` | Build e lint ok. Testado manualmente pelo usuário: ok |
 | 2026-10-24 | Fase 3.3 — módulo `contratos/` | `b7af71f` | Build e lint ok. Testado manualmente pelo usuário: ok |
-| 2026-10-24 | Fase 3.4 — módulo `problemas/` | `d5ae3cc` | Build e lint ok. Pendente: teste manual (atenção ao campo das atualizações) |
+| 2026-10-24 | Fase 3.4 — módulo `problemas/` | `d5ae3cc` | Build e lint ok |
+| 2026-10-24 | Testes de API com usuários de seed + correções | _(este commit)_ | Tipos de agendamento corrigidos, permissões de problema ajustadas à API, aviso de 403 na lista, autor nas atualizações |

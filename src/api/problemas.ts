@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, corpoNaoTipado, obterDados } from './client';
+import { api, corpoNaoTipado, ErroApi, obterDados } from './client';
 import type { Contrato } from './contratos';
 
 export interface Problema {
@@ -25,6 +25,7 @@ export interface AtualizacaoDeProblema {
   mensagem?: string | null;
   texto?: string | null;
   status?: string | null;
+  autor_id?: string | null;
   usuario_nome?: string | null;
   autor?: string | null;
   created_at?: string;
@@ -68,15 +69,23 @@ export function useTodosOsProblemas() {
     queryKey: chaves.lista,
     queryFn: async () => {
       const contratos = await obterDados<Contrato[]>(api.GET('/api/v1/contratos', { params: { query: { por_pagina: 100 } } }));
+      let contratosNegados = 0;
       const problemasPorContrato = await Promise.all(
         contratos.map(async (contrato) => {
-          const problemas = await obterDados<Problema[]>(
-            api.GET('/api/v1/contratos/{contrato_id}/problemas', { params: { path: { contrato_id: contrato.id } } }),
-          ).catch(() => []);
-          return problemas.map((problema): ProblemaComContrato => ({ ...problema, contrato_id: problema.contrato_id ?? contrato.id, contrato }));
+          try {
+            const problemas = await obterDados<Problema[]>(
+              api.GET('/api/v1/contratos/{contrato_id}/problemas', { params: { path: { contrato_id: contrato.id } } }),
+            );
+            return problemas.map((problema): ProblemaComContrato => ({ ...problema, contrato_id: problema.contrato_id ?? contrato.id, contrato }));
+          } catch (erro) {
+            // o vistoriador recebe 403 nesta rota; contamos para avisar na tela
+            if (erro instanceof ErroApi && erro.status === 403) contratosNegados += 1;
+            return [];
+          }
         }),
       );
-      return problemasPorContrato.flat().sort((primeiro, segundo) => String(segundo.created_at ?? '').localeCompare(String(primeiro.created_at ?? '')));
+      const problemas = problemasPorContrato.flat().sort((primeiro, segundo) => String(segundo.created_at ?? '').localeCompare(String(primeiro.created_at ?? '')));
+      return { problemas, contratosNegados };
     },
   });
 }

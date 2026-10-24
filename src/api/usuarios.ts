@@ -119,3 +119,15 @@ export function useAlternarMeuMfa() {
     onSuccess: invalidar,
   });
 }
+
+/** Mapa id → nome de todos os usuários (até 100), para exibir autores. Cai para null se a API negar. */
+export function useNomeDoUsuario() {
+  const consulta = useQuery({
+    queryKey: ['usuarios', 'nomes'],
+    queryFn: () => obterDados<Usuario[]>(api.GET('/api/v1/usuarios', { params: { query: { por_pagina: 100 } } })),
+    staleTime: 5 * 60_000,
+    retry: false,
+  });
+  const nomes = new Map((consulta.data ?? []).map((usuario) => [usuario.id, usuario.nome]));
+  return (id: string | null | undefined): string | null => (id ? (nomes.get(id) ?? null) : null);
+}

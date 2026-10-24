@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { ROTULO_DO_STATUS_DO_PROBLEMA, textoDaAtualizacao, useAtualizacoesDoProblema, useRegistrarAtualizacao } from '../../api/problemas';
+import { useNomeDoUsuario } from '../../api/usuarios';
 import { BadgeStatus } from '../../components/BadgeStatus';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
 import { useFlash } from '../../components/Flash';
@@ -10,8 +11,11 @@ export function LinhaDoTempoDoProblema({ problemaId, podeComentar }: { problemaI
   const { definirFlash } = useFlash();
   const consulta = useAtualizacoesDoProblema(problemaId);
   const registrarAtualizacao = useRegistrarAtualizacao(problemaId);
+  const nomeDoUsuario = useNomeDoUsuario();
   const [texto, setTexto] = useState('');
-  const atualizacoes = [...(consulta.data ?? [])].sort((primeira, segunda) => String(segunda.created_at ?? '').localeCompare(String(primeira.created_at ?? '')));
+  const atualizacoes = [...(consulta.data ?? [])].sort((primeira, segunda) =>
+    String(segunda.created_at ?? '').localeCompare(String(primeira.created_at ?? '')),
+  );
 
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault();
@@ -31,7 +35,13 @@ export function LinhaDoTempoDoProblema({ problemaId, podeComentar }: { problemaI
       {podeComentar && (
         <div className="card-body border-bottom">
           <form onSubmit={aoEnviar} className="d-flex gap-2">
-            <input className="form-control form-control-sm" placeholder="Descreva o andamento…" aria-label="Nova atualização" value={texto} onChange={(evento) => setTexto(evento.target.value)} />
+            <input
+              className="form-control form-control-sm"
+              placeholder="Descreva o andamento…"
+              aria-label="Nova atualização"
+              value={texto}
+              onChange={(evento) => setTexto(evento.target.value)}
+            />
             <button className="btn btn-primary btn-sm text-nowrap" disabled={registrarAtualizacao.isPending || !texto.trim()}>
               Registrar
             </button>
@@ -43,18 +53,27 @@ export function LinhaDoTempoDoProblema({ problemaId, podeComentar }: { problemaI
           {atualizacoes.length === 0 ? (
             <li className="list-group-item text-muted small">Nenhuma atualização.</li>
           ) : (
-            atualizacoes.map((atualizacao) => (
-              <li key={atualizacao.id} className="list-group-item small">
-                <div className="d-flex justify-content-between gap-2">
-                  <span className="text-muted">
-                    {formatarDataHora(atualizacao.created_at)}
-                    {(atualizacao.usuario_nome || atualizacao.autor) && ` · ${atualizacao.usuario_nome || atualizacao.autor}`}
-                  </span>
-                  {atualizacao.status && <BadgeStatus grupo="problema" valor={atualizacao.status} rotulo={ROTULO_DO_STATUS_DO_PROBLEMA[atualizacao.status]} />}
-                </div>
-                {textoDaAtualizacao(atualizacao) && <div className="mt-1" style={{ whiteSpace: 'pre-line' }}>{textoDaAtualizacao(atualizacao)}</div>}
-              </li>
-            ))
+            atualizacoes.map((atualizacao) => {
+              const autor = atualizacao.usuario_nome || atualizacao.autor || nomeDoUsuario(atualizacao.autor_id);
+              return (
+                <li key={atualizacao.id} className="list-group-item small">
+                  <div className="d-flex justify-content-between gap-2">
+                    <span className="text-muted">
+                      {formatarDataHora(atualizacao.created_at)}
+                      {autor && ` · ${autor}`}
+                    </span>
+                    {atualizacao.status && (
+                      <BadgeStatus grupo="problema" valor={atualizacao.status} rotulo={ROTULO_DO_STATUS_DO_PROBLEMA[atualizacao.status]} />
+                    )}
+                  </div>
+                  {textoDaAtualizacao(atualizacao) && (
+                    <div className="mt-1" style={{ whiteSpace: 'pre-line' }}>
+                      {textoDaAtualizacao(atualizacao)}
+                    </div>
+                  )}
+                </li>
+              );
+            })
           )}
         </ul>
       </EstadoDaConsulta>

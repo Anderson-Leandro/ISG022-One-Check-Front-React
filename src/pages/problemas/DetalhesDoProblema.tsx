@@ -12,8 +12,8 @@ import { useFlash } from '../../components/Flash';
 import { formatarDataHora } from '../../utils/formatar';
 import { LinhaDoTempoDoProblema } from './LinhaDoTempoDoProblema';
 
-/** Quem pode mudar status / registrar andamento (o visualizador só consulta). */
-const PERFIS_QUE_ATUALIZAM = ['admin', 'gestor', 'vistoriador'];
+/** A API devolve 403 para vistoriador e locatário em PATCH /status e POST /atualizacoes. */
+const PERFIS_QUE_ATUALIZAM = ['admin', 'gestor'];
 
 /** problemas/detalhes.php */
 export function DetalhesDoProblema() {

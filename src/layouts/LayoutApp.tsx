@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import { Offcanvas } from 'react-bootstrap';
 import { useAuth } from '../auth/AuthContext';
 import { itensDeMenuPara, rotaInicial } from '../auth/permissoes';
+import { SuspenseDaPagina } from '../components/CarregandoPagina';
 import { ExibirFlash, useFlash } from '../components/Flash';
 import { Marca } from '../components/Marca';
 
@@ -90,7 +91,9 @@ export function LayoutApp() {
 
           <main className="col-lg-10 col-xl-10 ms-auto px-4 py-4 app-main">
             <ExibirFlash />
-            <Outlet />
+            <SuspenseDaPagina>
+              <Outlet />
+            </SuspenseDaPagina>
           </main>
         </div>
       </div>

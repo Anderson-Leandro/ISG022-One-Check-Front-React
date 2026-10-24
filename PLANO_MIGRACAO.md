@@ -123,11 +123,12 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - [x] Placeholder `EmMigracao` removido: **todas as telas do PHP estão migradas**
 - Testado em jsdom com dados reais: aceite e rejeição feitos pela tela e confirmados na API (com `motivo_rejeicao`); layout correto nas rotas; admin segue com o layout administrativo
 
-### ⏳ Fase 6 — Corte final (próxima)
-- [ ] Nginx servindo `dist/` com fallback SPA (`try_files $uri /index.html`), substituindo `Dockerfile.web`/`docker-compose.yml`/`render.yaml`
-- [ ] Code splitting por rota (`React.lazy`) — bundle em ~800 kB com Leaflet + Chart.js
-- [ ] Solicitar ao time da API a origem de produção no CORS
-- [ ] Aposentar `../front/`
+### 🔶 Fase 6 — Corte final (parcial: deploy adiado pelo usuário)
+- [x] Code splitting por rota: `carregarSobDemanda` (React.lazy) em `src/App.tsx`, `SuspenseDaPagina` em volta do `Outlet` dos layouts (navbar/menu ficam visíveis) e `manualChunks` no `vite.config.ts` (react, consultas, bootstrap, mapa, graficos). JS inicial: 810 kB → ~350 kB (248 → ~111 kB gzip); Leaflet e Chart.js só baixam no mapa/painéis. Login e MFA ficam no bundle inicial
+- [x] Proteção na reconfiguração de MFA (ver Pendências com a API): com MFA ativo, `/mfa/configurar` pede confirmação antes de chamar `GET /auth/mfa/setup`. Teste unitário com fetch simulado em `src/__testes__/ConfigurarMfa.test.tsx`
+- [ ] **Adiado (decisão de deploy pendente):** Nginx servindo `dist/` com fallback SPA (`try_files $uri /index.html`), substituindo `Dockerfile.web`/`docker-compose.yml`/`render.yaml`
+- [ ] **Adiado (depende do domínio de produção):** solicitar ao time da API a origem de produção no CORS
+- [ ] **Adiado (depois do deploy):** aposentar `../front/`. Não apagar antes: é o front publicado hoje e tem alterações não commitadas no git dele
 
 ## Pontos de atenção
 - Token no browser (antes ficava no servidor). Evoluir para refresh em cookie httpOnly se a API oferecer.
@@ -146,6 +147,8 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - Checklists não têm DELETE (dados de teste ficam)
 - `GET /dashboard` não considera o perfil: o vistoriador vê "2 imóveis locados", mas só 1 imóvel na lista
 - **Segurança:** `GET /usuarios` responde 200 para o perfil locatário, listando todos os usuários (e-mails). Reportar ao time da API
+- **Segurança/MFA:** `GET /auth/mfa/setup` troca o segredo TOTP de quem **já tem MFA ativo** na hora, antes do `activate`. Só abrir a tela de reconfiguração e desistir deixa o autenticador atual inválido. Confirmado em 2026-10-24: o admin de seed perdeu o MFA quando um teste abriu `/mfa/configurar`. O front agora pede confirmação, mas a API deveria guardar o segredo novo como pendente e só trocar no `activate`. Para recuperar o admin, outro admin precisa usar `DELETE /usuarios/{id}/mfa`, ou é preciso resetar no banco/seed (fora do escopo do front)
+- Locatário recebe 403 em `GET /contratos/{id}/agendamentos` do próprio contrato (a área do locatário não mostra agendamentos)
 - Vistoriador sem acesso a `GET /contratos/{id}/problemas` (403), embora possa abrir um problema pelo ID — confirmar se é intencional
 
 ## Testes automatizados de API (sessão de 2026-10-24)
@@ -175,3 +178,4 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 | 2026-10-24 | Fase 3.5 — módulo `vistorias/` (Fase 3 concluída) | `b0714b5` | Build e lint ok; fluxo e permissões testados contra a API com os usuários de seed |
 | 2026-10-24 | Fase 4 — dashboards e logs | `7907789` | Build, lint e 12 testes unitários ok; 9 telas renderizadas com dados reais (admin, vistoriador, locatário) |
 | 2026-10-24 | Fase 5 — área do locatário (todas as telas migradas) | `8f42256` | Build, lint e testes ok; aceite/rejeição testados pela tela contra a API |
+| 2026-10-24 | Fase 6 (parcial) — code splitting + proteção de MFA | _(este commit)_ | Build, lint e 14 testes unitários ok; 18 rotas sob demanda renderizadas com dados reais. Deploy, CORS e aposentar `front/` adiados |

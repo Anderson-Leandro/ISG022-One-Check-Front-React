@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { SuspenseDaPagina } from '../components/CarregandoPagina';
 import { ExibirFlash } from '../components/Flash';
 import { Marca } from '../components/Marca';
 
@@ -53,7 +54,9 @@ export function LayoutLocatario() {
       </div>
       <main className="container py-4">
         <ExibirFlash />
-        <Outlet />
+        <SuspenseDaPagina>
+          <Outlet />
+        </SuspenseDaPagina>
       </main>
     </>
   );

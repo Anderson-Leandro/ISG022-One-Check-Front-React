@@ -12,6 +12,13 @@ import { NovoUsuario } from './pages/usuarios/NovoUsuario';
 import { EditarUsuario } from './pages/usuarios/EditarUsuario';
 import { MeuPerfil } from './pages/usuarios/MeuPerfil';
 import { Permissoes } from './pages/usuarios/Permissoes';
+import { ListaDeImoveis } from './pages/imoveis/ListaDeImoveis';
+import { NovoImovel } from './pages/imoveis/NovoImovel';
+import { EditarImovel } from './pages/imoveis/EditarImovel';
+import { DetalhesDoImovel } from './pages/imoveis/DetalhesDoImovel';
+import { ComodosDoImovel } from './pages/imoveis/ComodosDoImovel';
+import { HistoricoDoImovel } from './pages/imoveis/HistoricoDoImovel';
+import { MapaDeImoveis } from './pages/imoveis/MapaDeImoveis';
 import { useAuth } from './auth/AuthContext';
 import { rotaInicial } from './auth/permissoes';
 
@@ -52,15 +59,15 @@ export function App() {
         </Route>
 
         <Route element={<RotaProtegida pagina="imoveis" />}>
-          <Route path="/imoveis" element={<EmMigracao titulo="Imóveis" origemPhp="imoveis/index.php" />} />
-          <Route path="/imoveis/novo" element={<EmMigracao titulo="Novo imóvel" origemPhp="imoveis/novo.php" />} />
-          <Route path="/imoveis/:id" element={<EmMigracao titulo="Imóvel" origemPhp="imoveis/detalhes.php" />} />
-          <Route path="/imoveis/:id/editar" element={<EmMigracao titulo="Editar imóvel" origemPhp="imoveis/editar.php" />} />
-          <Route path="/imoveis/:id/comodos" element={<EmMigracao titulo="Cômodos" origemPhp="imoveis/comodos.php" />} />
-          <Route path="/imoveis/:id/historico" element={<EmMigracao titulo="Histórico" origemPhp="imoveis/historico.php" />} />
+          <Route path="/imoveis" element={<ListaDeImoveis />} />
+          <Route path="/imoveis/novo" element={<NovoImovel />} />
+          <Route path="/imoveis/:id" element={<DetalhesDoImovel />} />
+          <Route path="/imoveis/:id/editar" element={<EditarImovel />} />
+          <Route path="/imoveis/:id/comodos" element={<ComodosDoImovel />} />
+          <Route path="/imoveis/:id/historico" element={<HistoricoDoImovel />} />
         </Route>
         <Route element={<RotaProtegida pagina="mapa" />}>
-          <Route path="/imoveis/mapa" element={<EmMigracao titulo="Mapa" origemPhp="imoveis/mapa.php" />} />
+          <Route path="/imoveis/mapa" element={<MapaDeImoveis />} />
         </Route>
 
         <Route element={<RotaProtegida pagina="vistorias" />}>

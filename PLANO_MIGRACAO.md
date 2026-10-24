@@ -28,7 +28,8 @@ Se faltar endpoint, anotar em "Pendências com a API" abaixo.
 - `openapi-typescript` + `openapi-fetch` (`npm run gen:api` → `src/api/schema.d.ts`)
 - React Router 6, TanStack Query 5
 - Bootstrap 5.3 + react-bootstrap + bootstrap-icons; `src/styles/style.css` copiado do PHP
-- A instalar quando chegar a fase: react-hook-form + zod, react-chartjs-2, react-leaflet, @tanstack/react-table, vitest + testing-library
+- Instalados: leaflet + react-leaflet 5
+- A instalar quando chegar a fase: react-chartjs-2, @tanstack/react-table, vitest + testing-library
 
 ## Mapeamento PHP → React
 | PHP | React |
@@ -66,13 +67,20 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - [x] `public/mfa-setup.php` → `pages/auth/ConfigurarMfa.tsx`
 - [x] `public/logout.php` → `useAuth().sair()` (botão na navbar)
 
-### ⏳ Fase 3 — Módulos CRUD (em andamento — próximo: `imoveis/`)
+### ⏳ Fase 3 — Módulos CRUD (em andamento — próximo: `contratos/`)
 1. [x] `usuarios/` — index, novo, editar, perfil (`/usuarios/me`), permissoes
    - `pages/usuarios/{ListaDeUsuarios,NovoUsuario,EditarUsuario,MeuPerfil,Permissoes}.tsx`; hooks em `src/api/usuarios.ts`
    - Perfil usa `GET/PATCH /usuarios/me` (`senha_atual`/`senha_nova`) em vez do `PUT /usuarios/{id}` do PHP
    - `permissoes.php` era vazio no PHP → virou matriz somente leitura das regras de `permissoes.ts`
    - Formulários com `useState` (simples); react-hook-form + zod entra no form grande de imóveis
-2. [ ] `imoveis/` — index, novo/editar (`_form_campos.php` → componente compartilhado), detalhes, comodos, historico, mapa (Leaflet)
+2. [x] `imoveis/` — index, novo/editar, detalhes, comodos, historico, mapa
+   - `pages/imoveis/*`; hooks em `src/api/imoveis.ts`; opções em `src/config/imoveis.ts`
+   - `_form_campos.php` → `FormularioDeImovel.tsx` (CEP via ViaCEP, geolocalização, mapa clicável)
+   - Endereço gravado depois do imóvel via `POST /imoveis/{id}/endereco`, como no PHP
+   - Mapa: Leaflet + react-leaflet (`src/components/mapa/`); geocodificação Nominatim agora no navegador (1 req/s)
+   - `historico.php` era vazio no PHP → lista os contratos do imóvel (`GET /contratos?imovel_id=`)
+   - Lista ganhou coluna Título e link para detalhes (o PHP só tinha "Editar"); badges seguem `badge_status`
+   - Formulários seguem com `useState`; react-hook-form/zod descartado por ora (não fez falta)
 3. [ ] `contratos/` — index, novo, detalhes, anexos, assinatura, encerrar/cancelar, agendamentos
 4. [ ] `problemas/` — index, novo (`/contratos/{id}/problemas`), detalhes, historico/atualizacoes
 5. [ ] `vistorias/` (= checklists) — index, nova, detalhes, checklist/itens, fotos (`FormData`), comparativo, relatorio/PDF (download em blob)
@@ -85,6 +93,7 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 
 ### ⬜ Fase 6 — Corte final
 - [ ] Nginx servindo `dist/` com fallback SPA (`try_files $uri /index.html`), substituindo `Dockerfile.web`/`docker-compose.yml`/`render.yaml`
+- [ ] Code splitting por rota (`React.lazy`) — bundle passou de 500 kB com o Leaflet
 - [ ] Solicitar ao time da API a origem de produção no CORS
 - [ ] Aposentar `../front/`
 
@@ -108,4 +117,5 @@ _(nenhuma até agora)_
 |---|---|---|---|
 | 2026-10-24 | Plano definido (React + Vite, só web) | — | Backend PHP descartado; API Python em Docker |
 | 2026-10-24 | Fases 1 e 2 concluídas | `bf07170` | Build e lint ok (3 warnings de fast-refresh). Login testado manualmente pelo usuário: ok |
-| 2026-10-24 | Fase 3.1 — módulo `usuarios/` | `cc86b35` | Build e lint ok. Pendente: teste manual com admin/gestor contra a API |
+| 2026-10-24 | Fase 3.1 — módulo `usuarios/` | `cc86b35` | Build e lint ok. Testado manualmente pelo usuário: ok |
+| 2026-10-24 | Fase 3.2 — módulo `imoveis/` | _(este commit)_ | Build e lint ok. Pendente: teste manual contra a API |

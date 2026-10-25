@@ -147,7 +147,7 @@ Ao converter uma tela, trocar o `<EmMigracao>` correspondente em `src/App.tsx` p
 - Checklists não têm DELETE (dados de teste ficam)
 - `GET /dashboard` não considera o perfil: o vistoriador vê "2 imóveis locados", mas só 1 imóvel na lista
 - **Segurança:** `GET /usuarios` responde 200 para o perfil locatário, listando todos os usuários (e-mails). Reportar ao time da API
-- **Segurança/MFA:** `GET /auth/mfa/setup` troca o segredo TOTP de quem **já tem MFA ativo** na hora, antes do `activate`. Só abrir a tela de reconfiguração e desistir deixa o autenticador atual inválido. Confirmado em 2026-10-24: o admin de seed perdeu o MFA quando um teste abriu `/mfa/configurar`. O front agora pede confirmação, mas a API deveria guardar o segredo novo como pendente e só trocar no `activate`. Para recuperar o admin, outro admin precisa usar `DELETE /usuarios/{id}/mfa`, ou é preciso resetar no banco/seed (fora do escopo do front)
+- **Segurança/MFA:** `GET /auth/mfa/setup` troca o segredo TOTP de quem **já tem MFA ativo** na hora, antes do `activate`. Só abrir a tela de reconfiguração e desistir deixa o autenticador atual inválido. Confirmado em 2026-10-24: o admin de seed perdeu o MFA quando um teste abriu `/mfa/configurar`. O front agora pede confirmação, mas a API deveria guardar o segredo novo como pendente e só trocar no `activate`. MFA do admin recuperado pelo usuário em 2026-10-25, com o mesmo secret do seed
 - Locatário recebe 403 em `GET /contratos/{id}/agendamentos` do próprio contrato (a área do locatário não mostra agendamentos)
 - Vistoriador sem acesso a `GET /contratos/{id}/problemas` (403), embora possa abrir um problema pelo ID — confirmar se é intencional
 
@@ -179,3 +179,4 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 | 2026-10-24 | Fase 4 — dashboards e logs | `7907789` | Build, lint e 12 testes unitários ok; 9 telas renderizadas com dados reais (admin, vistoriador, locatário) |
 | 2026-10-24 | Fase 5 — área do locatário (todas as telas migradas) | `8f42256` | Build, lint e testes ok; aceite/rejeição testados pela tela contra a API |
 | 2026-10-24 | Fase 6 (parcial) — code splitting + proteção de MFA | `860acf8` | Build, lint e 14 testes unitários ok; 18 rotas sob demanda renderizadas com dados reais. Deploy, CORS e aposentar `front/` adiados |
+| 2026-10-25 | Testes da Fase 6 com o admin recuperado | — | 32 testes de tela contra a API, todos ok: 18 rotas sob demanda (admin, vistoriador, locatário, com o layout certo), detalhes de vistoria/imóvel/contrato/problema abertos a partir das listas, 4 painéis + logs, bloqueios de rota. Só leitura |

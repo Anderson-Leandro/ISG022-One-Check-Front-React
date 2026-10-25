@@ -159,6 +159,8 @@ Script local fora do repositório (não versionado). Credenciais dos usuários d
 - Dados de teste que ficaram (a API não tem DELETE): contratos `fce07282…`, `105c33bb…` e `cd90cb98…` (cancelados), problema "TESTE-AUTO Problema", 4 checklists do contrato `105c33bb…` e 2 do `cd90cb98…` (aceito/rejeitado). Usuários, imóveis, cômodos, agendamentos e fotos de teste foram removidos
 - Vistorias: fluxo completo testado com admin, vistoriador e locatário (criar, itens, foto, submeter, aceitar, rejeitar, PDF)
 
+Testes de tela contra a API real: `testes-de-api/` na raiz do projeto, **fora do git** (`.gitignore`) por decisão do usuário. Rodar com `npx vitest run --config testes-de-api/vitest.config.mjs`, passando as credenciais do seed só por variáveis de ambiente (`OC_<PERFIL>_EMAIL/SENHA`, `OC_MFA_SECRET`; instruções no topo do `vitest.config.mjs`). O `npm test` roda só `src/` (unitários) e o lint ignora a pasta.
+
 ## Verificação (a cada fase)
 - API: `curl http://localhost:8000/api/v1/health`; front: `npm run dev` (porta 5173)
 - Navegar com cada perfil (admin, gestor, vistoriador, visualizador, locatario): menus e bloqueios de rota

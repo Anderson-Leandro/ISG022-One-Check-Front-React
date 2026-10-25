@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .env
+
+# Testes de tela contra a API real (mantidos fora do git por enquanto)
+testes-de-api/

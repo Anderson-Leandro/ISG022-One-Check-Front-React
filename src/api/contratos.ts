@@ -18,8 +18,11 @@ export interface Contrato {
   [campo: string]: unknown;
 }
 
+export type TipoDeAgendamento = components['schemas']['AgendamentoCreate']['tipo'];
+
 export interface Agendamento {
   id: string;
+  /** Na resposta o tipo é texto livre; só a escrita é restrita a TipoDeAgendamento. */
   tipo: string;
   data_agendada: string;
   observacao?: string | null;

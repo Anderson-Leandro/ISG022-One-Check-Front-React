@@ -6,12 +6,13 @@ import {
   useCriarAgendamento,
   useRemoverAgendamento,
   type Agendamento,
+  type TipoDeAgendamento,
 } from '../../api/contratos';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
 import { useFlash } from '../../components/Flash';
 import { formatarDataHora } from '../../utils/formatar';
 
-const FORMULARIO_VAZIO = { tipo: 'inicial', dataAgendada: '', observacao: '' };
+const FORMULARIO_VAZIO = { tipo: 'inicial' as TipoDeAgendamento, dataAgendada: '', observacao: '' };
 
 /** "2026-05-28T09:00:00" → "2026-05-28T09:00" (valor aceito pelo input datetime-local). */
 function paraCampoDataHora(valor: string): string {
@@ -33,7 +34,7 @@ export function AgendamentosDoContrato({ contratoId, podeEditar }: { contratoId:
 
   function iniciarEdicao(agendamento: Agendamento) {
     setIdEmEdicao(agendamento.id);
-    setFormulario({ tipo: agendamento.tipo, dataAgendada: paraCampoDataHora(agendamento.data_agendada), observacao: agendamento.observacao ?? '' });
+    setFormulario({ tipo: agendamento.tipo === 'encerramento' ? 'encerramento' : 'inicial', dataAgendada: paraCampoDataHora(agendamento.data_agendada), observacao: agendamento.observacao ?? '' });
   }
 
   function cancelarEdicao() {
@@ -106,7 +107,7 @@ export function AgendamentosDoContrato({ contratoId, podeEditar }: { contratoId:
               <label className="form-label small" htmlFor="agendamento-tipo">
                 Tipo
               </label>
-              <select id="agendamento-tipo" className="form-select form-select-sm" value={formulario.tipo} onChange={(evento) => setFormulario({ ...formulario, tipo: evento.target.value })}>
+              <select id="agendamento-tipo" className="form-select form-select-sm" value={formulario.tipo} onChange={(evento) => setFormulario({ ...formulario, tipo: evento.target.value as TipoDeAgendamento })}>
                 {Object.entries(ROTULO_DO_TIPO_DE_AGENDAMENTO).map(([valor, rotulo]) => (
                   <option key={valor} value={valor}>
                     {rotulo}

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, corpoNaoTipado, ErroApi, obterDados } from './client';
+import { api, ErroApi, obterDados } from './client';
+import type { paths } from './schema';
 import type { Contrato } from './contratos';
 
 export interface Problema {
@@ -31,23 +32,30 @@ export interface AtualizacaoDeProblema {
   created_at?: string;
 }
 
-export const ROTULO_DO_STATUS_DO_PROBLEMA: Record<string, string> = {
+/** Valores aceitos pela API, tirados dos enums do OpenAPI para acompanharem o `gen:api`. */
+type CorpoDeNovoProblema = NonNullable<paths['/api/v1/contratos/{contrato_id}/problemas']['post']['requestBody']>['content']['application/json'];
+type CorpoDeStatusDoProblema = NonNullable<paths['/api/v1/problemas/{problema_id}/status']['patch']['requestBody']>['content']['application/json'];
+export type PrioridadeDoProblema = NonNullable<CorpoDeNovoProblema['prioridade']>;
+export type StatusDoProblema = CorpoDeStatusDoProblema['status'];
+
+/** Mínimo exigido pela API no texto de uma atualização (sem contar os espaços das pontas). */
+export const TAMANHO_MINIMO_DA_ATUALIZACAO = 5;
+
+const ROTULOS_DE_STATUS: Record<StatusDoProblema, string> = {
   aberto: 'Aberto',
+  em_analise: 'Em análise',
   em_andamento: 'Em andamento',
   resolvido: 'Resolvido',
+  fechado: 'Fechado',
 };
+/** Indexável por qualquer texto, porque o status chega da API como string. */
+export const ROTULO_DO_STATUS_DO_PROBLEMA: Record<string, string> = ROTULOS_DE_STATUS;
 
 export const ROTULO_DA_PRIORIDADE: Record<string, string> = {
   normal: 'Normal',
   alta: 'Alta',
   urgente: 'Urgente',
 };
-
-/**
- * O OpenAPI não descreve o corpo de POST /problemas/{id}/atualizacoes.
- * Usamos "descricao" (mesmo nome do campo do problema) — confirmar com o time da API.
- */
-const CAMPO_DO_TEXTO_DA_ATUALIZACAO = 'descricao';
 
 export function textoDaAtualizacao(atualizacao: AtualizacaoDeProblema): string {
   return atualizacao.descricao ?? atualizacao.mensagem ?? atualizacao.texto ?? '';
@@ -124,11 +132,12 @@ function useInvalidarProblemas() {
 export function useRegistrarProblema() {
   const invalidar = useInvalidarProblemas();
   return useMutation({
-    mutationFn: ({ contratoId, titulo, descricao, prioridade }: { contratoId: string; titulo: string; descricao: string | null; prioridade: string }) =>
+    // o problema nasce sempre "aberto": a API recusa outro status na criação, então o campo não é enviado
+    mutationFn: ({ contratoId, titulo, descricao, prioridade }: { contratoId: string; titulo: string; descricao: string | null; prioridade: PrioridadeDoProblema }) =>
       obterDados<Problema>(
         api.POST('/api/v1/contratos/{contrato_id}/problemas', {
           params: { path: { contrato_id: contratoId } },
-          ...corpoNaoTipado({ titulo, descricao, prioridade, status: 'aberto' }),
+          body: { titulo, descricao, prioridade },
         }),
       ),
     onSuccess: invalidar,
@@ -138,8 +147,8 @@ export function useRegistrarProblema() {
 export function useAtualizarStatusDoProblema(id: string) {
   const invalidar = useInvalidarProblemas();
   return useMutation({
-    mutationFn: (status: string) =>
-      obterDados(api.PATCH('/api/v1/problemas/{problema_id}/status', { params: { path: { problema_id: id } }, ...corpoNaoTipado({ status }) })),
+    mutationFn: (status: StatusDoProblema) =>
+      obterDados(api.PATCH('/api/v1/problemas/{problema_id}/status', { params: { path: { problema_id: id } }, body: { status } })),
     onSuccess: invalidar,
   });
 }
@@ -151,7 +160,7 @@ export function useRegistrarAtualizacao(id: string) {
       obterDados<AtualizacaoDeProblema>(
         api.POST('/api/v1/problemas/{problema_id}/atualizacoes', {
           params: { path: { problema_id: id } },
-          ...corpoNaoTipado({ [CAMPO_DO_TEXTO_DA_ATUALIZACAO]: texto }),
+          body: { descricao: texto },
         }),
       ),
     onSuccess: invalidar,

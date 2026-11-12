@@ -31,6 +31,8 @@ describe('permissoesDaVistoria (regras confirmadas contra a API)', () => {
   });
   it('fotos: só JPEG, PNG e WebP, até 10 MB', () => {
     expect(validarFoto({ type: 'image/webp', size: 1024 })).toBeNull();
+    expect(validarFoto({ type: '', size: 1024 })).toBeNull();
+    expect(validarFoto({ type: 'image/jpg', size: 1024 })).toBeNull();
     expect(validarFoto({ type: 'image/heic', size: 1024 })).toMatch(/JPEG, PNG ou WebP/);
     expect(validarFoto({ type: 'image/jpeg', size: 10 * 1024 * 1024 + 1 })).toMatch(/10 MB/);
   });

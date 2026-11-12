@@ -22,7 +22,6 @@ import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
 import { useFlash } from '../../components/Flash';
 import { BadgeStatusDaVistoria } from './BadgesDaVistoria';
 
-
 function EditorDoItem({ checklistId, item, rotulo }: { checklistId: string; item: ItemDoChecklist; rotulo: string }) {
   const { definirFlash } = useFlash();
   const atualizarItem = useAtualizarItem(checklistId);

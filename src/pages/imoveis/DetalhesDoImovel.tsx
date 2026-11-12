@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { imovelTemGaragem, useComodos, useContratosDoImovel, useEnderecoDoImovel, useImovel } from '../../api/imoveis';
 import { useAuth } from '../../auth/AuthContext';
-import { podeAcessar } from '../../auth/permissoes';
+import { podeAcessar, podeCriar } from '../../auth/permissoes';
 import { BadgeStatus } from '../../components/BadgeStatus';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
@@ -53,9 +53,11 @@ export function DetalhesDoImovel() {
                 <Link to={`/imoveis/${id}/editar`} className="btn btn-outline-secondary btn-sm">
                   Editar
                 </Link>
-                <Link to={`/vistorias/nova?imovel_id=${id}`} className="btn btn-primary btn-sm">
-                  Nova vistoria
-                </Link>
+                {podeCriar(usuario, 'vistorias') && (
+                  <Link to={`/vistorias/nova?imovel_id=${id}`} className="btn btn-primary btn-sm">
+                    Nova vistoria
+                  </Link>
+                )}
                 <Link to="/imoveis" className="btn btn-link btn-sm">
                   Voltar
                 </Link>
@@ -158,9 +160,11 @@ export function DetalhesDoImovel() {
                       <Link to="/vistorias" className="btn btn-outline-secondary btn-sm">
                         Ver vistorias
                       </Link>
-                      <Link to={`/vistorias/nova?imovel_id=${id}`} className="btn btn-primary btn-sm ms-2">
-                        Nova vistoria
-                      </Link>
+                      {podeCriar(usuario, 'vistorias') && (
+                        <Link to={`/vistorias/nova?imovel_id=${id}`} className="btn btn-primary btn-sm ms-2">
+                          Nova vistoria
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

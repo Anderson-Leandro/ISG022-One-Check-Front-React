@@ -51,7 +51,7 @@ const ROTULOS_DE_STATUS: Record<StatusDoProblema, string> = {
 /** Indexável por qualquer texto, porque o status chega da API como string. */
 export const ROTULO_DO_STATUS_DO_PROBLEMA: Record<string, string> = ROTULOS_DE_STATUS;
 
-/** Resolvido e fechado encerram o problema: não contam como pendência nem aceitam comentário do locatário. */
+/** Resolvido e fechado encerram o problema: não contam como pendência nos painéis. */
 export function problemaEstaEncerrado(status: string | null | undefined): boolean {
   return status === 'resolvido' || status === 'fechado';
 }
@@ -91,7 +91,7 @@ export function useTodosOsProblemas() {
             );
             return problemas.map((problema): ProblemaComContrato => ({ ...problema, contrato_id: problema.contrato_id ?? contrato.id, contrato }));
           } catch (erro) {
-            // o vistoriador recebe 403 nesta rota; contamos para avisar na tela
+            // um 403 inesperado num contrato não derruba a lista; a tela avisa quantos foram negados
             if (erro instanceof ErroApi && erro.status === 403) contratosNegados += 1;
             return [];
           }

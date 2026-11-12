@@ -249,7 +249,9 @@ export const TAMANHO_MAXIMO_DA_FOTO = 10 * 1024 * 1024;
 
 /** Confere a foto antes do envio; devolve a mensagem ou null. */
 export function validarFoto(arquivo: { type: string; size: number }): string | null {
-  if (!TIPOS_DE_FOTO_ACEITOS.includes(arquivo.type)) return 'Formato não aceito. Envie uma foto JPEG, PNG ou WebP (fotos HEIC do iPhone precisam ser convertidas antes).';
+  // alguns navegadores e câmeras entregam o arquivo sem tipo (ou como image/jpg): nesses casos quem decide é a API
+  const tipoDeclarado = arquivo.type === 'image/jpg' ? 'image/jpeg' : arquivo.type;
+  if (tipoDeclarado && !TIPOS_DE_FOTO_ACEITOS.includes(tipoDeclarado)) return 'Formato não aceito. Envie uma foto JPEG, PNG ou WebP (fotos HEIC do iPhone precisam ser convertidas antes).';
   if (arquivo.size > TAMANHO_MAXIMO_DA_FOTO) return 'A foto passa de 10 MB. Reduza o tamanho e envie de novo.';
   return null;
 }

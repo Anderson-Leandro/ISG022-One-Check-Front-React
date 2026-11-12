@@ -65,8 +65,6 @@ export function NovaVistoria() {
     }
   }
 
-  // só admin e gestor criam vistorias, e o responsável precisa ser um vistoriador ativo (a listagem já traz só eles)
-  const opcoesDeVistoriador = vistoriadores;
 
   return (
     <>
@@ -118,7 +116,8 @@ export function NovaVistoria() {
                     </label>
                     <select id="vistoriador" className="form-select" required value={formulario.vistoriadorId} onChange={(evento) => setFormulario({ ...formulario, vistoriadorId: evento.target.value })}>
                       <option value="">Selecione um vistoriador...</option>
-                      {opcoesDeVistoriador.map((vistoriador) => (
+                      {/* o responsável precisa ser um vistoriador ativo: a listagem já traz só eles */}
+                      {vistoriadores.map((vistoriador) => (
                         <option key={vistoriador.id} value={vistoriador.id}>
                           {vistoriador.nome || 'Sem nome'} ({vistoriador.email})
                         </option>

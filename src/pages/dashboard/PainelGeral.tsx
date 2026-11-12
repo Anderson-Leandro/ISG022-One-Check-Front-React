@@ -72,17 +72,26 @@ export function PainelGeral() {
             <CartaoDeIndicador rotulo="Contratos ativos" valor={contratosAtivos} complemento={`de ${contratos.length} no total`} icone="bi-file-earmark-text" corDoIcone="amber" />
           </Link>
         </div>
+        {/* com o total da API, o cartão mostra o número dela; sem ele (carregando ou falha), o da listagem, com o rótulo próprio */}
         {resumo?.checklists_pendentes !== null && (
           <div className="col-6 col-xl-3">
             <Link to="/vistorias" className="text-decoration-none">
-              <CartaoDeIndicador rotulo="Checklists pendentes" valor={resumo?.checklists_pendentes ?? pendentesDeAceite} complemento={`${pendentesDeAceite} aguardando aceite`} icone="bi-clipboard-check" corDoIcone="purple" />
+              {typeof resumo?.checklists_pendentes === 'number' ? (
+                <CartaoDeIndicador rotulo="Checklists pendentes" valor={resumo.checklists_pendentes} complemento={`${pendentesDeAceite} aguardando aceite`} icone="bi-clipboard-check" corDoIcone="purple" />
+              ) : (
+                <CartaoDeIndicador rotulo="Aguardando aceite" valor={pendentesDeAceite} complemento="vistorias enviadas" icone="bi-clipboard-check" corDoIcone="purple" />
+              )}
             </Link>
           </div>
         )}
         {resumo?.problemas_abertos !== null && podeAcessar(usuario, 'problemas') && (
           <div className="col-6 col-xl-3">
             <Link to="/problemas" className="text-decoration-none">
-              <CartaoDeIndicador rotulo="Problemas abertos" valor={resumo?.problemas_abertos ?? semAtendimento} complemento={`${problemasNaoResolvidos.length} não resolvidos`} icone="bi-exclamation-triangle" corDoIcone="red" negativo />
+              {typeof resumo?.problemas_abertos === 'number' ? (
+                <CartaoDeIndicador rotulo="Problemas abertos" valor={resumo.problemas_abertos} complemento={`${semAtendimento} sem atendimento`} icone="bi-exclamation-triangle" corDoIcone="red" negativo />
+              ) : (
+                <CartaoDeIndicador rotulo="Problemas não resolvidos" valor={problemasNaoResolvidos.length} complemento={`${semAtendimento} sem atendimento`} icone="bi-exclamation-triangle" corDoIcone="red" negativo />
+              )}
             </Link>
           </div>
         )}

@@ -15,12 +15,12 @@ export type Pagina =
 export type RecursoCriavel = 'imoveis' | 'contratos' | 'vistorias' | 'problemas' | 'usuarios';
 
 export const PERFIS_POR_PAGINA: Record<Pagina, string[]> = {
-  dashboard: ['admin', 'gestor', 'vistoriador', 'visualizador'],
-  imoveis: ['admin', 'gestor', 'vistoriador', 'visualizador'],
-  vistorias: ['admin', 'gestor', 'vistoriador', 'visualizador', 'locatario'],
-  contratos: ['admin', 'gestor', 'visualizador'],
-  problemas: ['admin', 'gestor', 'vistoriador', 'visualizador', 'locatario'],
-  mapa: ['admin', 'gestor', 'vistoriador', 'visualizador'],
+  dashboard: ['admin', 'gestor', 'vistoriador'],
+  imoveis: ['admin', 'gestor', 'vistoriador'],
+  vistorias: ['admin', 'gestor', 'vistoriador', 'locatario'],
+  contratos: ['admin', 'gestor'],
+  problemas: ['admin', 'gestor', 'vistoriador', 'locatario'],
+  mapa: ['admin', 'gestor', 'vistoriador'],
   usuarios: ['admin', 'gestor'],
   logs: ['admin'],
   locatario: ['locatario'],
@@ -31,11 +31,38 @@ export const PERFIS_QUE_CRIAM: Record<RecursoCriavel, string[]> = {
   contratos: ['admin', 'gestor'],
   vistorias: ['admin', 'gestor', 'vistoriador'],
   problemas: ['admin', 'gestor', 'vistoriador', 'locatario'],
-  usuarios: ['admin'],
+  usuarios: ['admin', 'gestor'],
 };
 
+/** Sem usuário (ou sem perfil) devolve '', que não acessa nada. */
 export function perfilDo(usuario: Usuario | null): string {
-  return String(usuario?.role ?? 'visualizador').toLowerCase();
+  return String(usuario?.role ?? '').toLowerCase();
+}
+
+const PERFIS_DE_GESTAO = ['admin', 'gestor'];
+/** O gestor só cria, edita, desativa e reseta contas destes perfis; admin e gestor ficam com o admin. */
+const PERFIS_QUE_O_GESTOR_GERENCIA = ['vistoriador', 'locatario'];
+
+/** GET /usuarios só responde para admin e gestor; os outros perfis não devem nem chamar. */
+export function podeListarUsuarios(usuario: Usuario | null): boolean {
+  return PERFIS_DE_GESTAO.includes(perfilDo(usuario));
+}
+
+/** Perfis que o usuário logado pode atribuir no cadastro e na edição. */
+export function perfisAtribuiveisPor(usuario: Usuario | null): string[] {
+  const perfil = perfilDo(usuario);
+  if (perfil === 'admin') return ['admin', 'gestor', 'vistoriador', 'locatario'];
+  return perfil === 'gestor' ? PERFIS_QUE_O_GESTOR_GERENCIA : [];
+}
+
+/**
+ * A gestão de usuários recusa o próprio ID (a própria conta usa /usuarios/me),
+ * e o gestor não mexe em contas de admin nem de gestor.
+ */
+export function podeGerenciarUsuario(usuario: Usuario | null, alvo: { id: string; role?: unknown; perfil?: unknown }): boolean {
+  if (!usuario || usuario.id === alvo.id) return false;
+  const perfilDoAlvo = String(alvo.role ?? alvo.perfil ?? '').toLowerCase();
+  return perfisAtribuiveisPor(usuario).includes(perfilDoAlvo);
 }
 
 export function podeAcessar(usuario: Usuario | null, pagina: Pagina): boolean {

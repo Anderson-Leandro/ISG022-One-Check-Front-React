@@ -1,4 +1,4 @@
-export type Perfil = 'admin' | 'gestor' | 'vistoriador' | 'visualizador' | 'locatario';
+export type Perfil = 'admin' | 'gestor' | 'vistoriador' | 'locatario';
 
 export interface Usuario {
   id: string;

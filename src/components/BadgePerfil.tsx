@@ -3,7 +3,6 @@ const BADGE_POR_PERFIL: Record<string, { classe: string; rotulo: string }> = {
   gestor: { classe: 'bg-warning text-dark', rotulo: 'Gestor' },
   vistoriador: { classe: 'bg-primary', rotulo: 'Vistoriador' },
   locatario: { classe: 'bg-success', rotulo: 'Locatário' },
-  visualizador: { classe: 'bg-info text-dark', rotulo: 'Visualizador' },
 };
 
 /** Badge colorido do perfil (match de usuarios/index.php). */

@@ -4,7 +4,9 @@ import { ErroApi } from '../../api/client';
 import { useTrocarMinhaSenha, useSituacaoDaMinhaSenha } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
 import { rotaInicial } from '../../auth/permissoes';
+import { CampoDeSenhaNova } from '../../components/CampoDeSenhaNova';
 import { useFlash } from '../../components/Flash';
+import { validarSenhaNova } from '../../utils/senha';
 import { LayoutLogin } from '../../layouts/LayoutLogin';
 
 /**
@@ -20,23 +22,31 @@ export function TrocarSenhaExpirada() {
   useSituacaoDaMinhaSenha();
   const [formulario, setFormulario] = useState({ senhaAtual: '', novaSenha: '', confirmacao: '' });
   const [erro, setErro] = useState('');
+  const [erroDaSenha, setErroDaSenha] = useState<string | null>(null);
 
   if (!usuario?.senha_expirada) return <Navigate to={rotaInicial(usuario)} replace />;
 
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault();
+    setErro('');
+    if (!formulario.senhaAtual) {
+      setErro('Informe a senha atual.');
+      return;
+    }
+    const senhaInvalida = validarSenhaNova(formulario.novaSenha);
+    setErroDaSenha(senhaInvalida);
+    if (senhaInvalida) return;
     if (formulario.novaSenha !== formulario.confirmacao) {
       setErro('A confirmação não confere com a nova senha.');
       return;
     }
-    setErro('');
     try {
       await trocarSenha.mutateAsync({ senha_atual: formulario.senhaAtual, nova_senha: formulario.novaSenha });
       definirFlash('sucesso', 'Senha alterada.');
       // a troca limpa a marca, e o guarda acima leva à página inicial do perfil
     } catch (falha) {
-      const mensagemDoCampo = falha instanceof ErroApi ? falha.erros.nova_senha : undefined;
-      setErro(mensagemDoCampo || (falha as Error).message || 'Erro ao alterar a senha.');
+      if (falha instanceof ErroApi && falha.erros.nova_senha) setErroDaSenha(falha.erros.nova_senha);
+      else setErro((falha as Error).message || 'Erro ao alterar a senha.');
     }
   }
 
@@ -56,7 +66,7 @@ export function TrocarSenhaExpirada() {
 
       {erro && <div className="alert alert-danger py-2 mb-3">{erro}</div>}
 
-      <form onSubmit={aoEnviar}>
+      <form onSubmit={aoEnviar} noValidate>
         <div className="mb-3">
           <label className="form-label" htmlFor="senha-atual">
             Senha atual
@@ -64,13 +74,7 @@ export function TrocarSenhaExpirada() {
           <input id="senha-atual" type="password" className="form-control" required autoFocus autoComplete="current-password" value={formulario.senhaAtual} onChange={(evento) => setFormulario({ ...formulario, senhaAtual: evento.target.value })} />
         </div>
         <div className="mb-3">
-          <label className="form-label" htmlFor="nova-senha">
-            Nova senha
-          </label>
-          <input id="nova-senha" type="password" className="form-control" required minLength={10} autoComplete="new-password" aria-describedby="ajuda-da-nova-senha" value={formulario.novaSenha} onChange={(evento) => setFormulario({ ...formulario, novaSenha: evento.target.value })} />
-          <div id="ajuda-da-nova-senha" className="form-text" style={{ color: '#6b7fa3' }}>
-            Pelo menos 10 caracteres. Não use só números e símbolos, palavras comuns nem sequências do teclado.
-          </div>
+          <CampoDeSenhaNova id="nova-senha" rotulo="Nova senha" obrigatorio valor={formulario.novaSenha} aoMudar={(novaSenha) => setFormulario({ ...formulario, novaSenha })} erro={erroDaSenha} corDaAjuda="#6b7fa3" />
         </div>
         <div className="mb-4">
           <label className="form-label" htmlFor="confirmacao">

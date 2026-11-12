@@ -5,7 +5,10 @@ import { useAuth } from '../../auth/AuthContext';
 import { armazenamentoDeTokens } from '../../auth/armazenamentoDeTokens';
 import { rotaInicial } from '../../auth/permissoes';
 import { BadgeMfa, BadgePerfil } from '../../components/BadgePerfil';
+import { ErroApi } from '../../api/client';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
+import { CampoDeSenhaNova } from '../../components/CampoDeSenhaNova';
+import { validarSenhaNova } from '../../utils/senha';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
 import { useFlash } from '../../components/Flash';
 
@@ -19,6 +22,7 @@ export function MeuPerfil() {
   const [desabilitando, setDesabilitando] = useState(false);
   const [confirmacao, setConfirmacao] = useState({ senha: '', codigo: '' });
   const [formulario, setFormulario] = useState({ nome: '', senhaAtual: '', senhaNova: '' });
+  const [erroDaSenha, setErroDaSenha] = useState<string | null>(null);
 
   const dados = consulta.data ?? usuario;
   useEffect(() => {
@@ -58,6 +62,13 @@ export function MeuPerfil() {
       definirFlash('erro', 'Nome é obrigatório.');
       return;
     }
+    const senhaInvalida = formulario.senhaNova ? validarSenhaNova(formulario.senhaNova) : null;
+    setErroDaSenha(senhaInvalida);
+    if (senhaInvalida) return;
+    if (formulario.senhaNova && !formulario.senhaAtual) {
+      definirFlash('erro', 'Informe a senha atual para alterar a senha.');
+      return;
+    }
     try {
       await atualizarPerfil.mutateAsync({
         nome,
@@ -67,7 +78,8 @@ export function MeuPerfil() {
       setFormulario({ nome, senhaAtual: '', senhaNova: '' });
       definirFlash('sucesso', 'Perfil atualizado.');
     } catch (falha) {
-      definirFlash('erro', (falha as Error).message || 'Erro ao atualizar perfil.');
+      if (falha instanceof ErroApi && falha.erros.senha_nova) setErroDaSenha(falha.erros.senha_nova);
+      else definirFlash('erro', (falha as Error).message || 'Erro ao atualizar perfil.');
     }
   }
 
@@ -125,7 +137,7 @@ export function MeuPerfil() {
                   </form>
                 )}
 
-                <form onSubmit={aoEnviar} className="row g-3">
+                <form onSubmit={aoEnviar} className="row g-3" noValidate>
                   <div className="col-12">
                     <label className="form-label" htmlFor="nome">
                       Nome
@@ -149,10 +161,7 @@ export function MeuPerfil() {
                     <input id="senha-atual" type="password" className="form-control" autoComplete="current-password" required={Boolean(formulario.senhaNova)} value={formulario.senhaAtual} onChange={(evento) => setFormulario({ ...formulario, senhaAtual: evento.target.value })} />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label" htmlFor="senha-nova">
-                      Nova senha
-                    </label>
-                    <input id="senha-nova" type="password" className="form-control" minLength={6} autoComplete="new-password" value={formulario.senhaNova} onChange={(evento) => setFormulario({ ...formulario, senhaNova: evento.target.value })} />
+                    <CampoDeSenhaNova id="senha-nova" rotulo="Nova senha" valor={formulario.senhaNova} aoMudar={(senhaNova) => setFormulario({ ...formulario, senhaNova })} erro={erroDaSenha} />
                   </div>
                   <div className="col-12">
                     <button className="btn btn-primary" disabled={atualizarPerfil.isPending}>

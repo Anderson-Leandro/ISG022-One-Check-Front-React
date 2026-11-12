@@ -3,6 +3,8 @@ import { api, desembrulhar, obterDados } from './client';
 import type { components } from './schema';
 import type { Imovel } from './imoveis';
 import type { Usuario } from '../auth/tipos';
+import { useAuth } from '../auth/AuthContext';
+import { podeListarUsuarios } from '../auth/permissoes';
 
 export const ITENS_POR_PAGINA = 20;
 
@@ -124,10 +126,12 @@ export function useImoveisDisponiveis() {
 }
 
 export function useLocatarios() {
+  const { usuario } = useAuth();
   return useQuery({
     queryKey: ['usuarios', 'locatarios'],
     queryFn: () => obterDados<Usuario[]>(api.GET('/api/v1/usuarios', { params: { query: { role: 'locatario', por_pagina: 100 } } })),
-    retry: false, // perfis sem acesso a /usuarios recebem 403 — a tela cai para o ID
+    retry: false,
+    enabled: podeListarUsuarios(usuario), // só admin e gestor listam usuários; nos outros perfis a tela cai para o ID
   });
 }
 

@@ -3,17 +3,18 @@ import { api, desembrulhar, obterDados } from './client';
 import type { components } from './schema';
 import type { Usuario } from '../auth/tipos';
 import { armazenamentoDeTokens } from '../auth/armazenamentoDeTokens';
+import { useAuth } from '../auth/AuthContext';
+import { podeListarUsuarios } from '../auth/permissoes';
 import type { DadosDeConfiguracaoMfa } from '../components/QrCodeMfa';
 
 export const ITENS_POR_PAGINA = 20;
 
-export const PERFIS = ['admin', 'gestor', 'vistoriador', 'visualizador', 'locatario'] as const;
+export const PERFIS = ['admin', 'gestor', 'vistoriador', 'locatario'] as const;
 
 export const ROTULO_DO_PERFIL: Record<string, string> = {
   admin: 'Administrador',
   gestor: 'Gestor',
   vistoriador: 'Vistoriador',
-  visualizador: 'Visualizador',
   locatario: 'Locatário',
 };
 
@@ -93,16 +94,18 @@ export function useAtualizarUsuario(id: string) {
   });
 }
 
-/** Admin liga/desliga o MFA de outro usuário (usuarios/editar.php). */
-export function useAlternarMfaDoUsuario(id: string) {
+/**
+ * MFA de outro usuário (usuarios/editar.php). Ninguém vê nem escolhe o segredo de outra pessoa:
+ * "exigir" só liga a exigência, e "resetar" apaga o autenticador. Nos dois casos o próprio usuário
+ * configura o autenticador no próximo login, e as sessões dele são encerradas.
+ */
+export function useMfaDoUsuario(id: string) {
   const invalidar = useInvalidarUsuarios();
   return useMutation({
-    mutationFn: (habilitar: boolean) => {
+    mutationFn: (acao: 'exigir' | 'resetar') => {
       const parametros = { params: { path: { usuario_id: id } } };
       return obterDados(
-        habilitar
-          ? api.POST('/api/v1/usuarios/{usuario_id}/mfa/habilitar', parametros)
-          : api.POST('/api/v1/usuarios/{usuario_id}/mfa/desabilitar', parametros),
+        acao === 'exigir' ? api.POST('/api/v1/usuarios/{usuario_id}/mfa/enable', parametros) : api.DELETE('/api/v1/usuarios/{usuario_id}/mfa', parametros),
       );
     },
     onSuccess: invalidar,
@@ -180,13 +183,18 @@ export function useDesabilitarMeuMfa() {
   });
 }
 
-/** Mapa id → nome de todos os usuários (até 100), para exibir autores. Cai para null se a API negar. */
+/**
+ * Mapa id → nome de todos os usuários (até 100), para exibir autores.
+ * Só admin e gestor listam usuários; nos outros perfis nada é pedido e o nome fica null.
+ */
 export function useNomeDoUsuario() {
+  const { usuario } = useAuth();
   const consulta = useQuery({
     queryKey: ['usuarios', 'nomes'],
     queryFn: () => obterDados<Usuario[]>(api.GET('/api/v1/usuarios', { params: { query: { por_pagina: 100 } } })),
     staleTime: 5 * 60_000,
     retry: false,
+    enabled: podeListarUsuarios(usuario),
   });
   const nomes = new Map((consulta.data ?? []).map((usuario) => [usuario.id, usuario.nome]));
   return (id: string | null | undefined): string | null => (id ? (nomes.get(id) ?? null) : null);

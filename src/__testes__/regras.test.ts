@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { proximosMeses, ultimosMeses } from '../api/painel';
-import { permissoesDaVistoria, type Checklist } from '../api/vistorias';
+import { problemaEstaEncerrado } from '../api/problemas';
+import { permissoesDaVistoria, validarFoto, type Checklist } from '../api/vistorias';
 import { itensDeMenuPara, perfisAtribuiveisPor, podeAcessar, podeCriar, podeGerenciarUsuario, podeListarUsuarios, rotaInicial } from '../auth/permissoes';
 import { formatarCpf, validarCpf } from '../utils/cpf';
 import { validarSenhaNova } from '../utils/senha';
@@ -21,6 +22,23 @@ describe('permissoesDaVistoria (regras confirmadas contra a API)', () => {
     expect(permissoesDaVistoria(checklist('pendente_aceite'), usuario('locatario')).aceitarOuRejeitar).toBe(true);
     expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('locatario'))).toEqual({ editarItens: false, submeter: false, enviarParaAceite: false, aceitarOuRejeitar: false });
   });
+  it('quem fez a vistoria não aceita nem rejeita a própria vistoria, mesmo sendo gestor', () => {
+    expect(permissoesDaVistoria(checklist('pendente_aceite', 'id-gestor'), usuario('gestor')).aceitarOuRejeitar).toBe(false);
+    expect(permissoesDaVistoria(checklist('pendente_aceite'), usuario('gestor')).aceitarOuRejeitar).toBe(true);
+  });
+  it('o status pendente_revisao deixou de existir: não libera edição', () => {
+    expect(Object.values(permissoesDaVistoria(checklist('pendente_revisao'), usuario('admin'))).some(Boolean)).toBe(false);
+  });
+  it('fotos: só JPEG, PNG e WebP, até 10 MB', () => {
+    expect(validarFoto({ type: 'image/webp', size: 1024 })).toBeNull();
+    expect(validarFoto({ type: '', size: 1024 })).toBeNull();
+    expect(validarFoto({ type: 'image/jpg', size: 1024 })).toBeNull();
+    expect(validarFoto({ type: 'image/heic', size: 1024 })).toMatch(/JPEG, PNG ou WebP/);
+    expect(validarFoto({ type: 'image/jpeg', size: 10 * 1024 * 1024 + 1 })).toMatch(/10 MB/);
+  });
+  it('resolvido e fechado encerram o problema', () => {
+    expect(['aberto', 'em_analise', 'em_andamento', 'resolvido', 'fechado'].map(problemaEstaEncerrado)).toEqual([false, false, false, true, true]);
+  });
   it('aceito e rejeitado são finais', () => {
     for (const status of ['aceito', 'rejeitado']) expect(Object.values(permissoesDaVistoria(checklist(status), usuario('admin'))).some(Boolean)).toBe(false);
   });
@@ -34,7 +52,10 @@ describe('RBAC (espelho de front/includes/rbac.php)', () => {
     expect(rotaInicial(usuario('vistoriador'))).toBe('/dashboard');
   });
   it('quem cria o quê', () => {
-    expect(podeCriar(usuario('vistoriador'), 'vistorias')).toBe(true);
+    expect(podeCriar(usuario('vistoriador'), 'vistorias')).toBe(false);
+    expect(podeCriar(usuario('gestor'), 'vistorias')).toBe(true);
+    expect(podeAcessar(usuario('vistoriador'), 'problemas')).toBe(false);
+    expect(podeCriar(usuario('locatario'), 'problemas')).toBe(true);
     expect(podeCriar(usuario('vistoriador'), 'imoveis')).toBe(false);
     expect(podeCriar(usuario('gestor'), 'usuarios')).toBe(true);
     expect(podeCriar(usuario('vistoriador'), 'usuarios')).toBe(false);

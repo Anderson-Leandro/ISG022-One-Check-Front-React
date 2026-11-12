@@ -4,7 +4,7 @@ import { useNomesParaContratos } from '../../api/contratos';
 import { useContratosAtivos } from '../../api/problemas';
 import { ROTULO_DO_TIPO_DE_VISTORIA, useCriarVistoria, useVistoriadores } from '../../api/vistorias';
 import { useAuth } from '../../auth/AuthContext';
-import { perfilDo, podeCriar } from '../../auth/permissoes';
+import { podeCriar } from '../../auth/permissoes';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
 import { useFlash } from '../../components/Flash';
@@ -28,10 +28,9 @@ export function NovaVistoria() {
   const { data: vistoriadores = [] } = useVistoriadores();
   const { nomeDoImovel } = useNomesParaContratos();
   const criarVistoria = useCriarVistoria();
-  const ehVistoriador = perfilDo(usuario) === 'vistoriador';
   const [formulario, setFormulario] = useState({
     contratoId: parametros.get('contrato_id') ?? '',
-    vistoriadorId: ehVistoriador ? (usuario?.id ?? '') : '',
+    vistoriadorId: '',
     tipo: 'inicial',
     data: hojeNoFormatoIso(),
   });
@@ -66,8 +65,6 @@ export function NovaVistoria() {
     }
   }
 
-  // o vistoriador logado pode não aparecer na lista se a API negar /usuarios
-  const opcoesDeVistoriador = vistoriadores.length > 0 ? vistoriadores : ehVistoriador && usuario ? [usuario] : [];
 
   return (
     <>
@@ -119,7 +116,8 @@ export function NovaVistoria() {
                     </label>
                     <select id="vistoriador" className="form-select" required value={formulario.vistoriadorId} onChange={(evento) => setFormulario({ ...formulario, vistoriadorId: evento.target.value })}>
                       <option value="">Selecione um vistoriador...</option>
-                      {opcoesDeVistoriador.map((vistoriador) => (
+                      {/* o responsável precisa ser um vistoriador ativo: a listagem já traz só eles */}
+                      {vistoriadores.map((vistoriador) => (
                         <option key={vistoriador.id} value={vistoriador.id}>
                           {vistoriador.nome || 'Sem nome'} ({vistoriador.email})
                         </option>

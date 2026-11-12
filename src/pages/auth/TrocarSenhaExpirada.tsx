@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { ErroApi } from '../../api/client';
 import { useTrocarMinhaSenha, useSituacaoDaMinhaSenha } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
+import { useSairDaConta } from '../../auth/useSairDaConta';
 import { rotaInicial } from '../../auth/permissoes';
 import { CampoDeSenhaNova } from '../../components/CampoDeSenhaNova';
 import { useFlash } from '../../components/Flash';
@@ -14,8 +15,8 @@ import { LayoutLogin } from '../../layouts/LayoutLogin';
  * Até a troca, a API só responde GET /usuarios/me, PUT /usuarios/me/senha e POST /auth/logout.
  */
 export function TrocarSenhaExpirada() {
-  const { usuario, sair } = useAuth();
-  const navegar = useNavigate();
+  const { usuario } = useAuth();
+  const aoSair = useSairDaConta();
   const { definirFlash } = useFlash();
   const trocarSenha = useTrocarMinhaSenha();
   // confere na API se a marca guardada ainda vale (a senha pode ter sido trocada em outro dispositivo)
@@ -49,11 +50,6 @@ export function TrocarSenhaExpirada() {
       if (falha instanceof ErroApi && falha.erros.nova_senha) setErroDaSenha(falha.erros.nova_senha);
       else setErro((falha as Error).message || 'Erro ao alterar a senha.');
     }
-  }
-
-  async function aoSair() {
-    await sair();
-    navegar('/login?logout=1', { replace: true });
   }
 
   return (

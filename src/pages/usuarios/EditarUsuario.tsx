@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ErroApi } from '../../api/client';
-import { mfaEstaExigido, perfilDoUsuario, ROTULO_DO_PERFIL, temAutenticadorConfigurado, useAtualizarUsuario, useMfaDoUsuario, useUsuario } from '../../api/usuarios';
+import { mfaEstaExigido, perfilDoUsuario, ROTULO_DO_PERFIL, temAutenticadorConfigurado, useAtualizarUsuario, useDesativarUsuario, useMfaDoUsuario, useUsuario } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
 import { perfisAtribuiveisPor, podeGerenciarUsuario } from '../../auth/permissoes';
 import { BadgeMfa } from '../../components/BadgePerfil';
@@ -22,6 +22,7 @@ export function EditarUsuario() {
   const consulta = useUsuario(ehAPropriaConta ? '' : id);
   const atualizarUsuario = useAtualizarUsuario(id);
   const mfaDoUsuario = useMfaDoUsuario(id);
+  const desativarUsuario = useDesativarUsuario(id);
   const [formulario, setFormulario] = useState({ nome: '', perfil: '', senha: '' });
   const [erroDaSenha, setErroDaSenha] = useState<string | null>(null);
 
@@ -54,6 +55,18 @@ export function EditarUsuario() {
       definirFlash('sucesso', acao === 'exigir' ? 'MFA exigido. O usuário configura o autenticador no próximo login.' : 'MFA resetado. O autenticador do usuário foi apagado.');
     } catch (falha) {
       definirFlash('erro', (falha as Error).message || 'Erro ao alterar o MFA.');
+    }
+  }
+
+  async function aoDesativar() {
+    const nome = alvo?.nome || 'este usuário';
+    if (!window.confirm(`Desativar ${nome}? A pessoa perde o acesso na hora e as sessões dela são encerradas.`)) return;
+    try {
+      await desativarUsuario.mutateAsync();
+      definirFlash('sucesso', `${nome} foi desativado e não consegue mais entrar.`);
+      navegar('/usuarios', { replace: true });
+    } catch (falha) {
+      definirFlash('erro', (falha as Error).message || 'Erro ao desativar o usuário.');
     }
   }
 
@@ -158,6 +171,15 @@ export function EditarUsuario() {
               </Link>
             </div>
           </form>
+
+          {/* a tela só abre para quem pode gerenciar esta conta (podeGerenciarUsuario), e nunca para a própria */}
+          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-4 pt-3 border-top">
+            <span className="small text-muted">Desativar tira o acesso da pessoa imediatamente.</span>
+            <button type="button" className="btn btn-outline-danger btn-sm" onClick={aoDesativar} disabled={desativarUsuario.isPending}>
+              <i className="bi bi-person-x me-1" />
+              Desativar usuário
+            </button>
+          </div>
         </div>
       </div>
     </EstadoDaConsulta>

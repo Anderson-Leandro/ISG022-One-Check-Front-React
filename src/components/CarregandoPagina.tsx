@@ -1,4 +1,6 @@
 import { Suspense, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
+import { LimiteDeErro } from './LimiteDeErro';
 
 /** Fallback exibido enquanto o chunk de uma página carregada sob demanda é baixado. */
 export function CarregandoPagina() {
@@ -10,7 +12,15 @@ export function CarregandoPagina() {
   );
 }
 
-/** Suspense com o fallback padrão — usado em volta do Outlet de cada layout para manter a navegação visível. */
+/**
+ * Suspense com o fallback padrão e um limite de erro, usado em volta do Outlet de cada layout: a navegação
+ * continua visível enquanto a página carrega ou se ela falhar, e trocar de rota tira a tela de erro.
+ */
 export function SuspenseDaPagina({ children }: { children: ReactNode }) {
-  return <Suspense fallback={<CarregandoPagina />}>{children}</Suspense>;
+  const { pathname } = useLocation();
+  return (
+    <LimiteDeErro chaveDeReinicio={pathname}>
+      <Suspense fallback={<CarregandoPagina />}>{children}</Suspense>
+    </LimiteDeErro>
+  );
 }

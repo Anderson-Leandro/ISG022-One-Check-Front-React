@@ -1,5 +1,6 @@
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { useSairDaConta } from '../auth/useSairDaConta';
 import { SuspenseDaPagina } from '../components/CarregandoPagina';
 import { ExibirFlash } from '../components/Flash';
 import { Marca } from '../components/Marca';
@@ -13,13 +14,8 @@ const LINKS_DO_LOCATARIO = [
 
 /** locatario/_header.php + _footer.php — também envolve vistorias/problemas/perfil quando o perfil é locatário. */
 export function LayoutLocatario() {
-  const { usuario, sair } = useAuth();
-  const navegar = useNavigate();
-
-  async function aoSair() {
-    await sair();
-    navegar('/login?logout=1', { replace: true });
-  }
+  const { usuario } = useAuth();
+  const aoSair = useSairDaConta();
 
   return (
     <>

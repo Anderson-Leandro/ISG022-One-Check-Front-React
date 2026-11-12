@@ -2,6 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { api, desembrulhar, ErroApi, obterDados } from './client';
 import type { components } from './schema';
 import type { Endereco } from '../utils/endereco';
+import { useInvalidarAposExcluir } from './exclusao';
 
 export const ITENS_POR_PAGINA = 20;
 
@@ -129,6 +130,15 @@ export function useHistoricoDoImovel(id: string) {
     queryKey: [...chaves.todos, 'historico', id],
     queryFn: () => obterDados<{ imovel_id: string; eventos: EventoDoHistorico[] }>(api.GET('/api/v1/imoveis/{imovel_id}/historico', caminhoDoImovel(id))),
     enabled: Boolean(id),
+  });
+}
+
+/** Exclusão lógica (admin e gestor): o imóvel some das listagens e deixa de contar no painel. */
+export function useExcluirImovel(id: string) {
+  const invalidar = useInvalidarAposExcluir(id);
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/imoveis/{imovel_id}', caminhoDoImovel(id))),
+    onSuccess: invalidar,
   });
 }
 

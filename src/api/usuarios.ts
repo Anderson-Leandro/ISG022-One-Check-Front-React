@@ -6,6 +6,7 @@ import { armazenamentoDeTokens } from '../auth/armazenamentoDeTokens';
 import { useAuth } from '../auth/AuthContext';
 import { podeListarUsuarios } from '../auth/permissoes';
 import type { DadosDeConfiguracaoMfa } from '../components/QrCodeMfa';
+import { useInvalidarAposExcluir } from './exclusao';
 
 export const ITENS_POR_PAGINA = 20;
 
@@ -95,6 +96,19 @@ export function useAtualizarUsuario(id: string) {
   return useMutation({
     mutationFn: (dados: DadosDeEdicaoDeUsuario) =>
       obterDados<Usuario>(api.PUT('/api/v1/usuarios/{usuario_id}', { params: { path: { usuario_id: id } }, body: dados })),
+    onSuccess: invalidar,
+  });
+}
+
+/**
+ * Desativa a conta de outro usuário (DELETE /usuarios/{id}): ele perde o acesso na hora, porque a API encerra
+ * as sessões dele. A API recusa o próprio ID, e o gestor não desativa admin nem gestor.
+ * As listas de usuários são recarregadas, mas não o detalhe de quem saiu, que poderia responder 404 com a tela aberta.
+ */
+export function useDesativarUsuario(id: string) {
+  const invalidar = useInvalidarAposExcluir(id, ['usuarios']);
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/usuarios/{usuario_id}', { params: { path: { usuario_id: id } } })),
     onSuccess: invalidar,
   });
 }

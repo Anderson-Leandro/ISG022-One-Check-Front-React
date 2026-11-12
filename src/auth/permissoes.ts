@@ -1,4 +1,4 @@
-import type { Usuario } from './tipos';
+import { PERFIS, type Usuario } from './tipos';
 
 /** Espelha includes/rbac.php — RBAC no front é só de interface; a API valida de verdade. */
 export type Pagina =
@@ -15,12 +15,12 @@ export type Pagina =
 export type RecursoCriavel = 'imoveis' | 'contratos' | 'vistorias' | 'problemas' | 'usuarios';
 
 export const PERFIS_POR_PAGINA: Record<Pagina, string[]> = {
-  dashboard: ['admin', 'gestor', 'vistoriador', 'visualizador'],
-  imoveis: ['admin', 'gestor', 'vistoriador', 'visualizador'],
-  vistorias: ['admin', 'gestor', 'vistoriador', 'visualizador', 'locatario'],
-  contratos: ['admin', 'gestor', 'visualizador'],
-  problemas: ['admin', 'gestor', 'vistoriador', 'visualizador', 'locatario'],
-  mapa: ['admin', 'gestor', 'vistoriador', 'visualizador'],
+  dashboard: ['admin', 'gestor', 'vistoriador'],
+  imoveis: ['admin', 'gestor', 'vistoriador'],
+  vistorias: ['admin', 'gestor', 'vistoriador', 'locatario'],
+  contratos: ['admin', 'gestor'],
+  problemas: ['admin', 'gestor', 'vistoriador', 'locatario'],
+  mapa: ['admin', 'gestor', 'vistoriador'],
   usuarios: ['admin', 'gestor'],
   logs: ['admin'],
   locatario: ['locatario'],
@@ -31,11 +31,43 @@ export const PERFIS_QUE_CRIAM: Record<RecursoCriavel, string[]> = {
   contratos: ['admin', 'gestor'],
   vistorias: ['admin', 'gestor', 'vistoriador'],
   problemas: ['admin', 'gestor', 'vistoriador', 'locatario'],
-  usuarios: ['admin'],
+  usuarios: ['admin', 'gestor'],
 };
 
+/** Sem usuário (ou sem perfil) devolve '', que não acessa nada. */
 export function perfilDo(usuario: Usuario | null): string {
-  return String(usuario?.role ?? 'visualizador').toLowerCase();
+  return String(usuario?.role ?? usuario?.perfil ?? '').toLowerCase();
+}
+
+function perfilEhValido(perfil: string): boolean {
+  return (PERFIS as readonly string[]).includes(perfil);
+}
+
+const PERFIS_DE_GESTAO = ['admin', 'gestor'];
+/** O gestor só cria, edita, desativa e reseta contas destes perfis; admin e gestor ficam com o admin. */
+const PERFIS_QUE_O_GESTOR_GERENCIA = ['vistoriador', 'locatario'];
+
+/** GET /usuarios só responde para admin e gestor; os outros perfis não devem nem chamar. */
+export function podeListarUsuarios(usuario: Usuario | null): boolean {
+  return PERFIS_DE_GESTAO.includes(perfilDo(usuario));
+}
+
+/** Perfis que o usuário logado pode atribuir no cadastro e na edição. */
+export function perfisAtribuiveisPor(usuario: Usuario | null): string[] {
+  const perfil = perfilDo(usuario);
+  if (perfil === 'admin') return [...PERFIS];
+  return perfil === 'gestor' ? PERFIS_QUE_O_GESTOR_GERENCIA : [];
+}
+
+/**
+ * A gestão de usuários recusa o próprio ID (a própria conta usa /usuarios/me),
+ * e o gestor não mexe em contas de admin nem de gestor.
+ */
+export function podeGerenciarUsuario(usuario: Usuario | null, alvo: { id: string; role?: unknown; perfil?: unknown }): boolean {
+  if (!usuario || usuario.id === alvo.id) return false;
+  // o admin alcança também contas com perfil fora da lista (ex.: o antigo "visualizador"), para corrigi-las
+  if (perfilDo(usuario) === 'admin') return true;
+  return perfisAtribuiveisPor(usuario).includes(perfilDo(alvo as Usuario));
 }
 
 export function podeAcessar(usuario: Usuario | null, pagina: Pagina): boolean {
@@ -50,7 +82,10 @@ export function podeCriar(usuario: Usuario | null, recurso: RecursoCriavel): boo
 
 /** Equivalente a api_home_url(). */
 export function rotaInicial(usuario: Usuario | null): string {
-  return perfilDo(usuario) === 'locatario' ? '/locatario' : '/dashboard';
+  const perfil = perfilDo(usuario);
+  // perfil fora da lista não acessa o dashboard: o perfil é a única página que não depende de permissão
+  if (!perfilEhValido(perfil)) return '/usuarios/perfil';
+  return perfil === 'locatario' ? '/locatario' : '/dashboard';
 }
 
 export type ItemDeMenu =

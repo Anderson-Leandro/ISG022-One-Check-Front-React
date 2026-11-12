@@ -4,6 +4,8 @@ import type { components } from './schema';
 import type { Comodo } from './imoveis';
 import type { Contrato } from './contratos';
 import type { Usuario } from '../auth/tipos';
+import { useAuth } from '../auth/AuthContext';
+import { podeListarUsuarios } from '../auth/permissoes';
 import { ROTULO_DO_COMODO } from '../config/imoveis';
 
 export interface FotoDoItem {
@@ -131,10 +133,12 @@ export function useCatalogoDeItens() {
 }
 
 export function useVistoriadores() {
+  const { usuario } = useAuth();
   return useQuery({
     queryKey: ['usuarios', 'vistoriadores'],
     queryFn: () => obterDados<Usuario[]>(api.GET('/api/v1/usuarios', { params: { query: { role: 'vistoriador', por_pagina: 100 } } })),
     retry: false,
+    enabled: podeListarUsuarios(usuario),
   });
 }
 

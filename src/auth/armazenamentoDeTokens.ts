@@ -87,6 +87,7 @@ export const armazenamentoDeTokens = {
 
   /** Aviso deixado por encerrarSessao; some no próximo login ou logout. */
   obterAvisoDeSessao: (): string | null => ler(sessionStorage, CHAVE_AVISO),
+  limparAvisoDeSessao: (): void => gravar(sessionStorage, CHAVE_AVISO, null),
 
   /** Notifica o AuthContext quando o client renova ou descarta tokens. */
   aoMudar(ouvinte: Ouvinte): () => void {

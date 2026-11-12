@@ -23,6 +23,8 @@ export function Login() {
       return;
     }
 
+    // o aviso de sessão encerrada vale até a pessoa tentar entrar de novo
+    armazenamentoDeTokens.limparAvisoDeSessao();
     setEnviando(true);
     setErro('');
     try {

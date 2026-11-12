@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { mfaEstaAtivo, perfilDoUsuario, temAutenticadorConfigurado, useAtualizarMeuPerfil, useDesabilitarMeuMfa, useMeuUsuario } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
 import { armazenamentoDeTokens } from '../../auth/armazenamentoDeTokens';
-import { perfilDo, rotaInicial } from '../../auth/permissoes';
+import { rotaInicial } from '../../auth/permissoes';
 import { BadgeMfa, BadgePerfil } from '../../components/BadgePerfil';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
@@ -28,7 +28,7 @@ export function MeuPerfil() {
   const mfaHabilitado = dados ? mfaEstaAtivo(dados) : false;
   const autenticadorConfigurado = dados ? temAutenticadorConfigurado(dados) : false;
   // nos outros perfis o MFA é obrigatório e a API recusa (403) o desligamento
-  const podeDesabilitarMfa = mfaHabilitado && perfilDo(usuario) === 'locatario';
+  const podeDesabilitarMfa = mfaHabilitado && dados !== null && perfilDoUsuario(dados) === 'locatario';
 
   function atualizarUsuarioGuardado(alteracoes: Record<string, unknown>) {
     if (usuario) armazenamentoDeTokens.salvarUsuario({ ...usuario, ...alteracoes });

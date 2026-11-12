@@ -44,9 +44,11 @@ interface PropriedadesDoCampoCodigo {
   id?: string;
   rotulo?: string;
   focoAutomatico?: boolean;
+  /** Só um campo por tela deve receber o preenchimento automático de código. */
+  preenchimentoAutomatico?: boolean;
 }
 
-export function CampoCodigoMfa({ valor, aoMudar, id = 'code', rotulo = 'Código de 6 dígitos', focoAutomatico = true }: PropriedadesDoCampoCodigo) {
+export function CampoCodigoMfa({ valor, aoMudar, id = 'code', rotulo = 'Código de 6 dígitos', focoAutomatico = true, preenchimentoAutomatico = true }: PropriedadesDoCampoCodigo) {
   return (
     <div className="mb-3">
       <label className="form-label" htmlFor={id}>
@@ -62,7 +64,7 @@ export function CampoCodigoMfa({ valor, aoMudar, id = 'code', rotulo = 'Código 
         maxLength={6}
         required
         autoFocus={focoAutomatico}
-        autoComplete="one-time-code"
+        autoComplete={preenchimentoAutomatico ? 'one-time-code' : 'off'}
         placeholder="000000"
         value={valor}
         onChange={(evento) => aoMudar(evento.target.value.replace(/\D/g, ''))}

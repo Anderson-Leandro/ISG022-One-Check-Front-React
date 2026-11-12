@@ -78,13 +78,23 @@ export function ConfigurarMfa() {
         <QrCodeMfa urlDoQr={urlDoQr} segredo={segredo} />
       )}
 
-      {gerarConfiguracao.data && (
+      {consultaDoUsuario.isError && (
+        <div className="alert alert-warning mb-3">
+          <i className="bi bi-exclamation-triangle me-2" />
+          Não foi possível conferir a situação do seu MFA: {consultaDoUsuario.error.message}
+          <button type="button" className="btn btn-warning btn-sm w-100 mt-3" onClick={() => consultaDoUsuario.refetch()}>
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {gerarConfiguracao.data && consultaDoUsuario.data && (
         <form onSubmit={aoEnviar}>
           <CampoCodigoMfa valor={codigo} aoMudar={setCodigo} rotulo={trocandoDeAutenticador ? 'Código do autenticador novo' : undefined} />
           {trocandoDeAutenticador && (
-            <CampoCodigoMfa id="codigo-atual" rotulo="Código do autenticador atual" valor={codigoAtual} aoMudar={setCodigoAtual} focoAutomatico={false} />
+            <CampoCodigoMfa id="codigo-atual" rotulo="Código do autenticador atual" valor={codigoAtual} aoMudar={setCodigoAtual} focoAutomatico={false} preenchimentoAutomatico={false} />
           )}
-          <button type="submit" className="btn btn-primary w-100" style={{ padding: 10 }} disabled={ativarMfa.isPending || consultaDoUsuario.isPending}>
+          <button type="submit" className="btn btn-primary w-100" style={{ padding: 10 }} disabled={ativarMfa.isPending}>
             <i className="bi bi-shield-check me-1" />
             {trocandoDeAutenticador ? 'Trocar autenticador' : 'Ativar MFA'}
           </button>

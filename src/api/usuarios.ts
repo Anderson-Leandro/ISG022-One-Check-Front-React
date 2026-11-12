@@ -117,7 +117,8 @@ function useAoTrocarCredencial() {
   const invalidar = useInvalidarUsuarios();
   return (dados: unknown) => {
     armazenamentoDeTokens.aplicarSessao(dados);
-    return invalidar();
+    // sem esperar a recarga: a tela segue adiante assim que a troca é confirmada
+    void invalidar();
   };
 }
 
@@ -135,10 +136,9 @@ export function useTrocarMinhaSenha() {
   return useMutation({
     mutationFn: (dados: components['schemas']['AlterarSenhaRequest']) => obterDados(api.PUT('/api/v1/usuarios/me/senha', { body: dados })),
     onSuccess: (dados) => {
+      aoTrocarCredencial(dados);
       const usuario = armazenamentoDeTokens.obterUsuario();
-      const recarregando = aoTrocarCredencial(dados);
       if (usuario) armazenamentoDeTokens.salvarUsuario({ ...usuario, senha_expirada: false });
-      return recarregando;
     },
   });
 }
@@ -150,7 +150,7 @@ export function useSituacaoDaMinhaSenha() {
     queryFn: async () => {
       const atual = await obterDados<Usuario>(api.GET('/api/v1/usuarios/me'));
       const guardado = armazenamentoDeTokens.obterUsuario();
-      if (guardado?.senha_expirada && atual.senha_expirada === false) armazenamentoDeTokens.salvarUsuario({ ...guardado, senha_expirada: false });
+      if (guardado?.senha_expirada && !atual.senha_expirada) armazenamentoDeTokens.salvarUsuario({ ...guardado, senha_expirada: false });
       return Boolean(atual.senha_expirada);
     },
     retry: false,

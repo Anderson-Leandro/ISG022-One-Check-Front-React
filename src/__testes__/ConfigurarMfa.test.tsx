@@ -85,7 +85,6 @@ describe('ConfigurarMfa — POST /auth/mfa/setup com segredo pendente', () => {
   it('sem autenticador, ativa só com o código novo e grava a sessão devolvida', async () => {
     abrir(false);
     await waitFor(() => expect(screen.getByText('Ativar MFA')).toBeTruthy());
-    await waitFor(() => expect((screen.getByText('Ativar MFA').closest('button') as HTMLButtonElement).disabled).toBe(false));
     expect(screen.queryByLabelText('Código do autenticador atual')).toBeNull();
 
     digitar('Código de 6 dígitos', '123456');

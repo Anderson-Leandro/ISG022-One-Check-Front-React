@@ -6,7 +6,6 @@ import { armazenamentoDeTokens } from '../auth/armazenamentoDeTokens';
 import { useAuth } from '../auth/AuthContext';
 import { podeListarUsuarios } from '../auth/permissoes';
 import type { DadosDeConfiguracaoMfa } from '../components/QrCodeMfa';
-import { useInvalidarAposExcluir } from './exclusao';
 
 export const ITENS_POR_PAGINA = 20;
 
@@ -106,10 +105,15 @@ export function useAtualizarUsuario(id: string) {
  * As listas de usuários são recarregadas, mas não o detalhe de quem saiu, que poderia responder 404 com a tela aberta.
  */
 export function useDesativarUsuario(id: string) {
-  const invalidar = useInvalidarAposExcluir(id, ['usuarios']);
+  const clienteDeConsultas = useQueryClient();
   return useMutation({
     mutationFn: () => obterDados(api.DELETE('/api/v1/usuarios/{usuario_id}', { params: { path: { usuario_id: id } } })),
-    onSuccess: invalidar,
+    // as listas (gestão, nomes, locatários, vistoriadores), mas não o detalhe de quem saiu nem a própria conta (/usuarios/me)
+    onSuccess: () => {
+      void clienteDeConsultas.invalidateQueries({
+        predicate: ({ queryKey }) => queryKey[0] === 'usuarios' && queryKey[1] !== 'me' && !queryKey.includes(id),
+      });
+    },
   });
 }
 

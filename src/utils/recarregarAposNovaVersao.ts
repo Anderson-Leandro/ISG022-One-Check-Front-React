@@ -11,8 +11,14 @@ export function ehFalhaDeCarregamentoDePagina(erro: unknown): boolean {
   return /dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Unable to preload CSS/i.test(mensagem);
 }
 
+export function estaSemConexao(): boolean {
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
 /** Recarrega a página se não houve outra recarga automática há pouco; devolve se recarregou. */
 export function recarregarAposNovaVersao(): boolean {
+  // sem conexão o arquivo não veio por falta de rede, não por versão nova: recarregar levaria à página de erro do navegador
+  if (estaSemConexao()) return false;
   try {
     const ultima = Number(sessionStorage.getItem(CHAVE_DA_ULTIMA_RECARGA) ?? 0);
     if (Date.now() - ultima < INTERVALO_MINIMO_EM_MS) return false;

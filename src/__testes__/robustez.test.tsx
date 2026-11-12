@@ -32,6 +32,17 @@ describe('sessão entre abas', () => {
     pararDeOuvir();
   });
 
+  it('sair em outra aba encerra esta mesmo quando a sessão não tinha refresh token', () => {
+    armazenamentoDeTokens.salvar('access-desta-aba', null);
+    const usuario = JSON.stringify({ id: 'a', nome: 'A', email: 'a@a', role: 'admin' });
+    localStorage.setItem('onecheck.usuario', usuario);
+
+    mudancaEmOutraAba('onecheck.usuario', usuario, null);
+
+    expect(armazenamentoDeTokens.obterAccessToken()).toBeNull();
+    expect(armazenamentoDeTokens.obterAvisoDeSessao()).toBe(AVISO_DE_SAIDA_EM_OUTRA_ABA);
+  });
+
   it('a renovação do token em outra aba não derruba esta', () => {
     armazenamentoDeTokens.salvar('access-desta-aba', 'refresh-1');
 

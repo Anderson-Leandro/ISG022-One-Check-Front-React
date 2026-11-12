@@ -23,8 +23,9 @@ export function DetalhesDoImovel() {
   const { data: contratos = [] } = useContratosDoImovel(id, 5);
   const excluirImovel = useExcluirImovel(id);
   const navegar = useNavigate();
-  // imóvel com contrato ativo está locado: excluir antes exige encerrar ou excluir o contrato
-  const temContratoAtivo = contratos.some((contrato) => contrato.status === 'ativo');
+  // imóvel com contrato ativo está locado: excluir antes exige encerrar ou excluir o contrato.
+  // O status do imóvel é a fonte principal (a lista de contratos aqui traz só os 5 mais recentes)
+  const temContratoAtivo = consultaDoImovel.data?.status === 'locado' || contratos.some((contrato) => contrato.status === 'ativo');
 
   useEffect(() => {
     if (consultaDoImovel.isError) definirFlash('erro', 'Imóvel não encontrado.');

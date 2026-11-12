@@ -52,9 +52,11 @@ export const AVISO_DE_SAIDA_EM_OUTRA_ABA = 'Sua sessão foi encerrada em outra a
  */
 function sincronizarComOutrasAbas(evento: StorageEvent): void {
   if (evento.storageArea !== localStorage) return;
-  // outra aba saiu (ou o armazenamento foi limpo): esta aba sai também e avisa no login
-  if ((evento.key === CHAVE_REFRESH || evento.key === null) && !ler(localStorage, CHAVE_REFRESH)) {
-    const estavaLogada = Boolean(ler(sessionStorage, CHAVE_ACCESS) || (evento.key === CHAVE_REFRESH && evento.oldValue));
+  // outra aba saiu (ou o armazenamento foi limpo): esta aba sai também e avisa no login.
+  // O logout apaga o refresh token e o usuário; olhar os dois cobre também a sessão que veio sem refresh token
+  const saiuEmOutraAba = !ler(localStorage, CHAVE_REFRESH) && !ler(localStorage, CHAVE_USUARIO);
+  if ((evento.key === CHAVE_REFRESH || evento.key === CHAVE_USUARIO || evento.key === null) && saiuEmOutraAba) {
+    const estavaLogada = Boolean(ler(sessionStorage, CHAVE_ACCESS) || evento.oldValue);
     descartarSessaoDestaAba(estavaLogada ? AVISO_DE_SAIDA_EM_OUTRA_ABA : null);
     return;
   }

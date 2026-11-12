@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { ehFalhaDeCarregamentoDePagina, recarregarAposNovaVersao } from '../utils/recarregarAposNovaVersao';
+import { ehFalhaDeCarregamentoDePagina, estaSemConexao, recarregarAposNovaVersao } from '../utils/recarregarAposNovaVersao';
 
 interface Propriedades {
   children: ReactNode;
@@ -40,20 +40,24 @@ export class LimiteDeErro extends Component<Propriedades, Estado> {
   render() {
     const { erro } = this.state;
     if (!erro) return this.props.children;
-    const novaVersao = ehFalhaDeCarregamentoDePagina(erro);
+    const falhaAoCarregar = ehFalhaDeCarregamentoDePagina(erro);
+    const semConexao = falhaAoCarregar && estaSemConexao();
+    const novaVersao = falhaAoCarregar && !semConexao;
     return (
       <div className="alert alert-danger m-3" role="alert">
         <h2 className="h6 mb-2">
           <i className="bi bi-exclamation-octagon me-2" />
-          {novaVersao ? 'O sistema foi atualizado' : 'Algo deu errado nesta tela'}
+          {semConexao ? 'Sem conexão' : novaVersao ? 'O sistema foi atualizado' : 'Algo deu errado nesta tela'}
         </h2>
         <p className="mb-3 small">
-          {novaVersao
-            ? 'Esta página mudou desde que a aba foi aberta. Recarregue para usar a versão nova.'
-            : 'Tente de novo. Se o erro continuar, recarregue a página ou volte para a tela anterior.'}
+          {semConexao
+            ? 'Não foi possível abrir esta página porque o computador está sem internet. Recarregue quando a conexão voltar.'
+            : novaVersao
+              ? 'Esta página mudou desde que a aba foi aberta. Recarregue para usar a versão nova.'
+              : 'Tente de novo. Se o erro continuar, recarregue a página ou volte para a tela anterior.'}
         </p>
         <div className="d-flex gap-2">
-          {!novaVersao && (
+          {!falhaAoCarregar && (
             <button type="button" className="btn btn-outline-light btn-sm" onClick={this.tentarDeNovo}>
               Tentar de novo
             </button>

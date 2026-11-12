@@ -93,6 +93,7 @@ afterEach(() => {
 
 describe('flash', () => {
   it('a mensagem criada antes de navegar aparece na tela seguinte e some na próxima troca', () => {
+    vi.useFakeTimers();
     montarRotas(
       [
         { caminho: '/novo', elemento: <Pagina nome="Novo" destino="/lista" mensagem={['sucesso', 'Salvo.']} /> },
@@ -105,6 +106,7 @@ describe('flash', () => {
     fireEvent.click(screen.getByText('Avisar e ir'));
     expect(screen.getByRole('heading', { name: 'Lista' })).toBeTruthy();
     expect(screen.getByRole('status').textContent).toContain('Salvo.');
+    act(() => vi.advanceTimersByTime(1500));
 
     fireEvent.click(screen.getByText('Ir'));
     expect(screen.getByRole('heading', { name: 'Outra' })).toBeTruthy();
@@ -127,6 +129,32 @@ describe('flash', () => {
 
     fireEvent.click(screen.getByText('Ir'));
     expect(screen.queryByText('Falhou.')).toBeNull();
+  });
+
+  it('não some enquanto o mouse está sobre a mensagem', () => {
+    vi.useFakeTimers();
+    montarRotas([{ caminho: '/a', elemento: <Pagina nome="A" mensagem={['sucesso', 'Lendo.']} /> }], '/a');
+
+    fireEvent.click(screen.getByText('Avisar'));
+    fireEvent.mouseEnter(screen.getByRole('status'));
+    act(() => vi.advanceTimersByTime(TEMPO_DE_EXIBICAO_EM_MS * 2));
+    expect(screen.getByText('Lendo.')).toBeTruthy();
+
+    fireEvent.mouseLeave(screen.getByRole('status'));
+    act(() => vi.advanceTimersByTime(TEMPO_DE_EXIBICAO_EM_MS));
+    expect(screen.queryByText('Lendo.')).toBeNull();
+  });
+
+  it('a pausa de uma mensagem que saiu da tela não impede a próxima de sumir', () => {
+    vi.useFakeTimers();
+    montarRotas([{ caminho: '/a', elemento: <Pagina nome="A" mensagem={['sucesso', 'Primeira.']} /> }], '/a');
+
+    fireEvent.click(screen.getByText('Avisar'));
+    fireEvent.mouseEnter(screen.getByRole('status'));
+    fireEvent.click(screen.getByLabelText('Fechar'));
+    fireEvent.click(screen.getByText('Avisar'));
+    act(() => vi.advanceTimersByTime(TEMPO_DE_EXIBICAO_EM_MS));
+    expect(screen.queryByText('Primeira.')).toBeNull();
   });
 
   it('sucesso some sozinho; erro fica até fechar', () => {

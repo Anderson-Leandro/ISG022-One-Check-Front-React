@@ -17,14 +17,15 @@ export function ConfigurarMfa() {
   const [codigo, setCodigo] = useState('');
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
-  // GET /auth/mfa/setup troca o segredo na hora (antes do activate): quem já tem MFA perderia o autenticador
-  // atual só por abrir a página. Por isso a reconfiguração pede confirmação antes de gerar o QR Code.
+  // Etapa 2 do PLANO_ADEQUACAO_API.md reescreve este fluxo: o POST /auth/mfa/setup guarda o segredo como
+  // pendente, e quem já tem MFA precisa enviar também o codigo_atual no activate. Até lá a reconfiguração
+  // não conclui, e a confirmação abaixo evita gerar um segredo novo a cada abertura da página.
   const reconfigurando = usuario ? mfaEstaAtivo(usuario) : false;
   const [reconfiguracaoConfirmada, setReconfiguracaoConfirmada] = useState(false);
 
   const configuracao = useQuery({
     queryKey: ['mfa', 'setup'],
-    queryFn: () => obterDados<DadosDeConfiguracaoMfa>(api.GET('/api/v1/auth/mfa/setup')),
+    queryFn: () => obterDados<DadosDeConfiguracaoMfa>(api.POST('/api/v1/auth/mfa/setup')),
     enabled: !reconfigurando || reconfiguracaoConfirmada,
     staleTime: Infinity,
     gcTime: 0,

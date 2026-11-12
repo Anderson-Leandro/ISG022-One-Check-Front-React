@@ -114,8 +114,12 @@ export function useAtualizarMeuPerfil() {
 export function useAlternarMeuMfa() {
   const invalidar = useInvalidarUsuarios();
   return useMutation({
+    // Etapa 2 do PLANO_ADEQUACAO_API.md: desabilitar passa a pedir senha e código numa tela própria.
+    // Até lá nada é enviado: a API exige a senha, e uma tentativa sem ela contaria no limite de tentativas.
     mutationFn: (habilitar: boolean) =>
-      obterDados(habilitar ? api.POST('/api/v1/auth/mfa/habilitar') : api.POST('/api/v1/auth/mfa/desabilitar')),
+      habilitar
+        ? obterDados(api.POST('/api/v1/auth/mfa/habilitar'))
+        : Promise.reject(new Error('Desabilitar o MFA ainda não está disponível nesta versão.')),
     onSuccess: invalidar,
   });
 }

@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { urlDeArquivo } from '../../api/client';
 import { idCurto } from '../../api/contratos';
-import { ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA, useAtualizarStatusDoProblema, useProblema } from '../../api/problemas';
+import { ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA, useAtualizarStatusDoProblema, useProblema, type StatusDoProblema } from '../../api/problemas';
 import { useAuth } from '../../auth/AuthContext';
 import { perfilDo, podeAcessar } from '../../auth/permissoes';
 import { BadgeStatus } from '../../components/BadgeStatus';
@@ -39,7 +39,7 @@ export function DetalhesDoProblema() {
   async function aoSalvarStatus(evento: FormEvent) {
     evento.preventDefault();
     try {
-      await atualizarStatus.mutateAsync(statusSelecionado);
+      await atualizarStatus.mutateAsync(statusSelecionado as StatusDoProblema);
       definirFlash('sucesso', 'Status atualizado.');
     } catch (falha) {
       definirFlash('erro', (falha as Error).message || 'Erro ao atualizar.');

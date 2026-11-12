@@ -81,8 +81,10 @@ export function MeuPerfil() {
                       Reconfigurar autenticador
                     </Link>
                   )}
+                  {/* desabilitar exige senha e código (Etapa 2 do PLANO_ADEQUACAO_API.md); até lá o botão fica oculto */}
                   <button
                     type="button"
+                    hidden={mfaHabilitado}
                     className={`btn btn-sm ${mfaHabilitado ? 'btn-outline-danger' : 'btn-outline-success'}`}
                     onClick={aoAlternarMfa}
                     disabled={alternarMfa.isPending}

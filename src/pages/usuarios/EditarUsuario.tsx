@@ -1,7 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ErroApi } from '../../api/client';
-import { mfaEstaAtivo, perfilDoUsuario, ROTULO_DO_PERFIL, temAutenticadorConfigurado, useAtualizarUsuario, useMfaDoUsuario, useUsuario } from '../../api/usuarios';
+import { mfaEstaExigido, perfilDoUsuario, ROTULO_DO_PERFIL, temAutenticadorConfigurado, useAtualizarUsuario, useMfaDoUsuario, useUsuario } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
 import { perfisAtribuiveisPor, podeGerenciarUsuario } from '../../auth/permissoes';
 import { BadgeMfa } from '../../components/BadgePerfil';
@@ -27,8 +27,12 @@ export function EditarUsuario() {
 
   const alvo = consulta.data;
   const semPermissao = Boolean(alvo) && !podeGerenciarUsuario(usuario, alvo!);
+  // preenche uma vez por usuário: as recargas (ex.: depois de exigir ou resetar o MFA) não apagam o que foi digitado
+  const idPreenchido = useRef<string | null>(null);
   useEffect(() => {
-    if (alvo) setFormulario({ nome: alvo.nome ?? '', perfil: perfilDoUsuario(alvo), senha: '' });
+    if (!alvo || idPreenchido.current === alvo.id) return;
+    idPreenchido.current = alvo.id;
+    setFormulario({ nome: alvo.nome ?? '', perfil: perfilDoUsuario(alvo), senha: '' });
   }, [alvo]);
 
   useEffect(() => {
@@ -39,7 +43,7 @@ export function EditarUsuario() {
   if (ehAPropriaConta) return <Navigate to="/usuarios/perfil" replace />;
   if (!id || consulta.isError || semPermissao) return <Navigate to="/usuarios" replace />;
 
-  const mfaExigido = alvo ? mfaEstaAtivo(alvo) : false;
+  const mfaExigido = alvo ? mfaEstaExigido(alvo) : false;
   const autenticadorConfigurado = alvo ? temAutenticadorConfigurado(alvo) : false;
   const perfisDisponiveis = perfisAtribuiveisPor(usuario);
 
@@ -63,6 +67,10 @@ export function EditarUsuario() {
     const senhaInvalida = formulario.senha ? validarSenhaNova(formulario.senha) : null;
     setErroDaSenha(senhaInvalida);
     if (senhaInvalida) return;
+    if (!perfisDisponiveis.includes(formulario.perfil)) {
+      definirFlash('erro', 'Escolha um perfil válido para este usuário.');
+      return;
+    }
     try {
       await atualizarUsuario.mutateAsync({ nome, role: formulario.perfil, ...(formulario.senha ? { senha: formulario.senha } : {}) });
       definirFlash('sucesso', 'Usuário atualizado.');
@@ -122,6 +130,11 @@ export function EditarUsuario() {
                 Perfil
               </label>
               <select id="perfil" className="form-select" value={formulario.perfil} onChange={(evento) => setFormulario({ ...formulario, perfil: evento.target.value })}>
+                {!perfisDisponiveis.includes(formulario.perfil) && (
+                  <option value={formulario.perfil} disabled>
+                    {formulario.perfil ? `${formulario.perfil} (perfil inválido)` : 'Selecione...'}
+                  </option>
+                )}
                 {perfisDisponiveis.map((perfil) => (
                   <option key={perfil} value={perfil}>
                     {ROTULO_DO_PERFIL[perfil]}

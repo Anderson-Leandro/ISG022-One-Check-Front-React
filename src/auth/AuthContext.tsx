@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { api, obterDados } from '../api/client';
 import { armazenamentoDeTokens } from './armazenamentoDeTokens';
 import type { RespostaDeLogin, Usuario } from './tipos';
@@ -38,13 +39,16 @@ export function ProvedorDeAutenticacao({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(() => armazenamentoDeTokens.obterUsuario());
   const [autenticado, setAutenticado] = useState<boolean>(estaAutenticado);
 
+  const clienteDeConsultas = useQueryClient();
   useEffect(
     () =>
       armazenamentoDeTokens.aoMudar(() => {
         setUsuario(armazenamentoDeTokens.obterUsuario());
         setAutenticado(estaAutenticado());
+        // dados em cache são de quem estava logado: o próximo usuário da aba não pode herdá-los
+        if (!estaAutenticado()) clienteDeConsultas.clear();
       }),
-    [],
+    [clienteDeConsultas],
   );
 
   const entrar = useCallback(async (email: string, senha: string): Promise<ResultadoDoLogin> => {

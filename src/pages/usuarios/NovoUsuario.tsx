@@ -34,6 +34,7 @@ export function NovoUsuario() {
     const cpf = formulario.cpf.trim();
 
     if (!nome || !email || !formulario.senha || !formulario.role) {
+      setErrosPorCampo({});
       setErro('Nome, e-mail, senha e perfil são obrigatórios.');
       return;
     }
@@ -52,9 +53,11 @@ export function NovoUsuario() {
     } catch (falha) {
       const errosDaApi = falha instanceof ErroApi ? falha.erros : {};
       setErrosPorCampo(errosDaApi);
-      // a mensagem geral repete a do primeiro campo; só aparece quando o erro não é de um campo desta tela
-      const temErroDeCampoDaTela = ['nome', 'email', 'senha', 'role', 'cpf'].some((campo) => errosDaApi[campo]);
-      setErro(temErroDeCampoDaTela ? '' : (falha as Error).message || 'Erro ao cadastrar usuário.');
+      // a mensagem geral repete a do primeiro campo; some só quando todos os erros já aparecem nos campos desta tela
+      const camposDaTela = ['nome', 'email', 'senha', 'role', 'cpf'];
+      const camposComErro = Object.keys(errosDaApi);
+      const tudoNosCampos = camposComErro.length > 0 && camposComErro.every((campo) => camposDaTela.includes(campo));
+      setErro(tudoNosCampos ? '' : (falha as Error).message || 'Erro ao cadastrar usuário.');
     }
   }
 

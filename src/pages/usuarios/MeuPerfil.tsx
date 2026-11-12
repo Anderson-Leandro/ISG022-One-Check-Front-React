@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { mfaEstaAtivo, perfilDoUsuario, temAutenticadorConfigurado, useAtualizarMeuPerfil, useDesabilitarMeuMfa, useMeuUsuario } from '../../api/usuarios';
+import { mfaEstaExigido, perfilDoUsuario, temAutenticadorConfigurado, useAtualizarMeuPerfil, useDesabilitarMeuMfa, useMeuUsuario } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
 import { armazenamentoDeTokens } from '../../auth/armazenamentoDeTokens';
 import { rotaInicial } from '../../auth/permissoes';
@@ -29,7 +29,7 @@ export function MeuPerfil() {
     if (consulta.data) setFormulario((anterior) => ({ ...anterior, nome: consulta.data.nome ?? '' }));
   }, [consulta.data]);
 
-  const mfaHabilitado = dados ? mfaEstaAtivo(dados) : false;
+  const mfaHabilitado = dados ? mfaEstaExigido(dados) : false;
   const autenticadorConfigurado = dados ? temAutenticadorConfigurado(dados) : false;
   // nos outros perfis o MFA é obrigatório e a API recusa (403) o desligamento
   const podeDesabilitarMfa = mfaHabilitado && dados !== null && perfilDoUsuario(dados) === 'locatario';
@@ -93,7 +93,7 @@ export function MeuPerfil() {
               <EstadoDaConsulta carregando={consulta.isPending && !dados} erro={null}>
                 <p className="mb-3 d-flex gap-2">
                   {dados && <BadgePerfil perfil={perfilDoUsuario(dados)} />}
-                  <BadgeMfa ativo={mfaHabilitado} rotuloAtivo="MFA ativo" rotuloInativo="MFA desabilitado" />
+                  <BadgeMfa ativo={mfaHabilitado} rotuloAtivo={autenticadorConfigurado ? 'MFA ativo' : 'MFA exigido, autenticador pendente'} rotuloInativo="MFA desabilitado" />
                 </p>
 
                 <div className="d-flex gap-2 mb-3">

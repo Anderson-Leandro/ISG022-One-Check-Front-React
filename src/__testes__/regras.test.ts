@@ -87,6 +87,17 @@ describe('gestão de usuários (regras da API)', () => {
     expect(podeGerenciarUsuario(usuario('gestor'), usuario('admin'))).toBe(false);
     expect(podeGerenciarUsuario(usuario('gestor'), usuario('gestor', 'outro-gestor'))).toBe(false);
   });
+  it('perfil fora da lista vai para o próprio perfil, sem laço de redirecionamento', () => {
+    expect(rotaInicial(usuario('visualizador'))).toBe('/usuarios/perfil');
+    expect(rotaInicial(null)).toBe('/usuarios/perfil');
+  });
+  it('o admin alcança contas com perfil fora da lista, e o gestor não', () => {
+    expect(podeGerenciarUsuario(usuario('admin'), usuario('visualizador'))).toBe(true);
+    expect(podeGerenciarUsuario(usuario('gestor'), usuario('visualizador'))).toBe(false);
+  });
+  it('aceita o perfil vindo em "perfil" no lugar de "role"', () => {
+    expect(podeAcessar({ id: 'x', nome: 'X', email: 'x@x', role: undefined as unknown as string, perfil: 'gestor' }, 'contratos')).toBe(true);
+  });
   it('ninguém gerencia a própria conta pela gestão de usuários', () => {
     expect(podeGerenciarUsuario(usuario('admin'), usuario('admin'))).toBe(false);
     expect(podeGerenciarUsuario(usuario('admin'), usuario('admin', 'outro-admin'))).toBe(true);
@@ -121,6 +132,7 @@ describe('política de senha conferida no navegador', () => {
   it('recusa só números e símbolos, e poucos caracteres distintos', () => {
     expect(validarSenhaNova('1234567890!@')).toMatch(/números e símbolos/);
     expect(validarSenhaNova('aaaaabbbbb')).toMatch(/caracteres diferentes/);
+    expect(validarSenhaNova('AaBbAaBbAa1')).toMatch(/caracteres diferentes/);
   });
   it('conta o limite em bytes: letra acentuada vale dois', () => {
     expect(validarSenhaNova(`Xyz12${'a'.repeat(67)}`)).toBeNull();

@@ -30,6 +30,7 @@ export function TrocarSenhaExpirada() {
     evento.preventDefault();
     setErro('');
     if (!formulario.senhaAtual) {
+      setErroDaSenha(null);
       setErro('Informe a senha atual.');
       return;
     }

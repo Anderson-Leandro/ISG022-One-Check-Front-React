@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ITENS_POR_PAGINA, mfaEstaAtivo, perfilDoUsuario, useListaDeUsuarios } from '../../api/usuarios';
+import { ITENS_POR_PAGINA, mfaEstaAtivo, PERFIS, perfilDoUsuario, ROTULO_DO_PERFIL, useListaDeUsuarios } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
 import { podeCriar, podeGerenciarUsuario } from '../../auth/permissoes';
 import { BadgeMfa, BadgePerfil } from '../../components/BadgePerfil';
@@ -68,10 +68,11 @@ export function ListaDeUsuarios() {
                 onChange={(evento) => setPerfilSelecionado(evento.target.value)}
               >
                 <option value="">Todos</option>
-                <option value="admin">Admin</option>
-                <option value="gestor">Gestor</option>
-                <option value="vistoriador">Vistoriador</option>
-                <option value="locatario">Locatário</option>
+                {PERFIS.map((perfil) => (
+                  <option key={perfil} value={perfil}>
+                    {ROTULO_DO_PERFIL[perfil]}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-auto">

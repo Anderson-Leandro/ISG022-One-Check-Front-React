@@ -9,7 +9,7 @@ import type { DadosDeConfiguracaoMfa } from '../components/QrCodeMfa';
 
 export const ITENS_POR_PAGINA = 20;
 
-export const PERFIS = ['admin', 'gestor', 'vistoriador', 'locatario'] as const;
+export { PERFIS } from '../auth/tipos';
 
 export const ROTULO_DO_PERFIL: Record<string, string> = {
   admin: 'Administrador',
@@ -29,6 +29,11 @@ export function perfilDoUsuario(usuario: Usuario): string {
 
 export function mfaEstaAtivo(usuario: Usuario): boolean {
   return Boolean(usuario.mfa_ativo ?? usuario.mfa_enabled ?? false);
+}
+
+/** MFA exigido da conta (mfa_enabled), mesmo que o autenticador ainda não tenha sido configurado. */
+export function mfaEstaExigido(usuario: Usuario): boolean {
+  return Boolean(usuario.mfa_enabled ?? usuario.mfa_ativo ?? false);
 }
 
 /** Com autenticador configurado, trocar ou desabilitar o MFA exige o código atual. */

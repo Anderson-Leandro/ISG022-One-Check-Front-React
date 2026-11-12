@@ -1,4 +1,6 @@
-export type Perfil = 'admin' | 'gestor' | 'vistoriador' | 'locatario';
+/** Perfis aceitos pela API. Fonte única das listas de perfil do front. */
+export const PERFIS = ['admin', 'gestor', 'vistoriador', 'locatario'] as const;
+export type Perfil = (typeof PERFIS)[number];
 
 export interface Usuario {
   id: string;

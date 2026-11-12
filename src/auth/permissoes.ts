@@ -19,7 +19,8 @@ export const PERFIS_POR_PAGINA: Record<Pagina, string[]> = {
   imoveis: ['admin', 'gestor', 'vistoriador'],
   vistorias: ['admin', 'gestor', 'vistoriador', 'locatario'],
   contratos: ['admin', 'gestor'],
-  problemas: ['admin', 'gestor', 'vistoriador', 'locatario'],
+  // o vistoriador recebe 403 em toda rota de problemas
+  problemas: ['admin', 'gestor', 'locatario'],
   mapa: ['admin', 'gestor', 'vistoriador'],
   usuarios: ['admin', 'gestor'],
   logs: ['admin'],
@@ -29,8 +30,9 @@ export const PERFIS_POR_PAGINA: Record<Pagina, string[]> = {
 export const PERFIS_QUE_CRIAM: Record<RecursoCriavel, string[]> = {
   imoveis: ['admin', 'gestor'],
   contratos: ['admin', 'gestor'],
-  vistorias: ['admin', 'gestor', 'vistoriador'],
-  problemas: ['admin', 'gestor', 'vistoriador', 'locatario'],
+  // POST /contratos/{id}/checklists é só de admin e gestor; o vistoriador preenche a vistoria que recebe
+  vistorias: ['admin', 'gestor'],
+  problemas: ['admin', 'gestor', 'locatario'],
   usuarios: ['admin', 'gestor'],
 };
 

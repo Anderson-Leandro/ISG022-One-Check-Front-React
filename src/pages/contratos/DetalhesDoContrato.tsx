@@ -117,7 +117,8 @@ export function DetalhesDoContrato() {
               <div className="card border-0 shadow-sm mb-3">
                 <div className="card-header d-flex justify-content-between align-items-center">
                   <span className="fw-semibold">Vistorias do contrato</span>
-                  {podeCriar(usuario, 'vistorias') && (
+                  {/* a API só cria vistoria em contrato ativo */}
+                  {podeCriar(usuario, 'vistorias') && contrato.status === 'ativo' && (
                     <Link to={`/vistorias/nova?contrato_id=${id}`} className="btn btn-primary btn-sm">
                       Nova vistoria
                     </Link>

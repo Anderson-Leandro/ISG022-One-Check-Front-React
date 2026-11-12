@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { ROTULO_DO_TIPO_DE_AGENDAMENTO } from '../../api/contratos';
 import { useDadosDoPainel, useResumoDoPainel } from '../../api/painel';
-import { ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA } from '../../api/problemas';
+import { problemaEstaEncerrado, ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA } from '../../api/problemas';
+import { useAuth } from '../../auth/AuthContext';
+import { podeAcessar } from '../../auth/permissoes';
 import { BadgeStatus } from '../../components/BadgeStatus';
 import { AvisoDeDadosNegados } from '../../components/AvisoDeDadosNegados';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
@@ -17,6 +19,8 @@ const DIAS_DO_HORIZONTE = 30;
 /** dashboard/operacional.php (vazio no PHP): o que precisa de ação agora. */
 export function PainelOperacional() {
   const resumo = useResumoDoPainel();
+  const { usuario } = useAuth();
+  const veProblemas = podeAcessar(usuario, 'problemas');
   const consulta = useDadosDoPainel();
   const { imoveis = [], checklists = [], problemas = [], agendamentos = [] } = consulta.data ?? {};
   const nomeDoImovel = (imovelId: string) => imoveis.find((imovel) => imovel.id === imovelId)?.titulo ?? 'Imóvel';
@@ -32,7 +36,7 @@ export function PainelOperacional() {
   const aguardandoAceite = checklists.filter((checklist) => checklist.status === 'pendente_aceite');
   const emPreenchimento = checklists.filter((checklist) => checklist.status === 'em_preenchimento');
   const problemasEmAberto = problemas
-    .filter((problema) => problema.status !== 'resolvido')
+    .filter((problema) => !problemaEstaEncerrado(problema.status))
     .sort((primeiro, segundo) => (ORDEM_DA_PRIORIDADE[primeiro.prioridade ?? 'normal'] ?? 3) - (ORDEM_DA_PRIORIDADE[segundo.prioridade ?? 'normal'] ?? 3));
 
   return (
@@ -43,7 +47,7 @@ export function PainelOperacional() {
 
       <div className="row g-3 mb-4">
         <div className="col-6 col-xl-3">
-          <CartaoDeIndicador rotulo={`Agendamentos (${DIAS_DO_HORIZONTE} dias)`} valor={proximosAgendamentos.length} complemento={`${resumo.data?.vistorias_agendadas ?? 0} agendadas no total`} icone="bi-calendar-event" corDoIcone="blue" />
+          <CartaoDeIndicador rotulo={`Agendamentos (${DIAS_DO_HORIZONTE} dias)`} valor={proximosAgendamentos.length} complemento={typeof resumo.data?.vistorias_agendadas === 'number' ? `${resumo.data.vistorias_agendadas} agendadas no total` : undefined} icone="bi-calendar-event" corDoIcone="blue" />
         </div>
         <div className="col-6 col-xl-3">
           <CartaoDeIndicador rotulo="Em preenchimento" valor={emPreenchimento.length} complemento="vistorias abertas" icone="bi-pencil-square" corDoIcone="amber" />
@@ -51,9 +55,11 @@ export function PainelOperacional() {
         <div className="col-6 col-xl-3">
           <CartaoDeIndicador rotulo="Aguardando aceite" valor={aguardandoAceite.length} complemento="do locatário" icone="bi-hourglass-split" corDoIcone="purple" />
         </div>
+        {veProblemas && (
         <div className="col-6 col-xl-3">
           <CartaoDeIndicador rotulo="Problemas não resolvidos" valor={problemasEmAberto.length} complemento={`${problemasEmAberto.filter((problema) => problema.prioridade === 'urgente').length} urgentes`} icone="bi-exclamation-triangle" corDoIcone="red" negativo />
         </div>
+        )}
       </div>
 
       <EstadoDaConsulta carregando={consulta.isPending} erro={consulta.error}>
@@ -104,6 +110,7 @@ export function PainelOperacional() {
             </div>
           </div>
 
+          {veProblemas && (
           <div className="col-lg-6">
             <div className="card">
               <div className="card-header">Problemas não resolvidos (por prioridade)</div>
@@ -132,6 +139,7 @@ export function PainelOperacional() {
               </ul>
             </div>
           </div>
+          )}
         </div>
       </EstadoDaConsulta>
     </>

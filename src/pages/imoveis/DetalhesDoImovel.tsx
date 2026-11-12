@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { imovelTemGaragem, useComodos, useContratosDoImovel, useEnderecoDoImovel, useImovel } from '../../api/imoveis';
+import { useAuth } from '../../auth/AuthContext';
+import { podeAcessar } from '../../auth/permissoes';
 import { BadgeStatus } from '../../components/BadgeStatus';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
@@ -14,6 +16,7 @@ import { formatarData } from '../../utils/formatar';
 export function DetalhesDoImovel() {
   const { id = '' } = useParams();
   const { definirFlash } = useFlash();
+  const { usuario } = useAuth();
   const consultaDoImovel = useImovel(id);
   const { data: endereco } = useEnderecoDoImovel(id);
   const { data: comodos = [] } = useComodos(id);
@@ -161,16 +164,18 @@ export function DetalhesDoImovel() {
                     </div>
                   </div>
                 </div>
-                <div className="col-md-6">
-                  <div className="card border-0 shadow-sm h-100">
-                    <div className="card-header fw-semibold">Problemas</div>
-                    <div className="card-body d-flex align-items-center">
-                      <Link to="/problemas" className="btn btn-outline-secondary btn-sm">
-                        Ver problemas
-                      </Link>
+                {podeAcessar(usuario, 'problemas') && (
+                  <div className="col-md-6">
+                    <div className="card border-0 shadow-sm h-100">
+                      <div className="card-header fw-semibold">Problemas</div>
+                      <div className="card-body d-flex align-items-center">
+                        <Link to="/problemas" className="btn btn-outline-secondary btn-sm">
+                          Ver problemas
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { ROTULO_DO_STATUS_DO_CONTRATO } from '../../api/contratos';
-import { chaveDoMes, ultimosMeses, useDadosDoPainel } from '../../api/painel';
+import { chaveDoMes, ultimosMeses, useDadosDoPainel, useResumoDoPainel } from '../../api/painel';
+import { problemaEstaEncerrado } from '../../api/problemas';
 import { useAuth } from '../../auth/AuthContext';
-import { podeCriar } from '../../auth/permissoes';
+import { podeAcessar, podeCriar } from '../../auth/permissoes';
 import { AvisoDeDadosNegados } from '../../components/AvisoDeDadosNegados';
 import { BadgeStatus } from '../../components/BadgeStatus';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
@@ -23,6 +24,8 @@ const recentes = <T extends { created_at?: string }>(lista: T[], quantidade: num
 export function PainelGeral() {
   const { usuario } = useAuth();
   const consulta = useDadosDoPainel();
+  // totais oficiais da API, já no recorte do perfil; null = o perfil não acessa aquele dado
+  const { data: resumo } = useResumoDoPainel();
   const { imoveis = [], contratos = [], checklists = [], problemas = [] } = consulta.data ?? {};
 
   const meses = ultimosMeses(6);
@@ -36,7 +39,7 @@ export function PainelGeral() {
   const contratosAtivos = contratos.filter((contrato) => contrato.status === 'ativo').length;
   const imoveisLocados = imoveis.filter((imovel) => imovel.status === 'locado').length;
   const pendentesDeAceite = checklists.filter((checklist) => checklist.status === 'pendente_aceite').length;
-  const problemasNaoResolvidos = problemas.filter((problema) => problema.status !== 'resolvido');
+  const problemasNaoResolvidos = problemas.filter((problema) => !problemaEstaEncerrado(problema.status));
   const semAtendimento = problemasNaoResolvidos.filter((problema) => problema.status === 'aberto').length;
 
   return (
@@ -60,7 +63,7 @@ export function PainelGeral() {
       <div className="row g-3 mb-4">
         <div className="col-6 col-xl-3">
           <Link to="/imoveis" className="text-decoration-none">
-            <CartaoDeIndicador rotulo="Total de imóveis" valor={imoveis.length} complemento={`${imoveisLocados} locados`} icone="bi-building" corDoIcone="blue" />
+            <CartaoDeIndicador rotulo="Total de imóveis" valor={imoveis.length} complemento={`${resumo?.imoveis_locados ?? imoveisLocados} locados`} icone="bi-building" corDoIcone="blue" />
           </Link>
         </div>
         <div className="col-6 col-xl-3">
@@ -69,16 +72,20 @@ export function PainelGeral() {
             <CartaoDeIndicador rotulo="Contratos ativos" valor={contratosAtivos} complemento={`de ${contratos.length} no total`} icone="bi-file-earmark-text" corDoIcone="amber" />
           </Link>
         </div>
-        <div className="col-6 col-xl-3">
-          <Link to="/vistorias" className="text-decoration-none">
-            <CartaoDeIndicador rotulo="Checklists pendentes" valor={pendentesDeAceite} complemento="aguardando aceite" icone="bi-clipboard-check" corDoIcone="purple" />
-          </Link>
-        </div>
-        <div className="col-6 col-xl-3">
-          <Link to="/problemas" className="text-decoration-none">
-            <CartaoDeIndicador rotulo="Problemas não resolvidos" valor={problemasNaoResolvidos.length} complemento={`${semAtendimento} sem atendimento`} icone="bi-exclamation-triangle" corDoIcone="red" negativo />
-          </Link>
-        </div>
+        {resumo?.checklists_pendentes !== null && (
+          <div className="col-6 col-xl-3">
+            <Link to="/vistorias" className="text-decoration-none">
+              <CartaoDeIndicador rotulo="Checklists pendentes" valor={resumo?.checklists_pendentes ?? pendentesDeAceite} complemento={`${pendentesDeAceite} aguardando aceite`} icone="bi-clipboard-check" corDoIcone="purple" />
+            </Link>
+          </div>
+        )}
+        {resumo?.problemas_abertos !== null && podeAcessar(usuario, 'problemas') && (
+          <div className="col-6 col-xl-3">
+            <Link to="/problemas" className="text-decoration-none">
+              <CartaoDeIndicador rotulo="Problemas abertos" valor={resumo?.problemas_abertos ?? semAtendimento} complemento={`${problemasNaoResolvidos.length} não resolvidos`} icone="bi-exclamation-triangle" corDoIcone="red" negativo />
+            </Link>
+          </div>
+        )}
       </div>
 
       <EstadoDaConsulta carregando={consulta.isPending} erro={consulta.error}>

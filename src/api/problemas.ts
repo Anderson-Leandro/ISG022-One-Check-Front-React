@@ -51,6 +51,11 @@ const ROTULOS_DE_STATUS: Record<StatusDoProblema, string> = {
 /** Indexável por qualquer texto, porque o status chega da API como string. */
 export const ROTULO_DO_STATUS_DO_PROBLEMA: Record<string, string> = ROTULOS_DE_STATUS;
 
+/** Resolvido e fechado encerram o problema: não contam como pendência nem aceitam comentário do locatário. */
+export function problemaEstaEncerrado(status: string | null | undefined): boolean {
+  return status === 'resolvido' || status === 'fechado';
+}
+
 export const ROTULO_DA_PRIORIDADE: Record<string, string> = {
   normal: 'Normal',
   alta: 'Alta',

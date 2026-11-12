@@ -4,16 +4,18 @@ import type { Agendamento, Contrato } from './contratos';
 import type { Imovel } from './imoveis';
 import type { Problema } from './problemas';
 import type { Checklist } from './vistorias';
+import { useAuth } from '../auth/AuthContext';
+import { podeAcessar } from '../auth/permissoes';
 
 /**
- * Os 4 números de GET /dashboard. São globais (iguais para todos os perfis), enquanto as listas
- * vêm filtradas pelo perfil — por isso os cartões usam as listas e só "vistorias_agendadas" vem daqui.
+ * Os 4 totais de GET /dashboard, com o mesmo recorte das listagens de cada perfil.
+ * Um total que o perfil não acessa vem null (ex.: problemas_abertos para o vistoriador): não exibir.
  */
 export interface ResumoDoPainel {
-  imoveis_locados: number;
-  checklists_pendentes: number;
-  problemas_abertos: number;
-  vistorias_agendadas: number;
+  imoveis_locados: number | null;
+  checklists_pendentes: number | null;
+  problemas_abertos: number | null;
+  vistorias_agendadas: number | null;
 }
 
 export interface RegistroDeLog {
@@ -43,8 +45,7 @@ export function useResumoDoPainel() {
 }
 
 /**
- * Ignora falhas de um contrato para não derrubar o painel, mas conta os 403
- * (o vistoriador não pode listar problemas por contrato) para a tela avisar.
+ * Ignora falhas de um contrato para não derrubar o painel, mas conta os 403 para a tela avisar.
  */
 async function porContrato<T>(contratos: Contrato[], buscar: (contratoId: string) => Promise<T[]>) {
   let negados = 0;
@@ -66,8 +67,11 @@ async function porContrato<T>(contratos: Contrato[], buscar: (contratoId: string
  * imóveis e contratos (até 100) + checklists, problemas e agendamentos de cada contrato, em paralelo.
  */
 export function useDadosDoPainel() {
+  const { usuario } = useAuth();
+  // o vistoriador recebe 403 em problemas: nada é pedido, em vez de um 403 por contrato
+  const veProblemas = podeAcessar(usuario, 'problemas');
   return useQuery({
-    queryKey: ['painel', 'dados'],
+    queryKey: ['painel', 'dados', veProblemas],
     queryFn: async () => {
       const [imoveis, contratos] = await Promise.all([
         obterDados<Imovel[]>(api.GET('/api/v1/imoveis', { params: { query: { por_pagina: 100 } } })),
@@ -76,7 +80,7 @@ export function useDadosDoPainel() {
       const caminho = (contratoId: string) => ({ params: { path: { contrato_id: contratoId } } });
       const [checklists, problemas, agendamentos] = await Promise.all([
         porContrato(contratos, (id) => obterDados<Checklist[]>(api.GET('/api/v1/contratos/{contrato_id}/checklists', caminho(id)))),
-        porContrato(contratos, (id) => obterDados<Problema[]>(api.GET('/api/v1/contratos/{contrato_id}/problemas', caminho(id)))),
+        porContrato(veProblemas ? contratos : [], (id) => obterDados<Problema[]>(api.GET('/api/v1/contratos/{contrato_id}/problemas', caminho(id)))),
         porContrato(contratos, (id) => obterDados<Agendamento[]>(api.GET('/api/v1/contratos/{contrato_id}/agendamentos', caminho(id)))),
       ]);
       return {

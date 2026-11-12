@@ -6,12 +6,14 @@ import {
   ESTADOS_DO_ITEM,
   permissoesDaVistoria,
   ROTULO_DO_ESTADO,
+  TIPOS_DE_FOTO_ACEITOS,
   useAdicionarItem,
   useAtualizarItem,
   useChecklist,
   useEnviarFoto,
   useNomesDaVistoria,
   useRemoverFoto,
+  validarFoto,
   type ItemDoChecklist,
 } from '../../api/vistorias';
 import { useAuth } from '../../auth/AuthContext';
@@ -20,7 +22,6 @@ import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
 import { useFlash } from '../../components/Flash';
 import { BadgeStatusDaVistoria } from './BadgesDaVistoria';
 
-const TIPOS_DE_FOTO_ACEITOS = 'image/jpeg,image/png';
 
 function EditorDoItem({ checklistId, item, rotulo }: { checklistId: string; item: ItemDoChecklist; rotulo: string }) {
   const { definirFlash } = useFlash();
@@ -45,6 +46,11 @@ function EditorDoItem({ checklistId, item, rotulo }: { checklistId: string; item
     const arquivo = evento.target.files?.[0];
     evento.target.value = '';
     if (!arquivo) return;
+    const fotoInvalida = validarFoto(arquivo);
+    if (fotoInvalida) {
+      definirFlash('erro', fotoInvalida);
+      return;
+    }
     try {
       await enviarFoto.mutateAsync({ itemId: item.id, arquivo });
       definirFlash('sucesso', 'Foto enviada.');
@@ -85,7 +91,7 @@ function EditorDoItem({ checklistId, item, rotulo }: { checklistId: string; item
           <button type="button" className="btn btn-outline-secondary btn-sm" title="Adicionar foto" onClick={() => seletorDeArquivo.current?.click()} disabled={enviarFoto.isPending}>
             {enviarFoto.isPending ? <span className="spinner-border spinner-border-sm" /> : <i className="bi bi-camera" />}
           </button>
-          <input ref={seletorDeArquivo} type="file" accept={TIPOS_DE_FOTO_ACEITOS} capture="environment" hidden onChange={aoEscolherFoto} />
+          <input ref={seletorDeArquivo} type="file" accept={TIPOS_DE_FOTO_ACEITOS.join(',')} capture="environment" hidden onChange={aoEscolherFoto} />
         </div>
       </div>
       {!!item.fotos?.length && (

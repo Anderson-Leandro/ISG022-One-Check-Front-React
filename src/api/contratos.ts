@@ -181,6 +181,21 @@ export function useMudarStatusDoContrato(id: string) {
   });
 }
 
+/**
+ * Exclusão lógica (admin e gestor): o contrato some das listagens e o GET por ID passa a dar 404.
+ * A API recusa com 409 enquanto houver vistoria ou problema no contrato.
+ * A recarga das consultas não é esperada, para a tela sair do registro antes do 404 dele chegar.
+ */
+export function useExcluirContrato(id: string) {
+  const invalidar = useInvalidar(['imoveis'], ['vistorias'], ['problemas'], ['painel']);
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/contratos/{contrato_id}', caminhoDoContrato(id))),
+    onSuccess: () => {
+      void invalidar();
+    },
+  });
+}
+
 export function useCriarAgendamento(contratoId: string) {
   const invalidar = useInvalidar();
   return useMutation({

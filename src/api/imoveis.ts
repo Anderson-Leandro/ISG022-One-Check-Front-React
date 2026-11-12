@@ -113,6 +113,25 @@ export function useContratosDoImovel(id: string, limite: number) {
   });
 }
 
+/** Um registro do histórico; `dados` tem o mesmo formato das listagens de contratos, checklists e problemas. */
+export interface EventoDoHistorico {
+  tipo: 'contrato' | 'vistoria' | 'problema';
+  data: string;
+  dados: { id: string; status?: string; tipo?: string; titulo?: string; data_inicio?: string; data_fim?: string | null; data_vistoria?: string | null; prioridade?: string };
+}
+
+/**
+ * Contratos, vistorias e problemas do imóvel, em ordem cronológica de registro.
+ * Cada perfil só recebe o que já vê nas listagens (o vistoriador, por exemplo, não recebe problemas).
+ */
+export function useHistoricoDoImovel(id: string) {
+  return useQuery({
+    queryKey: [...chaves.todos, 'historico', id],
+    queryFn: () => obterDados<{ imovel_id: string; eventos: EventoDoHistorico[] }>(api.GET('/api/v1/imoveis/{imovel_id}/historico', caminhoDoImovel(id))),
+    enabled: Boolean(id),
+  });
+}
+
 function useInvalidarImoveis() {
   const clienteDeConsultas = useQueryClient();
   return () => clienteDeConsultas.invalidateQueries({ queryKey: chaves.todos });

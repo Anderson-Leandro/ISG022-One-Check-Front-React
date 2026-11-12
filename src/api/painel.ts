@@ -25,7 +25,8 @@ export interface RegistroDeLog {
   entidade?: string | null;
   entidade_id?: string | null;
   detalhes?: string | null;
-  payload?: unknown;
+  /** Nas edições novas: {"campos": ["nome", …]}, só os nomes dos campos alterados. Eventos antigos trazem null. */
+  payload?: { campos?: unknown } | null;
   ip?: string | null;
   created_at: string;
 }
@@ -95,6 +96,12 @@ export function useDadosDoPainel() {
     },
     staleTime: 60_000,
   });
+}
+
+/** Nomes dos campos alterados numa edição, quando o evento os registra. */
+export function camposAlteradosNoLog(log: RegistroDeLog): string[] {
+  const campos = log.payload?.campos;
+  return Array.isArray(campos) ? campos.filter((campo): campo is string => typeof campo === 'string') : [];
 }
 
 export function useLogs(filtros: FiltrosDeLog) {

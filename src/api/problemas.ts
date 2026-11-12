@@ -149,6 +149,18 @@ export function useRegistrarProblema() {
   });
 }
 
+/** Exclusão lógica (admin e gestor), só de problema aberto e sem atualizações; fora disso a API responde 409. */
+export function useExcluirProblema(id: string) {
+  const invalidar = useInvalidarProblemas();
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/problemas/{problema_id}', { params: { path: { problema_id: id } } })),
+    // sem esperar a recarga: a tela sai do problema antes do 404 dele chegar
+    onSuccess: () => {
+      void invalidar();
+    },
+  });
+}
+
 export function useAtualizarStatusDoProblema(id: string) {
   const invalidar = useInvalidarProblemas();
   return useMutation({

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { urlDeArquivo } from '../../api/client';
 import { idCurto } from '../../api/contratos';
 import { useNomeDoUsuario } from '../../api/usuarios';
@@ -8,6 +8,7 @@ import {
   baixarPdfDaVistoria,
   permissoesDaVistoria,
   useChecklist,
+  useExcluirVistoria,
   useMudarStatusDaVistoria,
   useNomesDaVistoria,
   type AcaoDeStatus,
@@ -38,6 +39,8 @@ export function DetalhesDaVistoria() {
   const { nomeDoItem, nomeDoComodo } = useNomesDaVistoria(checklist);
   const nomeDoUsuario = useNomeDoUsuario();
   const mudarStatus = useMudarStatusDaVistoria(id);
+  const excluirVistoria = useExcluirVistoria(id);
+  const navegar = useNavigate();
   const pode = permissoesDaVistoria(checklist, usuario);
 
   useEffect(() => {
@@ -61,6 +64,17 @@ export function DetalhesDaVistoria() {
       definirFlash('sucesso', MENSAGEM_DE_SUCESSO[acao]);
     } catch (falha) {
       definirFlash('erro', (falha as Error).message || 'Erro ao executar ação.');
+    }
+  }
+
+  async function aoExcluir() {
+    if (!window.confirm('Excluir esta vistoria? Ela some de todas as listagens e não pode ser recuperada pela tela.')) return;
+    try {
+      await excluirVistoria.mutateAsync();
+      definirFlash('sucesso', 'Vistoria excluída.');
+      navegar('/vistorias', { replace: true });
+    } catch (falha) {
+      definirFlash('erro', (falha as Error).message || 'Erro ao excluir a vistoria.');
     }
   }
 
@@ -100,6 +114,12 @@ export function DetalhesDaVistoria() {
                   <Link to={`/problemas/novo?contrato_id=${checklist.contrato_id}`} className="btn btn-outline-danger btn-sm">
                     Registrar problema
                   </Link>
+                )}
+                {pode.excluir && (
+                  <button type="button" className="btn btn-outline-danger btn-sm" onClick={aoExcluir} disabled={excluirVistoria.isPending}>
+                    <i className="bi bi-trash me-1" />
+                    Excluir
+                  </button>
                 )}
                 <Link to="/vistorias" className="btn btn-link btn-sm">
                   Voltar

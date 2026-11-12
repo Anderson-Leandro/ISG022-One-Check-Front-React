@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import {
   idCurto,
   ROTULO_DO_STATUS_DO_CONTRATO,
   useChecklistsDoContrato,
   useContrato,
+  useExcluirContrato,
   useMudarStatusDoContrato,
   useNomesParaContratos,
   useProblemasDoContrato,
@@ -29,6 +30,11 @@ export function DetalhesDoContrato() {
   const { nomeDoImovel, nomeDoLocatario } = useNomesParaContratos();
   const mudarStatus = useMudarStatusDoContrato(id);
   const podeGerenciar = podeCriar(usuario, 'contratos');
+  const excluirContrato = useExcluirContrato(id);
+  const navegar = useNavigate();
+  // depois de uma vistoria inicial rejeitada (registro final), o gestor pode criar outra inicial
+  const iniciais = checklists.filter((checklist) => checklist.tipo === 'inicial');
+  const inicialFoiRejeitada = iniciais.length > 0 && iniciais.every((checklist) => checklist.status === 'rejeitado');
 
   useEffect(() => {
     if (consulta.isError) definirFlash('erro', 'Contrato não encontrado.');
@@ -48,6 +54,18 @@ export function DetalhesDoContrato() {
     }
   }
 
+  async function aoExcluir() {
+    if (!window.confirm('Excluir este contrato? Ele some de todas as listagens, os agendamentos somem junto e o imóvel volta a ficar disponível.')) return;
+    try {
+      await excluirContrato.mutateAsync();
+      definirFlash('sucesso', 'Contrato excluído.');
+      navegar('/contratos', { replace: true });
+    } catch (falha) {
+      // 409: a API pede para excluir antes as vistorias ou os problemas do contrato
+      definirFlash('erro', (falha as Error).message || 'Erro ao excluir o contrato.');
+    }
+  }
+
   return (
     <EstadoDaConsulta carregando={consulta.isPending} erro={null}>
       {contrato && (
@@ -56,9 +74,17 @@ export function DetalhesDoContrato() {
             titulo={`Contrato ${idCurto(contrato.id)}`}
             subtitulo={`${formatarData(contrato.data_inicio)} — ${formatarData(contrato.data_fim)}`}
             acoes={
-              <Link to="/contratos" className="btn btn-link btn-sm">
-                Voltar
-              </Link>
+              <>
+                {podeGerenciar && (
+                  <button type="button" className="btn btn-outline-danger btn-sm" onClick={aoExcluir} disabled={excluirContrato.isPending}>
+                    <i className="bi bi-trash me-1" />
+                    Excluir
+                  </button>
+                )}
+                <Link to="/contratos" className="btn btn-link btn-sm">
+                  Voltar
+                </Link>
+              </>
             }
           />
 
@@ -119,11 +145,12 @@ export function DetalhesDoContrato() {
                   <span className="fw-semibold">Vistorias do contrato</span>
                   {/* a API só cria vistoria em contrato ativo */}
                   {podeCriar(usuario, 'vistorias') && contrato.status === 'ativo' && (
-                    <Link to={`/vistorias/nova?contrato_id=${id}`} className="btn btn-primary btn-sm">
-                      Nova vistoria
+                    <Link to={`/vistorias/nova?contrato_id=${id}${inicialFoiRejeitada ? '&tipo=inicial' : ''}`} className="btn btn-primary btn-sm">
+                      {inicialFoiRejeitada ? 'Nova vistoria inicial' : 'Nova vistoria'}
                     </Link>
                   )}
                 </div>
+                {inicialFoiRejeitada && <div className="card-body py-2 small text-muted border-bottom">A vistoria inicial foi rejeitada e fica como registro. Uma nova vistoria inicial pode ser criada.</div>}
                 <ul className="list-group list-group-flush">
                   {checklists.length === 0 ? (
                     <li className="list-group-item text-muted small">Nenhuma vistoria.</li>

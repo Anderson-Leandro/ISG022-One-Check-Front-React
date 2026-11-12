@@ -156,6 +156,18 @@ export function useCriarVistoria() {
   });
 }
 
+/** Exclusão lógica (admin e gestor), só enquanto a vistoria está em preenchimento; fora disso a API responde 409. */
+export function useExcluirVistoria(id: string) {
+  const invalidar = useInvalidarVistorias();
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/checklists/{checklist_id}', caminhoDoChecklist(id))),
+    // sem esperar a recarga: a tela sai da vistoria antes do 404 dela chegar
+    onSuccess: () => {
+      void invalidar();
+    },
+  });
+}
+
 /** submeter / enviar-para-aceite / aceitar / rejeitar — todos PATCH na API (o PHP usava POST em aceitar/rejeitar). */
 export function useMudarStatusDaVistoria(id: string) {
   const invalidar = useInvalidarVistorias();
@@ -271,6 +283,7 @@ export function permissoesDaVistoria(checklist: Checklist | undefined, usuario: 
   const fezAVistoria = Boolean(usuario?.id) && checklist?.vistoriador_id === usuario?.id;
 
   return {
+    excluir: emEdicao && ehGestao,
     editarItens: emEdicao && (ehGestao || ehVistoriadorDesignado),
     submeter: status === 'em_preenchimento' && (ehGestao || ehVistoriadorDesignado),
     enviarParaAceite: emEdicao && ehGestao,

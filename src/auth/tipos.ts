@@ -6,6 +6,8 @@ export interface Usuario {
   email: string;
   role: Perfil | string;
   mfa_ativo?: boolean;
+  /** true obriga a troca de senha: até lá a API responde 403 em quase todas as rotas. */
+  senha_expirada?: boolean;
   [campo: string]: unknown;
 }
 

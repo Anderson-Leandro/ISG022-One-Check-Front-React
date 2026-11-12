@@ -19,67 +19,139 @@ export interface RespostaApi<T> {
   erro?: string;
 }
 
+/** Mensagens por campo do 422 ({"senha": "…", "endereco.rua": "…"}). */
+export type ErrosPorCampo = Record<string, string>;
+
 export class ErroApi extends Error {
   readonly status: number;
   readonly corpo: unknown;
+  /** Preenchido no 422; vazio nos outros erros. */
+  readonly erros: ErrosPorCampo;
+  /** Segundos de espera pedidos pela API no 429 (header Retry-After). */
+  readonly esperarSegundos: number | null;
 
-  constructor(mensagem: string, status: number, corpo: unknown) {
+  constructor(mensagem: string, status: number, corpo: unknown, esperarSegundos: number | null = null) {
     super(mensagem);
     this.status = status;
     this.corpo = corpo;
+    this.erros = extrairErrosPorCampo(corpo);
+    this.esperarSegundos = esperarSegundos;
   }
 }
 
-/** Equivalente a ApiClient::normalizeResponse — extrai a mensagem de erro do corpo da API. */
+function extrairErrosPorCampo(corpo: unknown): ErrosPorCampo {
+  const erros = (corpo as { erros?: unknown } | null | undefined)?.erros;
+  if (!erros || typeof erros !== 'object' || Array.isArray(erros)) return {};
+  const porCampo: ErrosPorCampo = {};
+  for (const [campo, valor] of Object.entries(erros)) {
+    if (typeof valor === 'string') porCampo[campo] = valor;
+    else if (Array.isArray(valor)) porCampo[campo] = valor.filter((item) => typeof item === 'string').join('; ');
+  }
+  return porCampo;
+}
+
+/** Todo erro da API vem no envelope {sucesso: false, erro, erros?}; o resto é falha de rede ou de proxy. */
 export function extrairMensagemDeErro(corpo: unknown, status: number): string {
   const objeto = (corpo ?? {}) as Record<string, unknown>;
   if (typeof objeto.erro === 'string' && objeto.erro) return objeto.erro;
-  if (typeof objeto.message === 'string' && objeto.message) return objeto.message;
-
-  const detalhe = objeto.detail;
-  if (typeof detalhe === 'string') return detalhe;
-  if (Array.isArray(detalhe)) {
-    const mensagens = detalhe
-      .map((item) => (item && typeof item === 'object' ? (item as { msg?: unknown }).msg : null))
-      .filter((mensagem): mensagem is string => typeof mensagem === 'string');
-    return mensagens.length ? mensagens.join('; ') : 'Erro de validação na API';
-  }
 
   if (status === 0) return 'API indisponível';
   if (status === 404) return 'Endpoint não encontrado na API.';
   if (status === 405) return 'Método não permitido na API.';
+  if (status === 413) return 'Arquivo ou conteúdo grande demais.';
+  if (status === 429) return 'Muitas tentativas. Tente novamente mais tarde.';
   return 'Resposta inválida da API';
 }
 
-const ROTA_DE_REFRESH = '/api/v1/auth/refresh';
-const requisicoesOriginais = new WeakMap<Request, Request>();
-let refreshEmAndamento: Promise<boolean> | null = null;
+function lerRetryAfter(resposta: Response): number | null {
+  const segundos = Number(resposta.headers.get('Retry-After'));
+  return Number.isFinite(segundos) && segundos > 0 ? Math.ceil(segundos) : null;
+}
 
-/** Equivalente a ApiClient::tryRefreshToken — uma única renovação por vez. */
-async function renovarToken(): Promise<boolean> {
-  const refreshToken = armazenamentoDeTokens.obterRefreshToken();
-  if (!refreshToken) return false;
-
-  refreshEmAndamento ??= (async () => {
-    try {
-      const resposta = await fetch(`${URL_DA_API}${ROTA_DE_REFRESH}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      });
-      const corpo = await resposta.json().catch(() => null);
-      const accessToken = corpo?.dados?.access_token;
-      if (!resposta.ok || !corpo?.sucesso || !accessToken) return false;
-      armazenamentoDeTokens.salvar(accessToken, corpo.dados.refresh_token ?? refreshToken);
-      return true;
-    } catch {
-      return false;
-    } finally {
-      refreshEmAndamento = null;
+/** Monta o ErroApi de uma resposta recusada. No 429, a mensagem diz quanto esperar, sem falar em senha errada. */
+export function criarErroDaResposta(corpo: unknown, resposta: Response): ErroApi {
+  if (resposta.status === 429) {
+    const esperarSegundos = lerRetryAfter(resposta);
+    if (esperarSegundos !== null) {
+      const minutos = Math.ceil(esperarSegundos / 60);
+      const espera = esperarSegundos < 60 ? `${esperarSegundos} segundo(s)` : `${minutos} minuto(s)`;
+      return new ErroApi(`Muitas tentativas. Tente novamente em ${espera}.`, 429, corpo, esperarSegundos);
     }
-  })();
+  }
+  return new ErroApi(extrairMensagemDeErro(corpo, resposta.status), resposta.status, corpo);
+}
 
+const ROTA_DE_REFRESH = '/api/v1/auth/refresh';
+/**
+ * Rotas que não usam o access token (login, etapas do login com temp_token, refresh e logout).
+ * Um 401 nelas é a própria recusa: renovar a sessão e repetir reenviaria a senha ou o código errado
+ * e contaria duas falhas no limite de tentativas da API.
+ */
+const ROTAS_SEM_RENOVACAO = [
+  '/api/v1/auth/login',
+  '/api/v1/auth/mfa/verify',
+  '/api/v1/auth/mfa/setup-login',
+  '/api/v1/auth/mfa/activate-login',
+  ROTA_DE_REFRESH,
+  '/api/v1/auth/logout',
+];
+const AVISO_DE_SESSAO_ENCERRADA = 'Sua sessão foi encerrada. Faça login novamente.';
+const INICIO_DO_ERRO_DE_SENHA_EXPIRADA = 'Sua senha não atende à política atual';
+const TRAVA_DE_REFRESH = 'onecheck.refresh';
+
+const requisicoesOriginais = new WeakMap<Request, Request>();
+
+type ResultadoDaRenovacao = 'renovado' | 'recusado' | 'indisponivel';
+let refreshEmAndamento: Promise<ResultadoDaRenovacao> | null = null;
+
+/**
+ * Uma renovação por vez também entre abas: a API encerra todas as sessões se um refresh token
+ * já trocado for reenviado. Com a trava, a segunda aba espera e renova com o refresh token que a
+ * primeira gravou. Sem navigator.locks (origem http que não seja localhost), vale só a trava desta aba.
+ */
+function comTravaEntreAbas<T>(tarefa: () => Promise<T>): Promise<T> {
+  const travas = typeof navigator !== 'undefined' ? navigator.locks : undefined;
+  return travas ? (travas.request(TRAVA_DE_REFRESH, tarefa) as Promise<T>) : tarefa();
+}
+
+async function pedirNovoPar(): Promise<ResultadoDaRenovacao> {
+  // lido só aqui, já dentro da trava: se outra aba renovou antes, este é o refresh token novo dela
+  const refreshToken = armazenamentoDeTokens.obterRefreshToken();
+  if (!refreshToken) return 'recusado';
+  try {
+    const resposta = await fetch(`${URL_DA_API}${ROTA_DE_REFRESH}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+    const corpo = await resposta.json().catch(() => null);
+    const accessToken = corpo?.dados?.access_token;
+    if (resposta.ok && corpo?.sucesso && accessToken) {
+      armazenamentoDeTokens.salvar(accessToken, corpo.dados.refresh_token ?? refreshToken);
+      return 'renovado';
+    }
+    // só 401 e 403 são recusa do token; 429, 5xx ou resposta ilegível não derrubam a sessão guardada
+    return resposta.status === 401 || resposta.status === 403 ? 'recusado' : 'indisponivel';
+  } catch {
+    return 'indisponivel';
+  }
+}
+
+/** Vários 401 ao mesmo tempo compartilham uma única renovação. */
+function renovarToken(): Promise<ResultadoDaRenovacao> {
+  refreshEmAndamento ??= comTravaEntreAbas(pedirNovoPar).finally(() => {
+    refreshEmAndamento = null;
+  });
   return refreshEmAndamento;
+}
+
+/** 403 de conta com senha fora da política: marca o usuário para a tela de troca de senha assumir. */
+async function marcarSenhaExpirada(resposta: Response): Promise<void> {
+  const usuario = armazenamentoDeTokens.obterUsuario();
+  if (!usuario || usuario.senha_expirada) return;
+  const corpo = await resposta.clone().json().catch(() => null);
+  const erro = typeof corpo?.erro === 'string' ? corpo.erro : '';
+  if (erro.startsWith(INICIO_DO_ERRO_DE_SENHA_EXPIRADA)) armazenamentoDeTokens.salvarUsuario({ ...usuario, senha_expirada: true });
 }
 
 const middlewareDeAutenticacao: Middleware = {
@@ -91,15 +163,25 @@ const middlewareDeAutenticacao: Middleware = {
     return request;
   },
   async onResponse({ request, response }) {
-    if (response.status !== 401 || request.url.endsWith(ROTA_DE_REFRESH)) return response;
+    if (response.status === 403) {
+      await marcarSenhaExpirada(response);
+      return response;
+    }
+    const rota = new URL(request.url).pathname;
+    if (response.status !== 401 || ROTAS_SEM_RENOVACAO.some((semRenovacao) => rota.endsWith(semRenovacao))) return response;
     if (!armazenamentoDeTokens.obterRefreshToken()) return response;
 
     const original = requisicoesOriginais.get(request);
-    if (!original || !(await renovarToken())) {
-      armazenamentoDeTokens.limpar();
+    if (!original) return response;
+
+    const resultado = await renovarToken();
+    if (resultado === 'indisponivel') return response;
+    if (resultado === 'recusado') {
+      armazenamentoDeTokens.encerrarSessao(AVISO_DE_SESSAO_ENCERRADA);
       return response;
     }
 
+    // uma única nova tentativa: se também der 401, a resposta segue para a tela
     const novaTentativa = new Request(original);
     novaTentativa.headers.set('Authorization', `Bearer ${armazenamentoDeTokens.obterAccessToken()}`);
     return fetch(novaTentativa);
@@ -126,7 +208,7 @@ export async function desembrulhar<T>(
   const { data, error, response } = resultado;
   const corpo = (data ?? error) as RespostaApi<T> | undefined;
   if (!response.ok || !corpo?.sucesso) {
-    throw new ErroApi(extrairMensagemDeErro(corpo, response.status), response.status, corpo);
+    throw criarErroDaResposta(corpo, response);
   }
   return corpo;
 }

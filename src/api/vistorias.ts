@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, ErroApi, extrairMensagemDeErro, obterDados } from './client';
+import { api, criarErroDaResposta, ErroApi, obterDados } from './client';
 import type { components } from './schema';
 import type { Comodo } from './imoveis';
 import type { Contrato } from './contratos';
@@ -231,7 +231,7 @@ export async function baixarPdfDaVistoria(id: string): Promise<Blob> {
   const { data, error, response } = await api.GET('/api/v1/checklists/{checklist_id}/download-pdf', { ...caminhoDoChecklist(id), parseAs: 'blob' });
   if (!response.ok || !(data instanceof Blob)) {
     const corpo = error ?? (await response.clone().json().catch(() => null));
-    throw new ErroApi(extrairMensagemDeErro(corpo, response.status), response.status, corpo);
+    throw criarErroDaResposta(corpo, response);
   }
   return data;
 }

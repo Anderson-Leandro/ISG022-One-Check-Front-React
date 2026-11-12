@@ -7,7 +7,7 @@ Plano e histórico de progresso: `PLANO_MIGRACAO.md` — ler antes de continuar 
 - API Python (FastAPI) já rodando em Docker: `http://localhost:8000` (`VITE_API_URL`).
 - **Nunca alterar** `../back/` (backend PHP antigo, descartado) nem o backend Python. Se faltar endpoint, anotar para o time da API.
 - Tipos: `npm run gen:api` regenera `src/api/schema.d.ts` a partir de `/openapi.json`. As respostas não são tipadas no OpenAPI; declarar interfaces locais por módulo.
-- Envelope: `{sucesso, dados, paginacao?, erro?}`; erros FastAPI em `detail`. Sempre usar `obterDados`/`desembrulhar` de `src/api/client.ts`.
+- Envelope: `{sucesso, dados, paginacao?, erro?}`; todo erro vem como `{sucesso: false, erro, erros?}` com status HTTP de erro (`erros` traz as mensagens por campo no `422`). Sempre usar `obterDados`/`desembrulhar` de `src/api/client.ts`; `ErroApi` expõe `status`, `erros` e `esperarSegundos` (`429`).
 
 ## Convenções
 - Nomes em português do Brasil, semânticos (`buscarImoveis`, `listaDeContratos`), sem abreviações.

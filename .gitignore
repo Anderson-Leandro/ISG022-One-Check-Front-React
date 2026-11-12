@@ -27,3 +27,8 @@ dist-ssr
 
 # Testes de tela contra a API real (mantidos fora do git por enquanto)
 testes-de-api/
+
+# Documentação da API (mantida fora do git por enquanto)
+referencia_api/
+
+PENDENCIAS_API.md

@@ -49,7 +49,7 @@ describe('permissoesDaVistoria (regras confirmadas contra a API)', () => {
   });
 });
 
-describe('RBAC (espelho de front/includes/rbac.php)', () => {
+describe('RBAC (regras de acesso da API)', () => {
   it('admin acessa tudo; locatário vai para a própria área', () => {
     expect(podeAcessar(usuario('admin'), 'logs')).toBe(true);
     expect(podeAcessar(usuario('gestor'), 'logs')).toBe(false);

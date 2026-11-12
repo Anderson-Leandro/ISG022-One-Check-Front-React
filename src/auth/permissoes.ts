@@ -1,6 +1,6 @@
 import { PERFIS, type Usuario } from './tipos';
 
-/** Espelha includes/rbac.php — RBAC no front é só de interface; a API valida de verdade. */
+/** Nasceu de includes/rbac.php e hoje segue as regras da API. RBAC no front é só de interface; a API valida de verdade. */
 export type Pagina =
   | 'dashboard'
   | 'imoveis'

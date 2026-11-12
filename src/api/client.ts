@@ -42,7 +42,12 @@ export class ErroApi extends Error {
 function extrairErrosPorCampo(corpo: unknown): ErrosPorCampo {
   const erros = (corpo as { erros?: unknown } | null | undefined)?.erros;
   if (!erros || typeof erros !== 'object' || Array.isArray(erros)) return {};
-  return Object.fromEntries(Object.entries(erros).filter((par): par is [string, string] => typeof par[1] === 'string'));
+  const porCampo: ErrosPorCampo = {};
+  for (const [campo, valor] of Object.entries(erros)) {
+    if (typeof valor === 'string') porCampo[campo] = valor;
+    else if (Array.isArray(valor)) porCampo[campo] = valor.filter((item) => typeof item === 'string').join('; ');
+  }
+  return porCampo;
 }
 
 /** Todo erro da API vem no envelope {sucesso: false, erro, erros?}; o resto é falha de rede ou de proxy. */
@@ -101,18 +106,16 @@ let refreshEmAndamento: Promise<ResultadoDaRenovacao> | null = null;
 
 /**
  * Uma renovação por vez também entre abas: a API encerra todas as sessões se um refresh token
- * já trocado for reenviado. Com a trava, a segunda aba espera e usa o token que a primeira gravou.
+ * já trocado for reenviado. Com a trava, a segunda aba espera e renova com o refresh token que a
+ * primeira gravou. Sem navigator.locks (origem http que não seja localhost), vale só a trava desta aba.
  */
 function comTravaEntreAbas<T>(tarefa: () => Promise<T>): Promise<T> {
   const travas = typeof navigator !== 'undefined' ? navigator.locks : undefined;
   return travas ? (travas.request(TRAVA_DE_REFRESH, tarefa) as Promise<T>) : tarefa();
 }
 
-async function pedirNovoPar(tokenQueFalhou: string | null): Promise<ResultadoDaRenovacao> {
-  // outra aba (ou uma troca de credencial) já gravou um access token novo enquanto esperávamos a trava
-  const accessTokenAtual = armazenamentoDeTokens.obterAccessToken();
-  if (accessTokenAtual && accessTokenAtual !== tokenQueFalhou) return 'renovado';
-
+async function pedirNovoPar(): Promise<ResultadoDaRenovacao> {
+  // lido só aqui, já dentro da trava: se outra aba renovou antes, este é o refresh token novo dela
   const refreshToken = armazenamentoDeTokens.obterRefreshToken();
   if (!refreshToken) return 'recusado';
   try {
@@ -127,32 +130,28 @@ async function pedirNovoPar(tokenQueFalhou: string | null): Promise<ResultadoDaR
       armazenamentoDeTokens.salvar(accessToken, corpo.dados.refresh_token ?? refreshToken);
       return 'renovado';
     }
-    // 5xx é falha do servidor, não recusa do token: a sessão continua guardada
-    return resposta.status >= 500 ? 'indisponivel' : 'recusado';
+    // só 401 e 403 são recusa do token; 429, 5xx ou resposta ilegível não derrubam a sessão guardada
+    return resposta.status === 401 || resposta.status === 403 ? 'recusado' : 'indisponivel';
   } catch {
     return 'indisponivel';
   }
 }
 
 /** Vários 401 ao mesmo tempo compartilham uma única renovação. */
-function renovarToken(tokenQueFalhou: string | null): Promise<ResultadoDaRenovacao> {
-  refreshEmAndamento ??= comTravaEntreAbas(() => pedirNovoPar(tokenQueFalhou)).finally(() => {
+function renovarToken(): Promise<ResultadoDaRenovacao> {
+  refreshEmAndamento ??= comTravaEntreAbas(pedirNovoPar).finally(() => {
     refreshEmAndamento = null;
   });
   return refreshEmAndamento;
 }
 
-function tokenEnviado(requisicao: Request): string | null {
-  return requisicao.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? null;
-}
-
 /** 403 de conta com senha fora da política: marca o usuário para a tela de troca de senha assumir. */
 async function marcarSenhaExpirada(resposta: Response): Promise<void> {
+  const usuario = armazenamentoDeTokens.obterUsuario();
+  if (!usuario || usuario.senha_expirada) return;
   const corpo = await resposta.clone().json().catch(() => null);
   const erro = typeof corpo?.erro === 'string' ? corpo.erro : '';
-  if (!erro.startsWith(INICIO_DO_ERRO_DE_SENHA_EXPIRADA)) return;
-  const usuario = armazenamentoDeTokens.obterUsuario();
-  if (usuario && !usuario.senha_expirada) armazenamentoDeTokens.salvarUsuario({ ...usuario, senha_expirada: true });
+  if (erro.startsWith(INICIO_DO_ERRO_DE_SENHA_EXPIRADA)) armazenamentoDeTokens.salvarUsuario({ ...usuario, senha_expirada: true });
 }
 
 const middlewareDeAutenticacao: Middleware = {
@@ -175,7 +174,7 @@ const middlewareDeAutenticacao: Middleware = {
     const original = requisicoesOriginais.get(request);
     if (!original) return response;
 
-    const resultado = await renovarToken(tokenEnviado(request));
+    const resultado = await renovarToken();
     if (resultado === 'indisponivel') return response;
     if (resultado === 'recusado') {
       armazenamentoDeTokens.encerrarSessao(AVISO_DE_SESSAO_ENCERRADA);

@@ -141,14 +141,51 @@ describe('cliente da API', () => {
     expect(armazenamentoDeTokens.consumirAvisoDeSessao()).toBeNull();
   });
 
-  it('mantém a sessão quando o refresh falha por erro do servidor', async () => {
+  it.each([500, 429])('mantém a sessão quando o refresh falha com %i, que não é recusa do token', async (statusDoRefresh) => {
     armazenamentoDeTokens.salvar('access-vencido', 'refresh-1');
-    responderCom((rota) => (rota === ROTA_DE_REFRESH ? { status: 500, corpo: recusa('Erro interno. Tente novamente mais tarde.') } : { status: 401, corpo: recusa('Token inválido') }));
+    responderCom((rota) => (rota === ROTA_DE_REFRESH ? { status: statusDoRefresh, corpo: recusa('Tente novamente mais tarde.') } : { status: 401, corpo: recusa('Token inválido') }));
 
     await capturarErro(obterDados(api.GET('/api/v1/usuarios/me')));
 
     expect(armazenamentoDeTokens.obterRefreshToken()).toBe('refresh-1');
     expect(armazenamentoDeTokens.consumirAvisoDeSessao()).toBeNull();
+  });
+
+  it('um 401 que chega depois de uma renovação concluída renova de novo com o refresh token atual', async () => {
+    armazenamentoDeTokens.salvar('access-1', 'refresh-1');
+    let renovacoes = 0;
+    responderCom(async (rota, requisicao) => {
+      if (rota === ROTA_DE_REFRESH) {
+        renovacoes += 1;
+        const { refresh_token: enviado } = (await requisicao.json()) as { refresh_token: string };
+        if (enviado !== `refresh-${renovacoes}`) return { status: 401, corpo: recusa('Refresh token reutilizado') };
+        return { status: 200, corpo: { sucesso: true, dados: { access_token: `access-${renovacoes + 1}`, refresh_token: `refresh-${renovacoes + 1}` } } };
+      }
+      const valido = requisicao.headers.get('Authorization') === `Bearer access-${renovacoes + 1}` && renovacoes > 0;
+      return valido ? { status: 200, corpo: { sucesso: true, dados: { rota } } } : { status: 401, corpo: recusa('Token inválido') };
+    });
+
+    await obterDados(api.GET('/api/v1/usuarios/me'));
+    armazenamentoDeTokens.salvar('access-revogado', 'refresh-2');
+    await obterDados(api.GET('/api/v1/dashboard'));
+
+    expect(renovacoes).toBe(2);
+    expect(armazenamentoDeTokens.obterRefreshToken()).toBe('refresh-3');
+  });
+
+  it('o aviso de sessão encerrada some depois de um logout comum', () => {
+    armazenamentoDeTokens.encerrarSessao('Sua sessão foi encerrada. Faça login novamente.');
+    armazenamentoDeTokens.limpar();
+
+    expect(armazenamentoDeTokens.consumirAvisoDeSessao()).toBeNull();
+  });
+
+  it('junta as mensagens quando um campo do 422 vem como lista', async () => {
+    responderCom(() => ({ status: 422, corpo: recusa('muito curta', { erros: { senha: ['muito curta', 'sem letra'] } }) }));
+
+    const erro = await capturarErro(obterDados(api.GET('/api/v1/usuarios/me')));
+
+    expect(erro.erros).toEqual({ senha: 'muito curta; sem letra' });
   });
 
   it('marca senha_expirada no usuário guardado quando a API responde o 403 da política de senha', async () => {

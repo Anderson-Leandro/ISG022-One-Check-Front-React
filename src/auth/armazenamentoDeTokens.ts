@@ -64,6 +64,7 @@ export const armazenamentoDeTokens = {
     gravar(sessionStorage, CHAVE_TEMP_MFA, null);
     gravar(localStorage, CHAVE_REFRESH, null);
     gravar(localStorage, CHAVE_USUARIO, null);
+    gravar(sessionStorage, CHAVE_AVISO, null);
     ouvintes.forEach((ouvinte) => ouvinte());
   },
 
@@ -79,8 +80,8 @@ export const armazenamentoDeTokens = {
 
   /** A API recusou a renovação: descarta a sessão e deixa um aviso para a tela de login. */
   encerrarSessao(aviso: string): void {
-    gravar(sessionStorage, CHAVE_AVISO, aviso);
     this.limpar();
+    gravar(sessionStorage, CHAVE_AVISO, aviso);
   },
 
   /** Lê o aviso uma única vez. */

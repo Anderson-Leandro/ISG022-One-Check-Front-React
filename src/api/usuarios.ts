@@ -2,6 +2,8 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { api, desembrulhar, obterDados } from './client';
 import type { components } from './schema';
 import type { Usuario } from '../auth/tipos';
+import { armazenamentoDeTokens } from '../auth/armazenamentoDeTokens';
+import type { DadosDeConfiguracaoMfa } from '../components/QrCodeMfa';
 
 export const ITENS_POR_PAGINA = 20;
 
@@ -26,6 +28,11 @@ export function perfilDoUsuario(usuario: Usuario): string {
 
 export function mfaEstaAtivo(usuario: Usuario): boolean {
   return Boolean(usuario.mfa_ativo ?? usuario.mfa_enabled ?? false);
+}
+
+/** Com autenticador configurado, trocar ou desabilitar o MFA exige o código atual. */
+export function temAutenticadorConfigurado(usuario: Usuario): boolean {
+  return Boolean(usuario.mfa_configurado ?? mfaEstaAtivo(usuario));
 }
 
 const chaves = {
@@ -102,25 +109,74 @@ export function useAlternarMfaDoUsuario(id: string) {
   });
 }
 
-export function useAtualizarMeuPerfil() {
+/**
+ * Trocar senha, autenticador ou MFA encerra todas as sessões da conta; a resposta traz em dados.sessao
+ * o único par de tokens que continua valendo, gravado aqui antes de recarregar as consultas.
+ */
+function useAoTrocarCredencial() {
   const invalidar = useInvalidarUsuarios();
+  return (dados: unknown) => {
+    armazenamentoDeTokens.aplicarSessao(dados);
+    // sem esperar a recarga: a tela segue adiante assim que a troca é confirmada
+    void invalidar();
+  };
+}
+
+export function useAtualizarMeuPerfil() {
+  const aoTrocarCredencial = useAoTrocarCredencial();
   return useMutation({
     mutationFn: (dados: DadosDeEdicaoDoPerfil) => obterDados<Usuario>(api.PATCH('/api/v1/usuarios/me', { body: dados })),
-    onSuccess: invalidar,
+    onSuccess: aoTrocarCredencial,
   });
 }
 
-/** Usuário logado liga/desliga o próprio MFA (usuarios/perfil.php). */
-export function useAlternarMeuMfa() {
-  const invalidar = useInvalidarUsuarios();
+/** Troca obrigatória de quem entrou com uma senha fora da política (senha_expirada). */
+export function useTrocarMinhaSenha() {
+  const aoTrocarCredencial = useAoTrocarCredencial();
   return useMutation({
-    // Etapa 2 do PLANO_ADEQUACAO_API.md: desabilitar passa a pedir senha e código numa tela própria.
-    // Até lá nada é enviado: a API exige a senha, e uma tentativa sem ela contaria no limite de tentativas.
-    mutationFn: (habilitar: boolean) =>
-      habilitar
-        ? obterDados(api.POST('/api/v1/auth/mfa/habilitar'))
-        : Promise.reject(new Error('Desabilitar o MFA ainda não está disponível nesta versão.')),
-    onSuccess: invalidar,
+    mutationFn: (dados: components['schemas']['AlterarSenhaRequest']) => obterDados(api.PUT('/api/v1/usuarios/me/senha', { body: dados })),
+    onSuccess: (dados) => {
+      aoTrocarCredencial(dados);
+      const usuario = armazenamentoDeTokens.obterUsuario();
+      if (usuario) armazenamentoDeTokens.salvarUsuario({ ...usuario, senha_expirada: false });
+    },
+  });
+}
+
+/** GET /usuarios/me responde mesmo com a senha expirada; se a marca já caiu na API, cai aqui também. */
+export function useSituacaoDaMinhaSenha() {
+  return useQuery({
+    queryKey: [...chaves.eu, 'senha'],
+    queryFn: async () => {
+      const atual = await obterDados<Usuario>(api.GET('/api/v1/usuarios/me'));
+      const guardado = armazenamentoDeTokens.obterUsuario();
+      if (guardado?.senha_expirada && !atual.senha_expirada) armazenamentoDeTokens.salvarUsuario({ ...guardado, senha_expirada: false });
+      return Boolean(atual.senha_expirada);
+    },
+    retry: false,
+  });
+}
+
+/** Gera o segredo novo e o QR Code. O segredo fica pendente na API até o activate. */
+export function useGerarConfiguracaoDeMfa() {
+  return useMutation({ mutationFn: () => obterDados<DadosDeConfiguracaoMfa>(api.POST('/api/v1/auth/mfa/setup')) });
+}
+
+/** Confirma o autenticador novo; codigo_atual é obrigatório para quem já tem um configurado. */
+export function useAtivarMeuMfa() {
+  const aoTrocarCredencial = useAoTrocarCredencial();
+  return useMutation({
+    mutationFn: (dados: components['schemas']['MfaActivateRequest']) => obterDados(api.POST('/api/v1/auth/mfa/activate', { body: dados })),
+    onSuccess: aoTrocarCredencial,
+  });
+}
+
+/** Só o locatário desliga o próprio MFA; nos outros perfis ele é obrigatório e a API responde 403. */
+export function useDesabilitarMeuMfa() {
+  const aoTrocarCredencial = useAoTrocarCredencial();
+  return useMutation({
+    mutationFn: (dados: components['schemas']['MfaDisableSelfRequest']) => obterDados(api.POST('/api/v1/auth/mfa/desabilitar', { body: dados })),
+    onSuccess: aoTrocarCredencial,
   });
 }
 

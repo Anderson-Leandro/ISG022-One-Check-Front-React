@@ -38,6 +38,7 @@ export const armazenamentoDeTokens = {
   salvar(accessToken: string, refreshToken: string | null): void {
     gravar(sessionStorage, CHAVE_ACCESS, accessToken);
     if (refreshToken) gravar(localStorage, CHAVE_REFRESH, refreshToken);
+    gravar(sessionStorage, CHAVE_AVISO, null);
     ouvintes.forEach((ouvinte) => ouvinte());
   },
 
@@ -84,12 +85,9 @@ export const armazenamentoDeTokens = {
     gravar(sessionStorage, CHAVE_AVISO, aviso);
   },
 
-  /** Lê o aviso uma única vez. */
-  consumirAvisoDeSessao(): string | null {
-    const aviso = ler(sessionStorage, CHAVE_AVISO);
-    if (aviso) gravar(sessionStorage, CHAVE_AVISO, null);
-    return aviso;
-  },
+  /** Aviso deixado por encerrarSessao; some no próximo login ou logout. */
+  obterAvisoDeSessao: (): string | null => ler(sessionStorage, CHAVE_AVISO),
+  limparAvisoDeSessao: (): void => gravar(sessionStorage, CHAVE_AVISO, null),
 
   /** Notifica o AuthContext quando o client renova ou descarta tokens. */
   aoMudar(ouvinte: Ouvinte): () => void {

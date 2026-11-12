@@ -1,36 +1,34 @@
-/** Dados de /auth/mfa/setup e /auth/mfa/setup-login — a API pode variar o nome dos campos. */
+/** Dados de POST /auth/mfa/setup e GET /auth/mfa/setup-login. */
 export interface DadosDeConfiguracaoMfa {
+  /** Imagem do QR Code gerada pela API, como data URI (data:image/png;base64,…). Só serve como src de <img>. */
   qr_url?: string;
-  qr_code_url?: string;
-  qrcode_url?: string;
-  qr?: string;
-  otpauth_uri?: string;
   secret?: string;
-  totp_secret?: string;
-  mfa_secret?: string;
 }
 
 export function extrairQrCode(dados: DadosDeConfiguracaoMfa | undefined): { urlDoQr: string; segredo: string } {
-  let urlDoQr = dados?.qr_url ?? dados?.qr_code_url ?? dados?.qrcode_url ?? dados?.qr ?? '';
-  if (!urlDoQr && dados?.otpauth_uri) {
-    urlDoQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(dados.otpauth_uri)}`;
-  }
-  const segredo = dados?.secret ?? dados?.totp_secret ?? dados?.mfa_secret ?? '';
-  return { urlDoQr, segredo };
+  return { urlDoQr: dados?.qr_url ?? '', segredo: dados?.secret ?? '' };
 }
 
+/** Sem a imagem, a chave manual ainda permite configurar o autenticador. */
 export function QrCodeMfa({ urlDoQr, segredo }: { urlDoQr: string; segredo: string }) {
   return (
     <>
-      <div className="text-center mb-3">
-        <img
-          src={urlDoQr}
-          alt="QR Code MFA"
-          width={200}
-          height={200}
-          style={{ border: '1px solid #2a3347', borderRadius: 8, background: '#fff', padding: 8 }}
-        />
-      </div>
+      {urlDoQr ? (
+        <div className="text-center mb-3">
+          <img
+            src={urlDoQr}
+            alt="QR Code MFA"
+            width={200}
+            height={200}
+            style={{ border: '1px solid #2a3347', borderRadius: 8, background: '#fff', padding: 8 }}
+          />
+        </div>
+      ) : (
+        <div className="alert alert-warning mb-3">
+          <i className="bi bi-exclamation-triangle me-2" />
+          Não foi possível carregar o QR Code.{segredo && ' Digite a chave manual abaixo no app autenticador.'}
+        </div>
+      )}
       {segredo && (
         <p className="text-center mb-4" style={{ fontSize: 12, color: '#6b7fa3' }}>
           Chave manual: <code style={{ color: '#4f8ef7' }}>{segredo}</code>
@@ -40,22 +38,30 @@ export function QrCodeMfa({ urlDoQr, segredo }: { urlDoQr: string; segredo: stri
   );
 }
 
-export function CampoCodigoMfa({ valor, aoMudar }: { valor: string; aoMudar(valor: string): void }) {
+interface PropriedadesDoCampoCodigo {
+  valor: string;
+  aoMudar(valor: string): void;
+  id?: string;
+  rotulo?: string;
+  focoAutomatico?: boolean;
+}
+
+export function CampoCodigoMfa({ valor, aoMudar, id = 'code', rotulo = 'Código de 6 dígitos', focoAutomatico = true }: PropriedadesDoCampoCodigo) {
   return (
     <div className="mb-3">
-      <label className="form-label" htmlFor="code">
+      <label className="form-label" htmlFor={id}>
         <i className="bi bi-key me-1" />
-        Código de 6 dígitos
+        {rotulo}
       </label>
       <input
         type="text"
         className="form-control text-center"
-        id="code"
+        id={id}
         inputMode="numeric"
         pattern="[0-9]{6}"
         maxLength={6}
         required
-        autoFocus
+        autoFocus={focoAutomatico}
         autoComplete="one-time-code"
         placeholder="000000"
         value={valor}

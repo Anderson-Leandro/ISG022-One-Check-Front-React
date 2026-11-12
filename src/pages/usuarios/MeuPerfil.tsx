@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { mfaEstaAtivo, perfilDoUsuario, useAlternarMeuMfa, useAtualizarMeuPerfil, useMeuUsuario } from '../../api/usuarios';
+import { mfaEstaAtivo, perfilDoUsuario, temAutenticadorConfigurado, useAtualizarMeuPerfil, useDesabilitarMeuMfa, useMeuUsuario } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
 import { armazenamentoDeTokens } from '../../auth/armazenamentoDeTokens';
-import { rotaInicial } from '../../auth/permissoes';
+import { perfilDo, rotaInicial } from '../../auth/permissoes';
 import { BadgeMfa, BadgePerfil } from '../../components/BadgePerfil';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
@@ -15,7 +15,9 @@ export function MeuPerfil() {
   const { definirFlash } = useFlash();
   const consulta = useMeuUsuario();
   const atualizarPerfil = useAtualizarMeuPerfil();
-  const alternarMfa = useAlternarMeuMfa();
+  const desabilitarMfa = useDesabilitarMeuMfa();
+  const [desabilitando, setDesabilitando] = useState(false);
+  const [confirmacao, setConfirmacao] = useState({ senha: '', codigo: '' });
   const [formulario, setFormulario] = useState({ nome: '', senhaAtual: '', senhaNova: '' });
 
   const dados = consulta.data ?? usuario;
@@ -24,20 +26,28 @@ export function MeuPerfil() {
   }, [consulta.data]);
 
   const mfaHabilitado = dados ? mfaEstaAtivo(dados) : false;
+  const autenticadorConfigurado = dados ? temAutenticadorConfigurado(dados) : false;
+  // nos outros perfis o MFA é obrigatório e a API recusa (403) o desligamento
+  const podeDesabilitarMfa = mfaHabilitado && perfilDo(usuario) === 'locatario';
 
   function atualizarUsuarioGuardado(alteracoes: Record<string, unknown>) {
     if (usuario) armazenamentoDeTokens.salvarUsuario({ ...usuario, ...alteracoes });
   }
 
-  async function aoAlternarMfa() {
-    const habilitar = !mfaHabilitado;
-    if (!habilitar && !window.confirm('Desabilitar MFA apagará sua configuração TOTP. Confirmar?')) return;
+  function fecharConfirmacao() {
+    setDesabilitando(false);
+    setConfirmacao({ senha: '', codigo: '' });
+  }
+
+  async function aoDesabilitarMfa(evento: FormEvent) {
+    evento.preventDefault();
     try {
-      await alternarMfa.mutateAsync(habilitar);
-      atualizarUsuarioGuardado({ mfa_ativo: habilitar, mfa_enabled: habilitar });
-      definirFlash('sucesso', habilitar ? 'MFA habilitado. Configure o autenticador no próximo login.' : 'MFA desabilitado. A configuração TOTP foi apagada.');
+      await desabilitarMfa.mutateAsync({ senha: confirmacao.senha, ...(autenticadorConfigurado ? { codigo: confirmacao.codigo } : {}) });
+      atualizarUsuarioGuardado({ mfa_ativo: false, mfa_enabled: false, mfa_configurado: false });
+      fecharConfirmacao();
+      definirFlash('sucesso', 'MFA desabilitado. A configuração do autenticador foi apagada.');
     } catch (falha) {
-      definirFlash('erro', (falha as Error).message || `Erro ao ${habilitar ? 'habilitar' : 'desabilitar'} MFA.`);
+      definirFlash('erro', (falha as Error).message || 'Erro ao desabilitar MFA.');
     }
   }
 
@@ -75,24 +85,45 @@ export function MeuPerfil() {
                 </p>
 
                 <div className="d-flex gap-2 mb-3">
-                  {mfaHabilitado && (
-                    <Link to="/mfa/configurar" className="btn btn-outline-primary btn-sm">
-                      <i className="bi bi-arrow-repeat me-1" />
-                      Reconfigurar autenticador
-                    </Link>
+                  <Link to="/mfa/configurar" className={`btn btn-sm ${autenticadorConfigurado ? 'btn-outline-primary' : 'btn-outline-success'}`}>
+                    <i className={`bi ${autenticadorConfigurado ? 'bi-arrow-repeat' : 'bi-shield-check'} me-1`} />
+                    {autenticadorConfigurado ? 'Trocar autenticador' : 'Configurar MFA'}
+                  </Link>
+                  {podeDesabilitarMfa && !desabilitando && (
+                    <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => setDesabilitando(true)}>
+                      <i className="bi bi-shield-x me-1" />
+                      Desabilitar MFA
+                    </button>
                   )}
-                  {/* desabilitar exige senha e código (Etapa 2 do PLANO_ADEQUACAO_API.md); até lá o botão fica oculto */}
-                  <button
-                    type="button"
-                    hidden={mfaHabilitado}
-                    className={`btn btn-sm ${mfaHabilitado ? 'btn-outline-danger' : 'btn-outline-success'}`}
-                    onClick={aoAlternarMfa}
-                    disabled={alternarMfa.isPending}
-                  >
-                    <i className={`bi ${mfaHabilitado ? 'bi-shield-x' : 'bi-shield-check'} me-1`} />
-                    {mfaHabilitado ? 'Desabilitar MFA' : 'Habilitar MFA'}
-                  </button>
                 </div>
+
+                {podeDesabilitarMfa && desabilitando && (
+                  <form onSubmit={aoDesabilitarMfa} className="row g-2 align-items-end mb-4 p-3" style={{ background: '#0f172a', borderRadius: 8, border: '1px solid #1e293b' }}>
+                    <p className="small text-muted col-12 mb-1">Desabilitar o MFA apaga a configuração do autenticador. Confirme com a sua senha{autenticadorConfigurado && ' e o código atual'}.</p>
+                    <div className="col-md-5">
+                      <label className="form-label" htmlFor="senha-para-desabilitar">
+                        Senha
+                      </label>
+                      <input id="senha-para-desabilitar" type="password" className="form-control form-control-sm" required autoComplete="current-password" value={confirmacao.senha} onChange={(evento) => setConfirmacao({ ...confirmacao, senha: evento.target.value })} />
+                    </div>
+                    {autenticadorConfigurado && (
+                      <div className="col-md-3">
+                        <label className="form-label" htmlFor="codigo-para-desabilitar">
+                          Código
+                        </label>
+                        <input id="codigo-para-desabilitar" className="form-control form-control-sm" required inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" placeholder="000000" value={confirmacao.codigo} onChange={(evento) => setConfirmacao({ ...confirmacao, codigo: evento.target.value.replace(/\D/g, '') })} />
+                      </div>
+                    )}
+                    <div className="col-auto">
+                      <button className="btn btn-danger btn-sm" disabled={desabilitarMfa.isPending}>
+                        Desabilitar
+                      </button>
+                      <button type="button" className="btn btn-outline-secondary btn-sm ms-1" onClick={fecharConfirmacao}>
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                )}
 
                 <form onSubmit={aoEnviar} className="row g-3">
                   <div className="col-12">

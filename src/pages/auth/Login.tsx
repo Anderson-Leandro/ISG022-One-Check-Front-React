@@ -14,6 +14,7 @@ export function Login() {
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
+  const avisoDeSessao = armazenamentoDeTokens.obterAvisoDeSessao();
 
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault();
@@ -41,6 +42,7 @@ export function Login() {
       <p style={{ textAlign: 'center', fontSize: 14, color: '#94A3B8', marginBottom: 32 }}>Sistema de gestão de imóveis</p>
 
       {parametros.has('logout') && <div className="alert alert-success py-2 mb-3">Você saiu com sucesso.</div>}
+      {avisoDeSessao && !erro && <div className="alert alert-warning py-2 mb-3">{avisoDeSessao}</div>}
       {erro && <div className="alert alert-danger py-2 mb-3">{erro}</div>}
 
       <form onSubmit={aoEnviar} autoComplete="off">
@@ -86,7 +88,7 @@ export function Login() {
         </button>
       </form>
       <p style={{ fontSize: 11, color: '#4a5568', textAlign: 'center', marginTop: 20, marginBottom: 0 }}>
-        Admin e vistoriador: MFA obrigatório após o primeiro acesso.
+        Admin, gestor e vistoriador: MFA obrigatório, configurado no primeiro acesso.
       </p>
     </LayoutLogin>
   );

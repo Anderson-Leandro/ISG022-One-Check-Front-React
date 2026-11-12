@@ -137,8 +137,9 @@ describe('cliente da API', () => {
     expect(armazenamentoDeTokens.obterAccessToken()).toBeNull();
     expect(armazenamentoDeTokens.obterRefreshToken()).toBeNull();
     expect(armazenamentoDeTokens.obterUsuario()).toBeNull();
-    expect(armazenamentoDeTokens.consumirAvisoDeSessao()).toBe('Sua sessão foi encerrada. Faça login novamente.');
-    expect(armazenamentoDeTokens.consumirAvisoDeSessao()).toBeNull();
+    expect(armazenamentoDeTokens.obterAvisoDeSessao()).toBe('Sua sessão foi encerrada. Faça login novamente.');
+    armazenamentoDeTokens.salvar('access-de-novo-login', 'refresh-de-novo-login');
+    expect(armazenamentoDeTokens.obterAvisoDeSessao()).toBeNull();
   });
 
   it.each([500, 429])('mantém a sessão quando o refresh falha com %i, que não é recusa do token', async (statusDoRefresh) => {
@@ -148,7 +149,7 @@ describe('cliente da API', () => {
     await capturarErro(obterDados(api.GET('/api/v1/usuarios/me')));
 
     expect(armazenamentoDeTokens.obterRefreshToken()).toBe('refresh-1');
-    expect(armazenamentoDeTokens.consumirAvisoDeSessao()).toBeNull();
+    expect(armazenamentoDeTokens.obterAvisoDeSessao()).toBeNull();
   });
 
   it('um 401 que chega depois de uma renovação concluída renova de novo com o refresh token atual', async () => {
@@ -177,7 +178,7 @@ describe('cliente da API', () => {
     armazenamentoDeTokens.encerrarSessao('Sua sessão foi encerrada. Faça login novamente.');
     armazenamentoDeTokens.limpar();
 
-    expect(armazenamentoDeTokens.consumirAvisoDeSessao()).toBeNull();
+    expect(armazenamentoDeTokens.obterAvisoDeSessao()).toBeNull();
   });
 
   it('junta as mensagens quando um campo do 422 vem como lista', async () => {

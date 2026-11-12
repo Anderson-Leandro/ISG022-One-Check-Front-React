@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ITENS_POR_PAGINA_DE_LOG, useLogs } from '../../api/painel';
+import { ErroApi } from '../../api/client';
+import { idCurto } from '../../api/contratos';
+import { camposAlteradosNoLog, ITENS_POR_PAGINA_DE_LOG, useLogs } from '../../api/painel';
 import { useNomeDoUsuario } from '../../api/usuarios';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
@@ -34,6 +36,10 @@ export function Logs() {
   const nomeDoUsuario = useNomeDoUsuario();
   const logs = consulta.data?.dados ?? [];
   const total = consulta.data?.paginacao?.total ?? logs.length;
+  // 422 do filtro de datas: a API devolve a mensagem em erros.de ou erros.ate
+  const errosDoFiltro = consulta.error instanceof ErroApi ? consulta.error.erros : {};
+  // os eventos não trazem mais o e-mail em "detalhes": a conta aparece pelo id (login_falho: a conta que foi alvo)
+  const contaDoLog = (id: string | null | undefined) => (id ? (nomeDoUsuario(id) ?? idCurto(id)) : '—');
 
   function aplicar(valores: typeof rascunho, pagina = 1) {
     const novosParametros = new URLSearchParams();
@@ -76,13 +82,15 @@ export function Logs() {
               <label className="form-label" htmlFor="filtro-de">
                 De
               </label>
-              <input id="filtro-de" type="date" className="form-control form-control-sm" value={rascunho.de} onChange={(evento) => setRascunho({ ...rascunho, de: evento.target.value })} />
+              <input id="filtro-de" type="date" className={`form-control form-control-sm ${errosDoFiltro.de ? 'is-invalid' : ''}`} value={rascunho.de} onChange={(evento) => setRascunho({ ...rascunho, de: evento.target.value })} />
+              {errosDoFiltro.de && <div className="invalid-feedback">{errosDoFiltro.de}</div>}
             </div>
             <div className="col-md-2">
               <label className="form-label" htmlFor="filtro-ate">
                 Até
               </label>
-              <input id="filtro-ate" type="date" className="form-control form-control-sm" value={rascunho.ate} onChange={(evento) => setRascunho({ ...rascunho, ate: evento.target.value })} />
+              <input id="filtro-ate" type="date" className={`form-control form-control-sm ${errosDoFiltro.ate ? 'is-invalid' : ''}`} min={rascunho.de || undefined} value={rascunho.ate} onChange={(evento) => setRascunho({ ...rascunho, ate: evento.target.value })} />
+              {errosDoFiltro.ate && <div className="invalid-feedback">{errosDoFiltro.ate}</div>}
             </div>
             <div className="col-auto">
               <button className="btn btn-primary btn-sm">Filtrar</button>
@@ -116,20 +124,28 @@ export function Logs() {
                     </tr>
                   </thead>
                   <tbody>
-                    {logs.map((log) => (
+                    {logs.map((log) => {
+                      const camposAlterados = camposAlteradosNoLog(log);
+                      // em eventos de usuário sem detalhes, mostra a conta afetada quando não é quem fez a ação
+                      const contaAfetada = log.entidade === 'usuario' && log.entidade_id && log.entidade_id !== log.usuario_id ? `Conta: ${contaDoLog(log.entidade_id)}` : '—';
+                      return (
                       <tr key={log.id}>
                         <td>
                           <span className={`badge ${classeDaAcao(log.acao)}`}>{log.acao}</span>
                         </td>
                         <td>{log.entidade || '—'}</td>
-                        <td style={{ fontSize: 12 }}>{nomeDoUsuario(log.usuario_id) ?? '—'}</td>
-                        <td style={{ fontSize: 12, color: '#6b7fa3' }}>{log.detalhes || '—'}</td>
+                        <td style={{ fontSize: 12 }}>{contaDoLog(log.usuario_id)}</td>
+                        <td style={{ fontSize: 12, color: '#6b7fa3' }}>
+                          {log.detalhes || contaAfetada}
+                          {camposAlterados.length > 0 && <div>Campos alterados: {camposAlterados.join(', ')}</div>}
+                        </td>
                         <td style={{ fontSize: 12, color: '#6b7fa3' }}>{log.ip || '—'}</td>
                         <td style={{ fontSize: 12, color: '#6b7fa3' }} className="text-nowrap">
                           {formatarDataHora(log.created_at)}
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

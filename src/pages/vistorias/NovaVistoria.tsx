@@ -16,7 +16,7 @@ function hojeNoFormatoIso(): string {
 }
 
 /**
- * vistorias/nova.php — aceita ?contrato_id= ou ?imovel_id= (usa o contrato ativo do imóvel).
+ * vistorias/nova.php — aceita ?contrato_id= ou ?imovel_id= (usa o contrato ativo do imóvel) e ?tipo=.
  * A regra "um contrato só tem uma vistoria inicial" é validada pela própria API.
  */
 export function NovaVistoria() {
@@ -31,7 +31,7 @@ export function NovaVistoria() {
   const [formulario, setFormulario] = useState({
     contratoId: parametros.get('contrato_id') ?? '',
     vistoriadorId: '',
-    tipo: 'inicial',
+    tipo: parametros.get('tipo') === 'encerramento' ? 'encerramento' : 'inicial',
     data: hojeNoFormatoIso(),
   });
   const [erro, setErro] = useState('');

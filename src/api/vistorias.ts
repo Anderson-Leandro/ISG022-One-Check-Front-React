@@ -3,6 +3,7 @@ import { api, criarErroDaResposta, ErroApi, obterDados } from './client';
 import type { components } from './schema';
 import type { Comodo } from './imoveis';
 import type { Contrato } from './contratos';
+import { useInvalidarAposExcluir } from './exclusao';
 import type { Usuario } from '../auth/tipos';
 import { useAuth } from '../auth/AuthContext';
 import { podeListarUsuarios } from '../auth/permissoes';
@@ -143,8 +144,8 @@ export function useVistoriadores() {
 
 function useInvalidarVistorias() {
   const clienteDeConsultas = useQueryClient();
-  // checklists também aparecem nos detalhes do contrato
-  return () => Promise.all([chaves.todos, ['contratos']].map((queryKey) => clienteDeConsultas.invalidateQueries({ queryKey })));
+  // checklists também aparecem nos detalhes do contrato e no histórico do imóvel
+  return () => Promise.all([chaves.todos, ['contratos'], ['imoveis', 'historico']].map((queryKey) => clienteDeConsultas.invalidateQueries({ queryKey })));
 }
 
 export function useCriarVistoria() {
@@ -152,6 +153,15 @@ export function useCriarVistoria() {
   return useMutation({
     mutationFn: ({ contratoId, dados }: { contratoId: string; dados: components['schemas']['ChecklistCreate'] }) =>
       obterDados<Checklist>(api.POST('/api/v1/contratos/{contrato_id}/checklists', { params: { path: { contrato_id: contratoId } }, body: dados })),
+    onSuccess: invalidar,
+  });
+}
+
+/** Exclusão lógica (admin e gestor), só enquanto a vistoria está em preenchimento; fora disso a API responde 409. */
+export function useExcluirVistoria(id: string) {
+  const invalidar = useInvalidarAposExcluir(id);
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/checklists/{checklist_id}', caminhoDoChecklist(id))),
     onSuccess: invalidar,
   });
 }
@@ -271,6 +281,7 @@ export function permissoesDaVistoria(checklist: Checklist | undefined, usuario: 
   const fezAVistoria = Boolean(usuario?.id) && checklist?.vistoriador_id === usuario?.id;
 
   return {
+    excluir: emEdicao && ehGestao,
     editarItens: emEdicao && (ehGestao || ehVistoriadorDesignado),
     submeter: status === 'em_preenchimento' && (ehGestao || ehVistoriadorDesignado),
     enviarParaAceite: emEdicao && ehGestao,

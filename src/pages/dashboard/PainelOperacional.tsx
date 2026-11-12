@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ROTULO_DO_TIPO_DE_AGENDAMENTO } from '../../api/contratos';
+import { agendamentosAPartirDeHoje, ROTULO_DO_TIPO_DE_AGENDAMENTO } from '../../api/contratos';
 import { useDadosDoPainel, useResumoDoPainel } from '../../api/painel';
 import { problemaEstaEncerrado, ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA } from '../../api/problemas';
 import { useAuth } from '../../auth/AuthContext';
@@ -27,12 +27,11 @@ export function PainelOperacional() {
 
   const agora = new Date();
   const limite = new Date(agora.getTime() + DIAS_DO_HORIZONTE * 86_400_000);
-  const proximosAgendamentos = agendamentos
-    .filter((agendamento) => {
-      const data = new Date(agendamento.data_agendada);
-      return agendamento.contrato.status === 'ativo' && data >= new Date(agora.toDateString()) && data <= limite;
-    })
-    .sort((primeiro, segundo) => primeiro.data_agendada.localeCompare(segundo.data_agendada));
+  const proximosAgendamentos = agendamentosAPartirDeHoje(
+    agendamentos.filter((agendamento) => agendamento.contrato.status === 'ativo'),
+    limite,
+    agora,
+  );
   const aguardandoAceite = checklists.filter((checklist) => checklist.status === 'pendente_aceite');
   const emPreenchimento = checklists.filter((checklist) => checklist.status === 'em_preenchimento');
   const problemasEmAberto = problemas

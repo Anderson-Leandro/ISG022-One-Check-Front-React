@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { proximosMeses, ultimosMeses } from '../api/painel';
+import { agendamentosAPartirDeHoje } from '../api/contratos';
+import { camposAlteradosNoLog, proximosMeses, ultimosMeses } from '../api/painel';
 import { problemaEstaEncerrado } from '../api/problemas';
 import { permissoesDaVistoria, validarFoto, type Checklist } from '../api/vistorias';
 import { itensDeMenuPara, perfisAtribuiveisPor, podeAcessar, podeCriar, podeGerenciarUsuario, podeListarUsuarios, rotaInicial } from '../auth/permissoes';
@@ -13,14 +14,14 @@ const checklist = (status: string, vistoriadorId = 'id-vistoriador'): Checklist 
 
 describe('permissoesDaVistoria (regras confirmadas contra a API)', () => {
   it('vistoriador designado edita e submete em preenchimento, mas não envia para aceite', () => {
-    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('vistoriador'))).toEqual({ editarItens: true, submeter: true, enviarParaAceite: false, aceitarOuRejeitar: false });
+    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('vistoriador'))).toEqual({ excluir: false, editarItens: true, submeter: true, enviarParaAceite: false, aceitarOuRejeitar: false });
   });
   it('outro vistoriador não edita', () => {
     expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('vistoriador', 'outro')).editarItens).toBe(false);
   });
   it('locatário só aceita/rejeita quando pendente de aceite', () => {
     expect(permissoesDaVistoria(checklist('pendente_aceite'), usuario('locatario')).aceitarOuRejeitar).toBe(true);
-    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('locatario'))).toEqual({ editarItens: false, submeter: false, enviarParaAceite: false, aceitarOuRejeitar: false });
+    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('locatario'))).toEqual({ excluir: false, editarItens: false, submeter: false, enviarParaAceite: false, aceitarOuRejeitar: false });
   });
   it('quem fez a vistoria não aceita nem rejeita a própria vistoria, mesmo sendo gestor', () => {
     expect(permissoesDaVistoria(checklist('pendente_aceite', 'id-gestor'), usuario('gestor')).aceitarOuRejeitar).toBe(false);
@@ -38,6 +39,10 @@ describe('permissoesDaVistoria (regras confirmadas contra a API)', () => {
   });
   it('resolvido e fechado encerram o problema', () => {
     expect(['aberto', 'em_analise', 'em_andamento', 'resolvido', 'fechado'].map(problemaEstaEncerrado)).toEqual([false, false, false, true, true]);
+  });
+  it('só admin e gestor excluem, e só em preenchimento', () => {
+    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('gestor')).excluir).toBe(true);
+    expect(permissoesDaVistoria(checklist('pendente_aceite'), usuario('admin')).excluir).toBe(false);
   });
   it('aceito e rejeitado são finais', () => {
     for (const status of ['aceito', 'rejeitado']) expect(Object.values(permissoesDaVistoria(checklist(status), usuario('admin'))).some(Boolean)).toBe(false);
@@ -158,5 +163,27 @@ describe('política de senha conferida no navegador', () => {
   it('conta o limite em bytes: letra acentuada vale dois', () => {
     expect(validarSenhaNova(`Xyz12${'a'.repeat(67)}`)).toBeNull();
     expect(validarSenhaNova(`Xyz12${'á'.repeat(34)}`)).toMatch(/72 bytes/);
+  });
+});
+
+describe('logs de auditoria', () => {
+  const log = (payload: unknown) => ({ id: 'l1', acao: 'update', created_at: '2026-11-12T10:00:00', payload: payload as never });
+  it('lista os campos alterados e trata eventos antigos sem payload', () => {
+    expect(camposAlteradosNoLog(log({ campos: ['nome', 'role'] }))).toEqual(['nome', 'role']);
+    expect(camposAlteradosNoLog(log(null))).toEqual([]);
+    expect(camposAlteradosNoLog(log({ campos: 'nome' }))).toEqual([]);
+  });
+});
+
+describe('agendamentos de hoje em diante', () => {
+  const referencia = new Date(2026, 10, 12, 15, 0); // 12/nov/2026 15h
+  const agendamento = (data_agendada: string | null) => ({ data_agendada });
+  it('inclui o dia de hoje mesmo em data sem hora, descarta o passado e ordena', () => {
+    const lista = [agendamento('2026-11-20T09:00:00'), agendamento('2026-11-11T09:00:00'), agendamento('2026-11-12'), agendamento(null)];
+    expect(agendamentosAPartirDeHoje(lista, undefined, referencia).map((item) => item.data_agendada)).toEqual(['2026-11-12', '2026-11-20T09:00:00']);
+  });
+  it('respeita o limite', () => {
+    const lista = [agendamento('2026-11-13T09:00:00'), agendamento('2026-12-30T09:00:00')];
+    expect(agendamentosAPartirDeHoje(lista, new Date(2026, 11, 12), referencia)).toHaveLength(1);
   });
 });

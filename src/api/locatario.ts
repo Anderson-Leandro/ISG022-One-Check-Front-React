@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api, obterDados } from './client';
-import type { Contrato } from './contratos';
+import type { Agendamento, Contrato } from './contratos';
 import { buscarEnderecoDoImovel, type Imovel } from './imoveis';
 import type { Problema } from './problemas';
 import type { Checklist } from './vistorias';
@@ -11,11 +11,12 @@ export interface ContratoDoLocatario {
   endereco: Awaited<ReturnType<typeof buscarEnderecoDoImovel>>;
   checklists: Checklist[];
   problemas: Problema[];
+  /** Vistorias agendadas do contrato; a API não envia a observação interna ao locatário. */
+  agendamentos: Agendamento[];
 }
 
 /**
  * locatario/index.php: a API já devolve só os contratos do locatário logado.
- * Agendamentos ficam de fora — a API responde 403 para o locatário (confirmado em teste).
  */
 export function useAreaDoLocatario() {
   return useQuery({
@@ -26,13 +27,14 @@ export function useAreaDoLocatario() {
       const detalhados = await Promise.all(
         ativos.map(async (contrato): Promise<ContratoDoLocatario> => {
           const caminho = { params: { path: { contrato_id: contrato.id } } };
-          const [imovel, endereco, checklists, problemas] = await Promise.all([
+          const [imovel, endereco, checklists, problemas, agendamentos] = await Promise.all([
             obterDados<Imovel>(api.GET('/api/v1/imoveis/{imovel_id}', { params: { path: { imovel_id: contrato.imovel_id } } })).catch(() => null),
             buscarEnderecoDoImovel(contrato.imovel_id).catch(() => null),
             obterDados<Checklist[]>(api.GET('/api/v1/contratos/{contrato_id}/checklists', caminho)).catch(() => []),
             obterDados<Problema[]>(api.GET('/api/v1/contratos/{contrato_id}/problemas', caminho)).catch(() => []),
+            obterDados<Agendamento[]>(api.GET('/api/v1/contratos/{contrato_id}/agendamentos', caminho)).catch(() => []),
           ]);
-          return { contrato, imovel, endereco, checklists, problemas };
+          return { contrato, imovel, endereco, checklists, problemas, agendamentos };
         }),
       );
       return { ativos: detalhados, encerrados: contratos.filter((contrato) => contrato.status !== 'ativo') };

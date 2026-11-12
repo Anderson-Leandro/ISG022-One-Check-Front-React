@@ -4,6 +4,7 @@ const CHAVE_REFRESH = 'onecheck.refresh_token';
 const CHAVE_ACCESS = 'onecheck.access_token';
 const CHAVE_USUARIO = 'onecheck.usuario';
 const CHAVE_TEMP_MFA = 'onecheck.mfa_temp_token';
+const CHAVE_AVISO = 'onecheck.aviso_de_sessao';
 
 type Ouvinte = () => void;
 const ouvintes = new Set<Ouvinte>();
@@ -64,6 +65,29 @@ export const armazenamentoDeTokens = {
     gravar(localStorage, CHAVE_REFRESH, null);
     gravar(localStorage, CHAVE_USUARIO, null);
     ouvintes.forEach((ouvinte) => ouvinte());
+  },
+
+  /**
+   * Troca de credencial (senha, autenticador, MFA): a API encerra todas as sessões e devolve em
+   * dados.sessao o único par que continua valendo. Sem gravar, a próxima requisição daria 401.
+   */
+  aplicarSessao(dados: unknown): void {
+    const sessao = (dados as { sessao?: { access_token?: unknown; refresh_token?: unknown } } | null | undefined)?.sessao;
+    if (typeof sessao?.access_token !== 'string' || !sessao.access_token) return;
+    this.salvar(sessao.access_token, typeof sessao.refresh_token === 'string' ? sessao.refresh_token : null);
+  },
+
+  /** A API recusou a renovação: descarta a sessão e deixa um aviso para a tela de login. */
+  encerrarSessao(aviso: string): void {
+    gravar(sessionStorage, CHAVE_AVISO, aviso);
+    this.limpar();
+  },
+
+  /** Lê o aviso uma única vez. */
+  consumirAvisoDeSessao(): string | null {
+    const aviso = ler(sessionStorage, CHAVE_AVISO);
+    if (aviso) gravar(sessionStorage, CHAVE_AVISO, null);
+    return aviso;
   },
 
   /** Notifica o AuthContext quando o client renova ou descarta tokens. */

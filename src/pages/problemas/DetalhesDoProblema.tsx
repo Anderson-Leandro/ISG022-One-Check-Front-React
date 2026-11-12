@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { urlDeArquivo } from '../../api/client';
 import { idCurto } from '../../api/contratos';
-import { problemaEstaEncerrado, ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA, useAtualizarStatusDoProblema, useExcluirProblema, useProblema, type StatusDoProblema } from '../../api/problemas';
+import { problemaEstaEncerrado, ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA, useAtualizacoesDoProblema, useAtualizarStatusDoProblema, useExcluirProblema, useProblema, type StatusDoProblema } from '../../api/problemas';
 import { useAuth } from '../../auth/AuthContext';
 import { perfilDo, podeAcessar } from '../../auth/permissoes';
 import { BadgeStatus } from '../../components/BadgeStatus';
@@ -27,8 +27,9 @@ export function DetalhesDoProblema() {
   const podeAtualizar = PERFIS_QUE_ATUALIZAM.includes(perfilDo(usuario));
   // o locatário dono do contrato comenta enquanto o problema não estiver resolvido nem fechado (depois a API responde 409)
   const podeComentar = podeAtualizar || (perfilDo(usuario) === 'locatario' && Boolean(problema) && !problemaEstaEncerrado(problema?.status));
-  // a API só exclui problema aberto e sem atualizações; o segundo caso volta como 409 com a mensagem
-  const podeExcluir = podeAtualizar && problema?.status === 'aberto';
+  // a API só exclui problema aberto e sem atualizações (a mesma consulta alimenta a linha do tempo abaixo)
+  const { data: atualizacoes } = useAtualizacoesDoProblema(id);
+  const podeExcluir = podeAtualizar && problema?.status === 'aberto' && atualizacoes?.length === 0;
   const excluirProblema = useExcluirProblema(id);
   const navegar = useNavigate();
 

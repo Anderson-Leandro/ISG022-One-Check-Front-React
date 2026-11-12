@@ -124,7 +124,11 @@ export function Logs() {
                     </tr>
                   </thead>
                   <tbody>
-                    {logs.map((log) => (
+                    {logs.map((log) => {
+                      const camposAlterados = camposAlteradosNoLog(log);
+                      // em eventos de usuário sem detalhes, mostra a conta afetada quando não é quem fez a ação
+                      const contaAfetada = log.entidade === 'usuario' && log.entidade_id && log.entidade_id !== log.usuario_id ? `Conta: ${contaDoLog(log.entidade_id)}` : '—';
+                      return (
                       <tr key={log.id}>
                         <td>
                           <span className={`badge ${classeDaAcao(log.acao)}`}>{log.acao}</span>
@@ -132,15 +136,16 @@ export function Logs() {
                         <td>{log.entidade || '—'}</td>
                         <td style={{ fontSize: 12 }}>{contaDoLog(log.usuario_id)}</td>
                         <td style={{ fontSize: 12, color: '#6b7fa3' }}>
-                          {log.detalhes || (log.entidade === 'usuario' && log.entidade_id ? `Conta: ${contaDoLog(log.entidade_id)}` : '—')}
-                          {camposAlteradosNoLog(log).length > 0 && <div>Campos alterados: {camposAlteradosNoLog(log).join(', ')}</div>}
+                          {log.detalhes || contaAfetada}
+                          {camposAlterados.length > 0 && <div>Campos alterados: {camposAlterados.join(', ')}</div>}
                         </td>
                         <td style={{ fontSize: 12, color: '#6b7fa3' }}>{log.ip || '—'}</td>
                         <td style={{ fontSize: 12, color: '#6b7fa3' }} className="text-nowrap">
                           {formatarDataHora(log.created_at)}
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

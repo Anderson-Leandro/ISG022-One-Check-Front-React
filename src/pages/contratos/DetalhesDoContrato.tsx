@@ -35,6 +35,10 @@ export function DetalhesDoContrato() {
   // depois de uma vistoria inicial rejeitada (registro final), o gestor pode criar outra inicial
   const iniciais = checklists.filter((checklist) => checklist.tipo === 'inicial');
   const inicialFoiRejeitada = iniciais.length > 0 && iniciais.every((checklist) => checklist.status === 'rejeitado');
+  // com uma inicial que não foi rejeitada, a próxima vistoria do contrato só pode ser a de saída
+  const tipoDaProximaVistoria = iniciais.length > 0 && !inicialFoiRejeitada ? 'encerramento' : 'inicial';
+  // a API recusa (409) a exclusão enquanto houver vistoria ou problema no contrato
+  const temRegistrosVinculados = checklists.length > 0 || problemas.length > 0;
 
   useEffect(() => {
     if (consulta.isError) definirFlash('erro', 'Contrato não encontrado.');
@@ -55,7 +59,8 @@ export function DetalhesDoContrato() {
   }
 
   async function aoExcluir() {
-    if (!window.confirm('Excluir este contrato? Ele some de todas as listagens, os agendamentos somem junto e o imóvel volta a ficar disponível.')) return;
+    const efeito = consulta.data?.status === 'ativo' ? 'os agendamentos somem junto e o imóvel volta a ficar disponível' : 'os agendamentos somem junto';
+    if (!window.confirm(`Excluir este contrato? Ele some de todas as listagens e ${efeito}.`)) return;
     try {
       await excluirContrato.mutateAsync();
       definirFlash('sucesso', 'Contrato excluído.');
@@ -76,7 +81,13 @@ export function DetalhesDoContrato() {
             acoes={
               <>
                 {podeGerenciar && (
-                  <button type="button" className="btn btn-outline-danger btn-sm" onClick={aoExcluir} disabled={excluirContrato.isPending}>
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={aoExcluir}
+                    disabled={excluirContrato.isPending || temRegistrosVinculados}
+                    title={temRegistrosVinculados ? 'Exclua antes as vistorias e os problemas deste contrato' : undefined}
+                  >
                     <i className="bi bi-trash me-1" />
                     Excluir
                   </button>
@@ -145,7 +156,7 @@ export function DetalhesDoContrato() {
                   <span className="fw-semibold">Vistorias do contrato</span>
                   {/* a API só cria vistoria em contrato ativo */}
                   {podeCriar(usuario, 'vistorias') && contrato.status === 'ativo' && (
-                    <Link to={`/vistorias/nova?contrato_id=${id}${inicialFoiRejeitada ? '&tipo=inicial' : ''}`} className="btn btn-primary btn-sm">
+                    <Link to={`/vistorias/nova?contrato_id=${id}&tipo=${tipoDaProximaVistoria}`} className="btn btn-primary btn-sm">
                       {inicialFoiRejeitada ? 'Nova vistoria inicial' : 'Nova vistoria'}
                     </Link>
                   )}

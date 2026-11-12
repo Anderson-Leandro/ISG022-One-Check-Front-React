@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { agendamentosAPartirDeHoje } from '../api/contratos';
 import { camposAlteradosNoLog, proximosMeses, ultimosMeses } from '../api/painel';
 import { problemaEstaEncerrado } from '../api/problemas';
 import { permissoesDaVistoria, validarFoto, type Checklist } from '../api/vistorias';
@@ -171,5 +172,18 @@ describe('logs de auditoria', () => {
     expect(camposAlteradosNoLog(log({ campos: ['nome', 'role'] }))).toEqual(['nome', 'role']);
     expect(camposAlteradosNoLog(log(null))).toEqual([]);
     expect(camposAlteradosNoLog(log({ campos: 'nome' }))).toEqual([]);
+  });
+});
+
+describe('agendamentos de hoje em diante', () => {
+  const referencia = new Date(2026, 10, 12, 15, 0); // 12/nov/2026 15h
+  const agendamento = (data_agendada: string | null) => ({ data_agendada });
+  it('inclui o dia de hoje mesmo em data sem hora, descarta o passado e ordena', () => {
+    const lista = [agendamento('2026-11-20T09:00:00'), agendamento('2026-11-11T09:00:00'), agendamento('2026-11-12'), agendamento(null)];
+    expect(agendamentosAPartirDeHoje(lista, undefined, referencia).map((item) => item.data_agendada)).toEqual(['2026-11-12', '2026-11-20T09:00:00']);
+  });
+  it('respeita o limite', () => {
+    const lista = [agendamento('2026-11-13T09:00:00'), agendamento('2026-12-30T09:00:00')];
+    expect(agendamentosAPartirDeHoje(lista, new Date(2026, 11, 12), referencia)).toHaveLength(1);
   });
 });

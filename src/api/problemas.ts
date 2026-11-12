@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ErroApi, obterDados } from './client';
 import type { paths } from './schema';
 import type { Contrato } from './contratos';
+import { useInvalidarAposExcluir } from './exclusao';
 
 export interface Problema {
   id: string;
@@ -129,9 +130,9 @@ export function useContratosAtivos() {
 
 function useInvalidarProblemas() {
   const clienteDeConsultas = useQueryClient();
-  // problemas também aparecem nos detalhes do contrato
+  // problemas também aparecem nos detalhes do contrato e no histórico do imóvel
   return () =>
-    Promise.all([chaves.todos, ['contratos']].map((queryKey) => clienteDeConsultas.invalidateQueries({ queryKey })));
+    Promise.all([chaves.todos, ['contratos'], ['imoveis', 'historico']].map((queryKey) => clienteDeConsultas.invalidateQueries({ queryKey })));
 }
 
 export function useRegistrarProblema() {
@@ -151,13 +152,10 @@ export function useRegistrarProblema() {
 
 /** Exclusão lógica (admin e gestor), só de problema aberto e sem atualizações; fora disso a API responde 409. */
 export function useExcluirProblema(id: string) {
-  const invalidar = useInvalidarProblemas();
+  const invalidar = useInvalidarAposExcluir(id);
   return useMutation({
     mutationFn: () => obterDados(api.DELETE('/api/v1/problemas/{problema_id}', { params: { path: { problema_id: id } } })),
-    // sem esperar a recarga: a tela sai do problema antes do 404 dele chegar
-    onSuccess: () => {
-      void invalidar();
-    },
+    onSuccess: invalidar,
   });
 }
 

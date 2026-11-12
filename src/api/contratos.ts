@@ -5,6 +5,8 @@ import type { Imovel } from './imoveis';
 import type { Usuario } from '../auth/tipos';
 import { useAuth } from '../auth/AuthContext';
 import { podeListarUsuarios } from '../auth/permissoes';
+import { paraData } from '../utils/formatar';
+import { useInvalidarAposExcluir } from './exclusao';
 
 export const ITENS_POR_PAGINA = 20;
 
@@ -28,6 +30,16 @@ export interface Agendamento {
   tipo: string;
   data_agendada: string;
   observacao?: string | null;
+}
+
+/** Agendamentos de hoje em diante (até o limite, se houver), do mais próximo para o mais distante. */
+export function agendamentosAPartirDeHoje<T extends { data_agendada: string | null }>(agendamentos: T[], limite?: Date, referencia = new Date()): T[] {
+  const inicioDeHoje = new Date(referencia.getFullYear(), referencia.getMonth(), referencia.getDate());
+  return agendamentos
+    .map((agendamento) => ({ agendamento, data: paraData(agendamento.data_agendada) }))
+    .filter((item): item is { agendamento: T; data: Date } => item.data !== null && item.data >= inicioDeHoje && (!limite || item.data <= limite))
+    .sort((primeiro, segundo) => primeiro.data.getTime() - segundo.data.getTime())
+    .map((item) => item.agendamento);
 }
 
 export interface ChecklistResumido {
@@ -184,15 +196,12 @@ export function useMudarStatusDoContrato(id: string) {
 /**
  * Exclusão lógica (admin e gestor): o contrato some das listagens e o GET por ID passa a dar 404.
  * A API recusa com 409 enquanto houver vistoria ou problema no contrato.
- * A recarga das consultas não é esperada, para a tela sair do registro antes do 404 dele chegar.
  */
 export function useExcluirContrato(id: string) {
-  const invalidar = useInvalidar(['imoveis'], ['vistorias'], ['problemas'], ['painel']);
+  const invalidar = useInvalidarAposExcluir(id);
   return useMutation({
     mutationFn: () => obterDados(api.DELETE('/api/v1/contratos/{contrato_id}', caminhoDoContrato(id))),
-    onSuccess: () => {
-      void invalidar();
-    },
+    onSuccess: invalidar,
   });
 }
 

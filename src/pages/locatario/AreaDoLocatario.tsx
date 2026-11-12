@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ROTULO_DO_TIPO_DE_AGENDAMENTO } from '../../api/contratos';
+import { agendamentosAPartirDeHoje, ROTULO_DO_TIPO_DE_AGENDAMENTO } from '../../api/contratos';
 import { useAreaDoLocatario } from '../../api/locatario';
 import { ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA } from '../../api/problemas';
 import { useMudarStatusDaVistoria, type Checklist } from '../../api/vistorias';
@@ -70,10 +70,7 @@ export function AreaDoLocatario() {
 
         {ativos.map(({ contrato, imovel, endereco, checklists, problemas, agendamentos }) => {
           const pendentes = checklists.filter((checklist) => checklist.status === 'pendente_aceite');
-          const inicioDeHoje = new Date(new Date().toDateString());
-          const proximosAgendamentos = agendamentos
-            .filter((agendamento) => new Date(agendamento.data_agendada) >= inicioDeHoje)
-            .sort((primeiro, segundo) => primeiro.data_agendada.localeCompare(segundo.data_agendada));
+          const proximosAgendamentos = agendamentosAPartirDeHoje(agendamentos);
           const historico = [...checklists].sort((primeira, segunda) => String(segunda.created_at ?? '').localeCompare(String(primeira.created_at ?? '')));
           return (
             <section key={contrato.id} className="mb-4">

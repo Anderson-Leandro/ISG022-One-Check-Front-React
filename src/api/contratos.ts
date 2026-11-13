@@ -3,6 +3,10 @@ import { api, desembrulhar, obterDados } from './client';
 import type { components } from './schema';
 import type { Imovel } from './imoveis';
 import type { Usuario } from '../auth/tipos';
+import { useAuth } from '../auth/AuthContext';
+import { podeListarUsuarios } from '../auth/permissoes';
+import { paraData } from '../utils/formatar';
+import { useInvalidarAposExcluir } from './exclusao';
 
 export const ITENS_POR_PAGINA = 20;
 
@@ -18,11 +22,24 @@ export interface Contrato {
   [campo: string]: unknown;
 }
 
+export type TipoDeAgendamento = components['schemas']['AgendamentoCreate']['tipo'];
+
 export interface Agendamento {
   id: string;
+  /** Na resposta o tipo é texto livre; só a escrita é restrita a TipoDeAgendamento. */
   tipo: string;
   data_agendada: string;
   observacao?: string | null;
+}
+
+/** Agendamentos de hoje em diante (até o limite, se houver), do mais próximo para o mais distante. */
+export function agendamentosAPartirDeHoje<T extends { data_agendada: string | null }>(agendamentos: T[], limite?: Date, referencia = new Date()): T[] {
+  const inicioDeHoje = new Date(referencia.getFullYear(), referencia.getMonth(), referencia.getDate());
+  return agendamentos
+    .map((agendamento) => ({ agendamento, data: paraData(agendamento.data_agendada) }))
+    .filter((item): item is { agendamento: T; data: Date } => item.data !== null && item.data >= inicioDeHoje && (!limite || item.data <= limite))
+    .sort((primeiro, segundo) => primeiro.data.getTime() - segundo.data.getTime())
+    .map((item) => item.agendamento);
 }
 
 export interface ChecklistResumido {
@@ -121,10 +138,12 @@ export function useImoveisDisponiveis() {
 }
 
 export function useLocatarios() {
+  const { usuario } = useAuth();
   return useQuery({
     queryKey: ['usuarios', 'locatarios'],
     queryFn: () => obterDados<Usuario[]>(api.GET('/api/v1/usuarios', { params: { query: { role: 'locatario', por_pagina: 100 } } })),
-    retry: false, // perfis sem acesso a /usuarios recebem 403 — a tela cai para o ID
+    retry: false,
+    enabled: podeListarUsuarios(usuario), // só admin e gestor listam usuários; nos outros perfis a tela cai para o ID
   });
 }
 
@@ -170,6 +189,18 @@ export function useMudarStatusDoContrato(id: string) {
           ? api.PATCH('/api/v1/contratos/{contrato_id}/encerrar', caminhoDoContrato(id))
           : api.PATCH('/api/v1/contratos/{contrato_id}/cancelar', caminhoDoContrato(id)),
       ),
+    onSuccess: invalidar,
+  });
+}
+
+/**
+ * Exclusão lógica (admin e gestor): o contrato some das listagens e o GET por ID passa a dar 404.
+ * A API recusa com 409 enquanto houver vistoria ou problema no contrato.
+ */
+export function useExcluirContrato(id: string) {
+  const invalidar = useInvalidarAposExcluir(id);
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/contratos/{contrato_id}', caminhoDoContrato(id))),
     onSuccess: invalidar,
   });
 }

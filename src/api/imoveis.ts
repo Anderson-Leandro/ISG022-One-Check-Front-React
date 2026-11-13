@@ -2,6 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { api, desembrulhar, ErroApi, obterDados } from './client';
 import type { components } from './schema';
 import type { Endereco } from '../utils/endereco';
+import { useInvalidarAposExcluir } from './exclusao';
 
 export const ITENS_POR_PAGINA = 20;
 
@@ -110,6 +111,34 @@ export function useContratosDoImovel(id: string, limite: number) {
     queryKey: chaves.contratos(id, limite),
     queryFn: () => obterDados<ContratoResumido[]>(api.GET('/api/v1/contratos', { params: { query: { imovel_id: id, por_pagina: limite } } })),
     enabled: Boolean(id),
+  });
+}
+
+/** Um registro do histórico; `dados` tem o mesmo formato das listagens de contratos, checklists e problemas. */
+export interface EventoDoHistorico {
+  tipo: 'contrato' | 'vistoria' | 'problema';
+  data: string;
+  dados: { id: string; status?: string; tipo?: string; titulo?: string; data_inicio?: string; data_fim?: string | null; data_vistoria?: string | null; prioridade?: string };
+}
+
+/**
+ * Contratos, vistorias e problemas do imóvel, em ordem cronológica de registro.
+ * Cada perfil só recebe o que já vê nas listagens (o vistoriador, por exemplo, não recebe problemas).
+ */
+export function useHistoricoDoImovel(id: string) {
+  return useQuery({
+    queryKey: [...chaves.todos, 'historico', id],
+    queryFn: () => obterDados<{ imovel_id: string; eventos: EventoDoHistorico[] }>(api.GET('/api/v1/imoveis/{imovel_id}/historico', caminhoDoImovel(id))),
+    enabled: Boolean(id),
+  });
+}
+
+/** Exclusão lógica (admin e gestor): o imóvel some das listagens e deixa de contar no painel. */
+export function useExcluirImovel(id: string) {
+  const invalidar = useInvalidarAposExcluir(id);
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/imoveis/{imovel_id}', caminhoDoImovel(id))),
+    onSuccess: invalidar,
   });
 }
 

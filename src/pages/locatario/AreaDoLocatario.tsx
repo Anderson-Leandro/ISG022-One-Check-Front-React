@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { agendamentosAPartirDeHoje, ROTULO_DO_TIPO_DE_AGENDAMENTO } from '../../api/contratos';
 import { useAreaDoLocatario } from '../../api/locatario';
 import { ROTULO_DA_PRIORIDADE, ROTULO_DO_STATUS_DO_PROBLEMA } from '../../api/problemas';
 import { useMudarStatusDaVistoria, type Checklist } from '../../api/vistorias';
@@ -8,7 +9,7 @@ import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
 import { useFlash } from '../../components/Flash';
 import { rotuloDoTipoDeImovel } from '../../config/imoveis';
 import { resumoDoEndereco } from '../../utils/endereco';
-import { formatarData, formatarMoeda } from '../../utils/formatar';
+import { formatarData, formatarDataHora, formatarMoeda } from '../../utils/formatar';
 import { BadgeStatusDaVistoria, BadgeTipoDaVistoria } from '../vistorias/BadgesDaVistoria';
 
 function VistoriaAguardandoAceite({ checklist }: { checklist: Checklist }) {
@@ -67,8 +68,9 @@ export function AreaDoLocatario() {
       <EstadoDaConsulta carregando={consulta.isPending} erro={consulta.error}>
         {ativos.length === 0 && <div className="alert alert-info">Nenhum contrato ativo vinculado ao seu usuário.</div>}
 
-        {ativos.map(({ contrato, imovel, endereco, checklists, problemas }) => {
+        {ativos.map(({ contrato, imovel, endereco, checklists, problemas, agendamentos }) => {
           const pendentes = checklists.filter((checklist) => checklist.status === 'pendente_aceite');
+          const proximosAgendamentos = agendamentosAPartirDeHoje(agendamentos);
           const historico = [...checklists].sort((primeira, segunda) => String(segunda.created_at ?? '').localeCompare(String(primeira.created_at ?? '')));
           return (
             <section key={contrato.id} className="mb-4">
@@ -92,6 +94,22 @@ export function AreaDoLocatario() {
                   <ul className="list-group list-group-flush">
                     {pendentes.map((checklist) => (
                       <VistoriaAguardandoAceite key={checklist.id} checklist={checklist} />
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {proximosAgendamentos.length > 0 && (
+                <div className="card mb-3">
+                  <div className="card-header">
+                    <i className="bi bi-calendar-event me-1" />
+                    Vistorias agendadas
+                  </div>
+                  <ul className="list-group list-group-flush">
+                    {proximosAgendamentos.map((agendamento) => (
+                      <li key={agendamento.id} className="list-group-item small">
+                        <strong>{formatarDataHora(agendamento.data_agendada)}</strong> · {ROTULO_DO_TIPO_DE_AGENDAMENTO[agendamento.tipo] ?? agendamento.tipo}
+                      </li>
                     ))}
                   </ul>
                 </div>

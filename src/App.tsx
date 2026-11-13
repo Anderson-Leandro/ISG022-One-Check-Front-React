@@ -6,6 +6,7 @@ import { LayoutLocatario } from './layouts/LayoutLocatario';
 import { Login } from './pages/auth/Login';
 import { VerificarMfa } from './pages/auth/VerificarMfa';
 import { ConfigurarMfaNoLogin } from './pages/auth/ConfigurarMfaNoLogin';
+import { TrocarSenhaExpirada } from './pages/auth/TrocarSenhaExpirada';
 import { useAuth } from './auth/AuthContext';
 import { rotaInicial } from './auth/permissoes';
 import { SuspenseDaPagina } from './components/CarregandoPagina';
@@ -15,7 +16,7 @@ function carregarSobDemanda<Modulo>(importar: () => Promise<Modulo>, nome: keyof
   return lazy(async () => ({ default: (await importar())[nome] as ComponentType }));
 }
 
-// Login e MFA ficam no bundle inicial (primeira tela); o resto vira um chunk por página.
+// Login, MFA e troca obrigatória de senha ficam no bundle inicial (primeira tela); o resto vira um chunk por página.
 const ConfigurarMfa = carregarSobDemanda(() => import('./pages/auth/ConfigurarMfa'), 'ConfigurarMfa');
 const AreaDoLocatario = carregarSobDemanda(() => import('./pages/locatario/AreaDoLocatario'), 'AreaDoLocatario');
 const ListaDeUsuarios = carregarSobDemanda(() => import('./pages/usuarios/ListaDeUsuarios'), 'ListaDeUsuarios');
@@ -68,6 +69,7 @@ export function App() {
 
         <Route element={<RotaProtegida />}>
           <Route path="/mfa/configurar" element={<ConfigurarMfa />} />
+          <Route path="/senha/trocar" element={<TrocarSenhaExpirada />} />
         </Route>
 
         <Route element={<RotaProtegida pagina="locatario" />}>

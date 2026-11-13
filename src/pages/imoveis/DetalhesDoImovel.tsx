@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
-import { imovelTemGaragem, useComodos, useContratosDoImovel, useEnderecoDoImovel, useImovel } from '../../api/imoveis';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { imovelTemGaragem, useComodos, useContratosDoImovel, useEnderecoDoImovel, useExcluirImovel, useImovel } from '../../api/imoveis';
+import { useAuth } from '../../auth/AuthContext';
+import { podeAcessar, podeCriar } from '../../auth/permissoes';
 import { BadgeStatus } from '../../components/BadgeStatus';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
@@ -14,16 +16,33 @@ import { formatarData } from '../../utils/formatar';
 export function DetalhesDoImovel() {
   const { id = '' } = useParams();
   const { definirFlash } = useFlash();
+  const { usuario } = useAuth();
   const consultaDoImovel = useImovel(id);
   const { data: endereco } = useEnderecoDoImovel(id);
   const { data: comodos = [] } = useComodos(id);
   const { data: contratos = [] } = useContratosDoImovel(id, 5);
+  const excluirImovel = useExcluirImovel(id);
+  const navegar = useNavigate();
+  // imóvel com contrato ativo está locado: excluir antes exige encerrar ou excluir o contrato.
+  // O status do imóvel é a fonte principal (a lista de contratos aqui traz só os 5 mais recentes)
+  const temContratoAtivo = consultaDoImovel.data?.status === 'locado' || contratos.some((contrato) => contrato.status === 'ativo');
 
   useEffect(() => {
     if (consultaDoImovel.isError) definirFlash('erro', 'Imóvel não encontrado.');
   }, [consultaDoImovel.isError, definirFlash]);
 
   if (!id || consultaDoImovel.isError) return <Navigate to="/imoveis" replace />;
+
+  async function aoExcluir() {
+    if (!window.confirm('Excluir este imóvel? Ele some de todas as listagens e do painel, e não pode ser recuperado pela tela.')) return;
+    try {
+      await excluirImovel.mutateAsync();
+      definirFlash('sucesso', 'Imóvel excluído.');
+      navegar('/imoveis', { replace: true });
+    } catch (falha) {
+      definirFlash('erro', (falha as Error).message || 'Erro ao excluir o imóvel.');
+    }
+  }
 
   const imovel = consultaDoImovel.data;
   const tipo = rotuloDoTipoDeImovel(imovel?.tipo);
@@ -50,9 +69,23 @@ export function DetalhesDoImovel() {
                 <Link to={`/imoveis/${id}/editar`} className="btn btn-outline-secondary btn-sm">
                   Editar
                 </Link>
-                <Link to={`/vistorias/nova?imovel_id=${id}`} className="btn btn-primary btn-sm">
-                  Nova vistoria
-                </Link>
+                {podeCriar(usuario, 'vistorias') && (
+                  <Link to={`/vistorias/nova?imovel_id=${id}`} className="btn btn-primary btn-sm">
+                    Nova vistoria
+                  </Link>
+                )}
+                {podeCriar(usuario, 'imoveis') && (
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={aoExcluir}
+                    disabled={excluirImovel.isPending || temContratoAtivo}
+                    title={temContratoAtivo ? 'Encerre ou exclua antes o contrato ativo deste imóvel' : undefined}
+                  >
+                    <i className="bi bi-trash me-1" />
+                    Excluir
+                  </button>
+                )}
                 <Link to="/imoveis" className="btn btn-link btn-sm">
                   Voltar
                 </Link>
@@ -155,22 +188,26 @@ export function DetalhesDoImovel() {
                       <Link to="/vistorias" className="btn btn-outline-secondary btn-sm">
                         Ver vistorias
                       </Link>
-                      <Link to={`/vistorias/nova?imovel_id=${id}`} className="btn btn-primary btn-sm ms-2">
-                        Nova vistoria
-                      </Link>
+                      {podeCriar(usuario, 'vistorias') && (
+                        <Link to={`/vistorias/nova?imovel_id=${id}`} className="btn btn-primary btn-sm ms-2">
+                          Nova vistoria
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
-                <div className="col-md-6">
-                  <div className="card border-0 shadow-sm h-100">
-                    <div className="card-header fw-semibold">Problemas</div>
-                    <div className="card-body d-flex align-items-center">
-                      <Link to="/problemas" className="btn btn-outline-secondary btn-sm">
-                        Ver problemas
-                      </Link>
+                {podeAcessar(usuario, 'problemas') && (
+                  <div className="col-md-6">
+                    <div className="card border-0 shadow-sm h-100">
+                      <div className="card-header fw-semibold">Problemas</div>
+                      <div className="card-body d-flex align-items-center">
+                        <Link to="/problemas" className="btn btn-outline-secondary btn-sm">
+                          Ver problemas
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

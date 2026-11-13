@@ -1,4 +1,6 @@
-export type Perfil = 'admin' | 'gestor' | 'vistoriador' | 'visualizador' | 'locatario';
+/** Perfis aceitos pela API. Fonte única das listas de perfil do front. */
+export const PERFIS = ['admin', 'gestor', 'vistoriador', 'locatario'] as const;
+export type Perfil = (typeof PERFIS)[number];
 
 export interface Usuario {
   id: string;
@@ -6,6 +8,8 @@ export interface Usuario {
   email: string;
   role: Perfil | string;
   mfa_ativo?: boolean;
+  /** true obriga a troca de senha: até lá a API responde 403 em quase todas as rotas. */
+  senha_expirada?: boolean;
   [campo: string]: unknown;
 }
 

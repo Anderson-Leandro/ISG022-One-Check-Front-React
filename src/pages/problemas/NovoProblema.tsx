@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useNomesParaContratos } from '../../api/contratos';
-import { ROTULO_DA_PRIORIDADE, useContratosAtivos, useRegistrarProblema } from '../../api/problemas';
+import { ROTULO_DA_PRIORIDADE, useContratosAtivos, useRegistrarProblema, type PrioridadeDoProblema } from '../../api/problemas';
 import { useAuth } from '../../auth/AuthContext';
 import { podeCriar } from '../../auth/permissoes';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
@@ -18,7 +18,7 @@ export function NovoProblema() {
   const consultaDosContratos = useContratosAtivos();
   const { nomeDoImovel } = useNomesParaContratos();
   const registrarProblema = useRegistrarProblema();
-  const [formulario, setFormulario] = useState({ contratoId: parametros.get('contrato_id') ?? '', titulo: '', prioridade: 'normal', descricao: '' });
+  const [formulario, setFormulario] = useState({ contratoId: parametros.get('contrato_id') ?? '', titulo: '', prioridade: 'normal' as PrioridadeDoProblema, descricao: '' });
   const [erro, setErro] = useState('');
 
   if (!podeCriar(usuario, 'problemas')) return <Navigate to="/problemas" replace />;
@@ -90,7 +90,7 @@ export function NovoProblema() {
                   <label className="form-label" htmlFor="prioridade">
                     Prioridade
                   </label>
-                  <select id="prioridade" className="form-select" value={formulario.prioridade} onChange={(evento) => setFormulario({ ...formulario, prioridade: evento.target.value })}>
+                  <select id="prioridade" className="form-select" value={formulario.prioridade} onChange={(evento) => setFormulario({ ...formulario, prioridade: evento.target.value as PrioridadeDoProblema })}>
                     {Object.entries(ROTULO_DA_PRIORIDADE).map(([valor, rotulo]) => (
                       <option key={valor} value={valor}>
                         {rotulo}

@@ -113,10 +113,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Mfa Setup */
-        get: operations["mfa_setup_api_v1_auth_mfa_setup_get"];
+        get?: never;
         put?: never;
-        post?: never;
+        /** Mfa Setup */
+        post: operations["mfa_setup_api_v1_auth_mfa_setup_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -149,7 +149,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Mfa Disable */
+        /**
+         * Mfa Disable
+         * @deprecated
+         * @description Obsoleta: removida a partir de 2027-01-31. Use DELETE /usuarios/{usuario_id}/mfa (usuario_id do corpo).
+         */
         post: operations["mfa_disable_api_v1_auth_mfa_disable_post"];
         delete?: never;
         options?: never;
@@ -260,6 +264,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/usuarios/me/dados": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exportar Meus Dados
+         * @description Os próprios dados pessoais, em JSON (LGPD, art. 18, II e V; SEC-028). Só do usuário autenticado.
+         */
+        get: operations["exportar_meus_dados_api_v1_usuarios_me_dados_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usuarios/me/anonimizar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Anonimizar Me
+         * @description Anonimiza a própria conta e a desativa (LGPD, art. 18, IV e VI; SEC-028, ADR-0017). Não tem volta.
+         */
+        post: operations["anonimizar_me_api_v1_usuarios_me_anonimizar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/usuarios/me/mfa/setup": {
         parameters: {
             query?: never;
@@ -269,7 +313,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Mfa Setup Me */
+        /**
+         * Mfa Setup Me
+         * @deprecated
+         * @description Obsoleta: removida a partir de 2027-01-31. Use POST /auth/mfa/setup.
+         */
         post: operations["mfa_setup_me_api_v1_usuarios_me_mfa_setup_post"];
         delete?: never;
         options?: never;
@@ -286,7 +334,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Mfa Enable Me */
+        /**
+         * Mfa Enable Me
+         * @deprecated
+         * @description Obsoleta: removida a partir de 2027-01-31. Use POST /auth/mfa/activate.
+         */
         post: operations["mfa_enable_me_api_v1_usuarios_me_mfa_enable_post"];
         delete?: never;
         options?: never;
@@ -304,7 +356,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Mfa Disable Me */
+        /**
+         * Mfa Disable Me
+         * @deprecated
+         * @description Obsoleta: removida a partir de 2027-01-31. Use POST /auth/mfa/desabilitar.
+         */
         delete: operations["mfa_disable_me_api_v1_usuarios_me_mfa_delete"];
         options?: never;
         head?: never;
@@ -348,23 +404,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/usuarios/{usuario_id}/mfa/setup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Mfa Setup Usuario */
-        post: operations["mfa_setup_usuario_api_v1_usuarios__usuario_id__mfa_setup_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/usuarios/{usuario_id}/mfa/habilitar": {
         parameters: {
             query?: never;
@@ -374,7 +413,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Mfa Enable Usuario */
+        /**
+         * Mfa Enable Usuario
+         * @deprecated
+         * @description Obsoleta: removida a partir de 2027-01-31. Use POST /usuarios/{usuario_id}/mfa/enable.
+         */
         post: operations["mfa_enable_usuario_api_v1_usuarios__usuario_id__mfa_habilitar_post"];
         delete?: never;
         options?: never;
@@ -408,7 +451,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Mfa Reset Usuario */
+        /**
+         * Mfa Reset Usuario
+         * @deprecated
+         * @description Obsoleta: removida a partir de 2027-01-31. Use DELETE /usuarios/{usuario_id}/mfa.
+         */
         post: operations["mfa_reset_usuario_api_v1_usuarios__usuario_id__mfa_desabilitar_post"];
         delete?: never;
         options?: never;
@@ -465,6 +512,31 @@ export interface paths {
         post?: never;
         /** Delete Imovel */
         delete: operations["delete_imovel_api_v1_imoveis__imovel_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imoveis/{imovel_id}/historico": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Historico Imovel
+         * @description Contratos, vistorias e problemas do imóvel em ordem cronológica de registro (US-017).
+         *
+         *     Cada perfil vê só o que já acessa pelas listagens (GET /contratos, GET /contratos/{id}/checklists e
+         *     /problemas): o locatário, os próprios contratos, inclusive os encerrados; o vistoriador, os contratos em
+         *     que tem vistoria e só as vistorias dele; problemas, pela regra de assert_acesso_problemas.
+         *     Locatário ou vistoriador sem nenhum contrato visível no imóvel recebe 403.
+         */
+        get: operations["historico_imovel_api_v1_imoveis__imovel_id__historico_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -555,7 +627,11 @@ export interface paths {
         get: operations["get_contrato_api_v1_contratos__contrato_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Excluir Contrato
+         * @description Exclusão lógica (ADR-0008): só para contrato sem checklist nem problema (exclua-os antes).
+         */
+        delete: operations["excluir_contrato_api_v1_contratos__contrato_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -697,7 +773,11 @@ export interface paths {
         get: operations["get_checklist_api_v1_checklists__checklist_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Excluir Checklist
+         * @description Exclusão lógica (ADR-0008): só antes do envio para aceite, para preservar a evidência do laudo.
+         */
+        delete: operations["excluir_checklist_api_v1_checklists__checklist_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -901,7 +981,11 @@ export interface paths {
         get: operations["get_problema_by_id_api_v1_problemas__problema_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Excluir Problema
+         * @description Exclusão lógica (ADR-0008): só para problema ainda aberto e sem atualizações.
+         */
+        delete: operations["excluir_problema_api_v1_problemas__problema_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -934,7 +1018,10 @@ export interface paths {
         /** Listar Atualizacoes */
         get: operations["listar_atualizacoes_api_v1_problemas__problema_id__atualizacoes_get"];
         put?: never;
-        /** Criar Atualizacao */
+        /**
+         * Criar Atualizacao
+         * @description Admin e gestor comentam sempre; o locatário dono, enquanto o problema não estiver encerrado (ADR-0012).
+         */
         post: operations["criar_atualizacao_api_v1_problemas__problema_id__atualizacoes_post"];
         delete?: never;
         options?: never;
@@ -949,7 +1036,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Dashboard */
+        /**
+         * Dashboard
+         * @description Totais com o mesmo recorte das listagens de cada perfil; null quando o perfil não acessa aquele dado.
+         */
         get: operations["dashboard_api_v1_dashboard_get"];
         put?: never;
         post?: never;
@@ -1065,6 +1155,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AceiteResposta */
+        AceiteResposta: {
+            /** Id */
+            id: string;
+            /** Checklist Id */
+            checklist_id: string;
+            /** Locatario Id */
+            locatario_id: string;
+            /** Status */
+            status: string;
+            /** Motivo Rejeicao */
+            motivo_rejeicao?: string | null;
+            /** Created At */
+            created_at?: string | null;
+        };
         /** AddChecklistItemRequest */
         AddChecklistItemRequest: {
             /** Comodo Id */
@@ -1078,17 +1183,41 @@ export interface components {
         };
         /** AgendamentoCreate */
         AgendamentoCreate: {
-            /** Tipo */
-            tipo: string;
+            /**
+             * Tipo
+             * @enum {string}
+             */
+            tipo: "inicial" | "encerramento";
             /** Data Agendada */
             data_agendada: string;
             /** Observacao */
             observacao?: string | null;
         };
+        /** AgendamentoResposta */
+        AgendamentoResposta: {
+            /** Id */
+            id: string;
+            /** Contrato Id */
+            contrato_id: string;
+            /**
+             * Tipo
+             * @description inicial ou encerramento
+             */
+            tipo: string;
+            /** Data Agendada */
+            data_agendada?: string | null;
+            /**
+             * Observacao
+             * @description Nota interna da equipe: não vai na resposta para o locatário
+             */
+            observacao?: string | null;
+            /** Created At */
+            created_at?: string | null;
+        };
         /** AgendamentoUpdate */
         AgendamentoUpdate: {
             /** Tipo */
-            tipo?: string | null;
+            tipo?: ("inicial" | "encerramento") | null;
             /** Data Agendada */
             data_agendada?: string | null;
             /** Observacao */
@@ -1101,13 +1230,30 @@ export interface components {
             /** Nova Senha */
             nova_senha: string;
         };
-        /** Body_upload_foto_api_v1_checklists__checklist_id__itens__item_id__fotos_post */
-        Body_upload_foto_api_v1_checklists__checklist_id__itens__item_id__fotos_post: {
-            /**
-             * Foto
-             * Format: binary
-             */
-            foto: string;
+        /**
+         * AnonimizarMeRequest
+         * @description Reautenticação para anonimizar a própria conta (SEC-028): senha e, com autenticador, o código.
+         */
+        AnonimizarMeRequest: {
+            /** Senha */
+            senha: string;
+            /** Codigo */
+            codigo?: string | null;
+        };
+        /** AtualizacaoProblemaResposta */
+        AtualizacaoProblemaResposta: {
+            /** Id */
+            id: string;
+            /** Problema Id */
+            problema_id: string;
+            /** Autor Id */
+            autor_id?: string | null;
+            /** Descricao */
+            descricao: string;
+            /** Foto Url */
+            foto_url?: string | null;
+            /** Created At */
+            created_at?: string | null;
         };
         /** ChecklistCreate */
         ChecklistCreate: {
@@ -1118,12 +1264,53 @@ export interface components {
             /** Vistoriador Id */
             vistoriador_id: string;
         };
+        /** ChecklistResposta */
+        ChecklistResposta: {
+            /** Id */
+            id: string;
+            /** Contrato Id */
+            contrato_id: string;
+            /** Vistoriador Id */
+            vistoriador_id?: string | null;
+            /** Tipo */
+            tipo: string;
+            /** Status */
+            status: string;
+            /** Data Vistoria */
+            data_vistoria?: string | null;
+            /** Created At */
+            created_at?: string | null;
+            aceite?: components["schemas"]["AceiteResposta"] | null;
+            /**
+             * Itens
+             * @description Só no detalhe
+             */
+            itens?: components["schemas"]["ItemChecklistResposta"][] | null;
+            /**
+             * Comodos
+             * @description Só no detalhe
+             */
+            comodos?: components["schemas"]["ComodoResposta"][] | null;
+        };
         /** ComodoCreate */
         ComodoCreate: {
             /** Tipo */
             tipo: string;
             /** Descricao */
             descricao?: string | null;
+        };
+        /** ComodoResposta */
+        ComodoResposta: {
+            /** Id */
+            id: string;
+            /** Imovel Id */
+            imovel_id: string;
+            /** Tipo */
+            tipo: string;
+            /** Descricao */
+            descricao?: string | null;
+            /** Nome */
+            nome?: string | null;
         };
         /** ComodoUpdate */
         ComodoUpdate: {
@@ -1151,6 +1338,25 @@ export interface components {
             /** Valor Mensal */
             valor_mensal?: number | null;
         };
+        /** ContratoResposta */
+        ContratoResposta: {
+            /** Id */
+            id: string;
+            /** Imovel Id */
+            imovel_id: string;
+            /** Locatario Id */
+            locatario_id: string;
+            /** Data Inicio */
+            data_inicio: string;
+            /** Data Fim */
+            data_fim: string;
+            /** Valor Mensal */
+            valor_mensal?: number | null;
+            /** Status */
+            status: string;
+            /** Created At */
+            created_at?: string | null;
+        };
         /** EnderecoCreate */
         EnderecoCreate: {
             /** Rua */
@@ -1176,10 +1382,241 @@ export interface components {
             /** Longitude */
             longitude?: number | null;
         };
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
+        /** EnderecoResposta */
+        EnderecoResposta: {
+            /** Rua */
+            rua?: string | null;
+            /**
+             * Logradouro
+             * @description O mesmo valor de `rua`, mantido por compatibilidade
+             */
+            logradouro?: string | null;
+            /** Numero */
+            numero?: string | null;
+            /** Complemento */
+            complemento?: string | null;
+            /** Bloco */
+            bloco?: string | null;
+            /** Andar */
+            andar?: string | null;
+            /** Bairro */
+            bairro?: string | null;
+            /** Cidade */
+            cidade?: string | null;
+            /** Estado */
+            estado?: string | null;
+            /** Cep */
+            cep?: string | null;
+            /** Latitude */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
+        };
+        /** Envelope[ChecklistResposta] */
+        Envelope_ChecklistResposta_: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            dados: components["schemas"]["ChecklistResposta"];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[ContratoResposta] */
+        Envelope_ContratoResposta_: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            dados: components["schemas"]["ContratoResposta"];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[ImovelResposta] */
+        Envelope_ImovelResposta_: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            dados: components["schemas"]["ImovelResposta"];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[LoginResposta] */
+        Envelope_LoginResposta_: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            dados: components["schemas"]["LoginResposta"];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[ProblemaResposta] */
+        Envelope_ProblemaResposta_: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            dados: components["schemas"]["ProblemaResposta"];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[TokensResposta] */
+        Envelope_TokensResposta_: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            dados: components["schemas"]["TokensResposta"];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[UsuarioResposta] */
+        Envelope_UsuarioResposta_: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            dados: components["schemas"]["UsuarioResposta"];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[list[AgendamentoResposta]] */
+        Envelope_list_AgendamentoResposta__: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            /** Dados */
+            dados: components["schemas"]["AgendamentoResposta"][];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[list[ChecklistResposta]] */
+        Envelope_list_ChecklistResposta__: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            /** Dados */
+            dados: components["schemas"]["ChecklistResposta"][];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[list[ComodoResposta]] */
+        Envelope_list_ComodoResposta__: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            /** Dados */
+            dados: components["schemas"]["ComodoResposta"][];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[list[ContratoResposta]] */
+        Envelope_list_ContratoResposta__: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            /** Dados */
+            dados: components["schemas"]["ContratoResposta"][];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[list[ImovelResposta]] */
+        Envelope_list_ImovelResposta__: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            /** Dados */
+            dados: components["schemas"]["ImovelResposta"][];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[list[ProblemaResposta]] */
+        Envelope_list_ProblemaResposta__: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            /** Dados */
+            dados: components["schemas"]["ProblemaResposta"][];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /** Envelope[list[UsuarioResposta]] */
+        Envelope_list_UsuarioResposta__: {
+            /**
+             * Sucesso
+             * @description Sempre true numa resposta 2xx
+             * @constant
+             */
+            sucesso: true;
+            /** Dados */
+            dados: components["schemas"]["UsuarioResposta"][];
+            /** @description Só nas listagens paginadas */
+            paginacao?: components["schemas"]["PaginacaoResposta"] | null;
+        };
+        /**
+         * ErroResposta
+         * @description O envelope de todo erro da API: o status HTTP acompanha o resultado (ADR-0003, DEBT-020).
+         */
+        ErroResposta: {
+            /**
+             * Sucesso
+             * @description Sempre false
+             * @constant
+             */
+            sucesso: false;
+            /**
+             * Erro
+             * @description Mensagem para mostrar ao usuário
+             */
+            erro: string;
+            /**
+             * Erros
+             * @description Mensagem por campo, nos 422 (o nome aninhado vem com ponto: endereco.rua)
+             */
+            erros?: {
+                [key: string]: unknown;
+            } | string[] | null;
+        };
+        /** FotoResposta */
+        FotoResposta: {
+            /** Id */
+            id: string;
+            /** Url */
+            url?: string | null;
         };
         /** ImovelCreate */
         ImovelCreate: {
@@ -1210,6 +1647,33 @@ export interface components {
             observacoes?: string | null;
             endereco?: components["schemas"]["EnderecoCreate"] | null;
         };
+        /** ImovelResposta */
+        ImovelResposta: {
+            /** Id */
+            id: string;
+            /** Codigo */
+            codigo?: string | null;
+            /** Titulo */
+            titulo?: string | null;
+            /** Tipo */
+            tipo: string;
+            /** Tamanho */
+            tamanho?: string | null;
+            /** Garagem */
+            garagem: boolean;
+            /** Garagem Vagas */
+            garagem_vagas: number;
+            /** Status */
+            status: string;
+            /** Observacoes */
+            observacoes?: string | null;
+            /** Ativo */
+            ativo: boolean;
+            /** Created At */
+            created_at?: string | null;
+            /** @description Só no detalhe e na criação */
+            endereco?: components["schemas"]["EnderecoResposta"] | null;
+        };
         /** ImovelUpdate */
         ImovelUpdate: {
             /** Codigo */
@@ -1230,6 +1694,23 @@ export interface components {
             observacoes?: string | null;
             endereco?: components["schemas"]["EnderecoCreate"] | null;
         };
+        /** ItemChecklistResposta */
+        ItemChecklistResposta: {
+            /** Id */
+            id: string;
+            /** Checklist Id */
+            checklist_id: string;
+            /** Comodo Id */
+            comodo_id?: string | null;
+            /** Item Vistoria Id */
+            item_vistoria_id?: string | null;
+            /** Estado */
+            estado?: string | null;
+            /** Observacao */
+            observacao?: string | null;
+            /** Fotos */
+            fotos: components["schemas"]["FotoResposta"][];
+        };
         /** ItemUpdateRequest */
         ItemUpdateRequest: {
             /** Estado */
@@ -1244,6 +1725,37 @@ export interface components {
             /** Senha */
             senha: string;
         };
+        /**
+         * LoginResposta
+         * @description Uma de três formas: tokens (login completo), mfa_required ou mfa_setup_required, com o temp_token.
+         */
+        LoginResposta: {
+            /** Access Token */
+            access_token?: string | null;
+            /** Refresh Token */
+            refresh_token?: string | null;
+            usuario?: components["schemas"]["UsuarioLoginResposta"] | null;
+            /**
+             * Mfa Required
+             * @description Falta o código: POST /auth/mfa/verify com o temp_token
+             */
+            mfa_required?: boolean | null;
+            /**
+             * Mfa Setup Required
+             * @description Falta configurar o autenticador: GET /auth/mfa/setup-login com o temp_token
+             */
+            mfa_setup_required?: boolean | null;
+            /**
+             * Temp Token
+             * @description Vale 10 minutos, só para o próximo passo do login
+             */
+            temp_token?: string | null;
+            /**
+             * Mfa Token
+             * @description O mesmo valor de `temp_token`, mantido por compatibilidade
+             */
+            mfa_token?: string | null;
+        };
         /** MfaActivateLoginRequest */
         MfaActivateLoginRequest: {
             /** Temp Token */
@@ -1255,11 +1767,20 @@ export interface components {
         MfaActivateRequest: {
             /** Codigo */
             codigo: string;
+            /** Codigo Atual */
+            codigo_atual?: string | null;
         };
         /** MfaDisableRequest */
         MfaDisableRequest: {
             /** Usuario Id */
             usuario_id: string;
+        };
+        /** MfaDisableSelfRequest */
+        MfaDisableSelfRequest: {
+            /** Senha */
+            senha: string;
+            /** Codigo */
+            codigo?: string | null;
         };
         /** MfaEnableRequest */
         MfaEnableRequest: {
@@ -1267,6 +1788,8 @@ export interface components {
             secret: string;
             /** Codigo */
             codigo: string;
+            /** Codigo Atual */
+            codigo_atual?: string | null;
         };
         /** MfaVerifyRequest */
         MfaVerifyRequest: {
@@ -1274,6 +1797,38 @@ export interface components {
             temp_token: string;
             /** Codigo */
             codigo: string;
+        };
+        /** PaginacaoResposta */
+        PaginacaoResposta: {
+            /** Total */
+            total: number;
+            /** Pagina */
+            pagina: number;
+            /** Itensporpagina */
+            itensPorPagina: number;
+        };
+        /** ProblemaResposta */
+        ProblemaResposta: {
+            /** Id */
+            id: string;
+            /** Contrato Id */
+            contrato_id: string;
+            /** Comodo Id */
+            comodo_id?: string | null;
+            /** Titulo */
+            titulo: string;
+            /** Descricao */
+            descricao?: string | null;
+            /** Foto Url */
+            foto_url?: string | null;
+            /** Prioridade */
+            prioridade: string;
+            /** Status */
+            status: string;
+            /** Created At */
+            created_at?: string | null;
+            /** Atualizacoes */
+            atualizacoes: components["schemas"]["AtualizacaoProblemaResposta"][];
         };
         /** RefreshRequest */
         RefreshRequest: {
@@ -1301,6 +1856,16 @@ export interface components {
              */
             mode: string;
         };
+        /** TokensResposta */
+        TokensResposta: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Refresh Token
+             * @description Novo a cada renovação: o anterior deixa de valer
+             */
+            refresh_token: string;
+        };
         /** UsuarioCreate */
         UsuarioCreate: {
             /** Nome */
@@ -1313,6 +1878,71 @@ export interface components {
             role: string;
             /** Cpf */
             cpf?: string | null;
+        };
+        /**
+         * UsuarioLoginResposta
+         * @description O usuário no login e no MFA: só a identificação e o perfil (os dados completos vêm de /usuarios/me).
+         */
+        UsuarioLoginResposta: {
+            /** Id */
+            id: string;
+            /** Nome */
+            nome: string;
+            /** Email */
+            email: string;
+            /**
+             * Role
+             * @description Perfil de acesso: admin, gestor, vistoriador ou locatario
+             */
+            role: string;
+            /**
+             * Senha Expirada
+             * @description A senha não atende à política atual: até trocá-la (PUT /usuarios/me/senha), as outras rotas respondem 403 (SEC-029)
+             * @default false
+             */
+            senha_expirada: boolean;
+        };
+        /** UsuarioResposta */
+        UsuarioResposta: {
+            /** Id */
+            id: string;
+            /** Nome */
+            nome: string;
+            /** Email */
+            email: string;
+            /**
+             * Role
+             * @description Perfil de acesso: admin, gestor, vistoriador ou locatario
+             */
+            role: string;
+            /**
+             * Cpf
+             * @description Completo para o próprio usuário e no detalhe de admin e gestor; mascarado nas listas
+             */
+            cpf?: string | null;
+            /**
+             * Mfa Enabled
+             * @description O MFA está ligado (exigido) para a conta
+             */
+            mfa_enabled: boolean;
+            /**
+             * Mfa Configurado
+             * @description A conta já tem um autenticador configurado
+             */
+            mfa_configurado: boolean;
+            /**
+             * Mfa Ativo
+             * @description O login pede o código: MFA ligado e autenticador configurado (mfa_enabled e mfa_configurado)
+             */
+            mfa_ativo: boolean;
+            /**
+             * Senha Expirada
+             * @description A senha não atende à política atual: até trocá-la (PUT /usuarios/me/senha), as outras rotas respondem 403 (SEC-029)
+             * @default false
+             */
+            senha_expirada: boolean;
+            /** Created At */
+            created_at?: string | null;
         };
         /** UsuarioUpdate */
         UsuarioUpdate: {
@@ -1335,15 +1965,6 @@ export interface components {
             senha_atual?: string | null;
             /** Senha Nova */
             senha_nova?: string | null;
-        };
-        /** ValidationError */
-        ValidationError: {
-            /** Location */
-            loc: (string | number)[];
-            /** Message */
-            msg: string;
-            /** Error Type */
-            type: string;
         };
     };
     responses: never;
@@ -1400,7 +2021,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1418,22 +2039,40 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_LoginResposta_"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema) */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Tentativas demais: espere o tempo do cabeçalho Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1451,22 +2090,40 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_LoginResposta_"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema) */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Tentativas demais: espere o tempo do cabeçalho Retry-After */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1497,7 +2154,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1530,12 +2187,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
     };
-    mfa_setup_api_v1_auth_mfa_setup_get: {
+    mfa_setup_api_v1_auth_mfa_setup_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -1583,7 +2240,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1616,7 +2273,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1648,29 +2305,9 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    refresh_api_v1_auth_refresh_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RefreshRequest"];
+                "application/json": components["schemas"]["MfaDisableSelfRequest"];
             };
         };
         responses: {
@@ -1689,7 +2326,49 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+        };
+    };
+    refresh_api_v1_auth_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description Sucesso */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TokensResposta_"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1722,7 +2401,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1736,13 +2415,22 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_UsuarioResposta_"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1775,7 +2463,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1808,7 +2496,60 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+        };
+    };
+    exportar_meus_dados_api_v1_usuarios_me_dados_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    anonimizar_me_api_v1_usuarios_me_anonimizar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnonimizarMeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1861,7 +2602,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1873,7 +2614,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaDisableSelfRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -1882,6 +2627,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1899,13 +2653,31 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_list_UsuarioResposta__"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -1914,7 +2686,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1932,22 +2704,49 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_UsuarioResposta_"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Conflito com o estado atual, como um registro em uso ou duplicado */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema) */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -1963,13 +2762,40 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_UsuarioResposta_"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -1978,7 +2804,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2013,7 +2839,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2044,38 +2870,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    mfa_setup_usuario_api_v1_usuarios__usuario_id__mfa_setup_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                usuario_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2091,7 +2886,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["MfaEnableRequest"] | null;
+                "application/json": {
+                    [key: string]: unknown;
+                } | null;
             };
         };
         responses: {
@@ -2110,7 +2907,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2126,7 +2923,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["MfaEnableRequest"] | null;
+                "application/json": {
+                    [key: string]: unknown;
+                } | null;
             };
         };
         responses: {
@@ -2145,7 +2944,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2176,7 +2975,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2207,7 +3006,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2227,13 +3026,22 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_list_ImovelResposta__"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -2242,7 +3050,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2260,22 +3068,40 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_ImovelResposta_"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema) */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2291,13 +3117,40 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_ImovelResposta_"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -2306,7 +3159,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2341,7 +3194,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2372,7 +3225,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+        };
+    };
+    historico_imovel_api_v1_imoveis__imovel_id__historico_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                imovel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2403,7 +3287,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2438,7 +3322,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2473,7 +3357,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2508,7 +3392,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2524,13 +3408,40 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_list_ComodoResposta__"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -2539,7 +3450,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2574,7 +3485,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2610,7 +3521,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2642,7 +3553,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2661,13 +3572,22 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_list_ContratoResposta__"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -2676,7 +3596,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2694,13 +3614,116 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_ContratoResposta_"];
+                };
+            };
+            /** @description Regra da rota violada, como datas incoerentes */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Conflito com o estado atual, como um registro em uso ou duplicado */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+        };
+    };
+    get_contrato_api_v1_contratos__contrato_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contrato_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sucesso */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ContratoResposta_"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -2709,12 +3732,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
     };
-    get_contrato_api_v1_contratos__contrato_id__get: {
+    excluir_contrato_api_v1_contratos__contrato_id__delete: {
         parameters: {
             query?: never;
             header?: never;
@@ -2740,7 +3763,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2771,7 +3794,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2802,7 +3825,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2833,7 +3856,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2864,7 +3887,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2880,13 +3903,40 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_list_AgendamentoResposta__"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -2895,7 +3945,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2930,7 +3980,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2946,13 +3996,40 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_list_ChecklistResposta__"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -2961,7 +4038,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -2981,22 +4058,58 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_ChecklistResposta_"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Conflito com o estado atual, como um registro em uso ou duplicado */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema) */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3012,13 +4125,40 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_list_ProblemaResposta__"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -3027,7 +4167,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3041,24 +4181,114 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Titulo */
+                    titulo: string;
+                    /** Descricao */
+                    descricao?: string | null;
+                    /** Comodo Id */
+                    comodo_id?: string | null;
+                    /**
+                     * Prioridade
+                     * @default normal
+                     * @enum {string}
+                     */
+                    prioridade?: "normal" | "alta" | "urgente";
+                    /**
+                     * Status
+                     * @default aberto
+                     * @enum {string}
+                     */
+                    status?: "aberto";
+                    /**
+                     * Foto Url
+                     * @description Uma foto já enviada pelo upload da API
+                     */
+                    foto_url?: string | null;
+                };
+                "multipart/form-data": {
+                    /** Titulo */
+                    titulo: string;
+                    /** Descricao */
+                    descricao?: string | null;
+                    /** Comodo Id */
+                    comodo_id?: string | null;
+                    /**
+                     * Prioridade
+                     * @default normal
+                     * @enum {string}
+                     */
+                    prioridade?: "normal" | "alta" | "urgente";
+                    /**
+                     * Status
+                     * @default aberto
+                     * @enum {string}
+                     */
+                    status?: "aberto";
+                    /**
+                     * Foto
+                     * Format: binary
+                     * @description JPEG, PNG ou WebP
+                     */
+                    foto?: string;
+                };
+            };
+        };
         responses: {
-            /** @description Successful Response */
-            200: {
+            /** @description Sucesso */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_ProblemaResposta_"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Conflito com o estado atual, como um registro em uso ou duplicado */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema) */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3093,7 +4323,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3124,7 +4354,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3160,6 +4390,64 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Sucesso */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ChecklistResposta_"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+        };
+    };
+    excluir_checklist_api_v1_checklists__checklist_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                checklist_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
             /** @description Successful Response */
             200: {
                 headers: {
@@ -3175,7 +4463,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3210,7 +4498,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3246,7 +4534,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3263,7 +4551,10 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "multipart/form-data": components["schemas"]["Body_upload_foto_api_v1_checklists__checklist_id__itens__item_id__fotos_post"];
+                "multipart/form-data": {
+                    /** Format: binary */
+                    foto: string;
+                };
             };
         };
         responses: {
@@ -3282,7 +4573,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3315,7 +4606,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3346,7 +4637,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3377,7 +4668,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3408,7 +4699,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3443,7 +4734,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3474,7 +4765,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3505,7 +4796,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3536,7 +4827,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3552,13 +4843,40 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description Sucesso */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Envelope_ProblemaResposta_"];
+                };
+            };
+            /** @description Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description O perfil ou o dono do registro não permite a operação */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+            /** @description Registro não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
             /** @description Validation Error */
@@ -3567,12 +4885,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
     };
-    atualizar_status_problema_api_v1_problemas__problema_id__status_patch: {
+    excluir_problema_api_v1_problemas__problema_id__delete: {
         parameters: {
             query?: never;
             header?: never;
@@ -3598,7 +4916,48 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
+                };
+            };
+        };
+    };
+    atualizar_status_problema_api_v1_problemas__problema_id__status_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                problema_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Status
+                     * @enum {string}
+                     */
+                    status: "aberto" | "em_andamento" | "em_analise" | "resolvido" | "fechado";
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3629,7 +4988,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3643,7 +5002,35 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Descricao
+                     * @description Pelo menos 5 caracteres, sem contar os espaços nas pontas
+                     */
+                    descricao: string;
+                    /**
+                     * Foto Url
+                     * @description Uma foto já enviada pelo upload da API
+                     */
+                    foto_url?: string | null;
+                };
+                "multipart/form-data": {
+                    /**
+                     * Descricao
+                     * @description Pelo menos 5 caracteres, sem contar os espaços nas pontas
+                     */
+                    descricao: string;
+                    /**
+                     * Foto
+                     * Format: binary
+                     * @description JPEG, PNG ou WebP
+                     */
+                    foto?: string;
+                };
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -3660,7 +5047,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3717,7 +5104,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3748,7 +5135,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3779,7 +5166,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3810,7 +5197,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3841,7 +5228,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };
@@ -3876,7 +5263,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErroResposta"];
                 };
             };
         };

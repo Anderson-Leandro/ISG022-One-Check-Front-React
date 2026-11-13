@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ITENS_POR_PAGINA, mfaEstaAtivo, perfilDoUsuario, useListaDeUsuarios } from '../../api/usuarios';
+import { ITENS_POR_PAGINA, mfaEstaAtivo, PERFIS, perfilDoUsuario, ROTULO_DO_PERFIL, useListaDeUsuarios } from '../../api/usuarios';
 import { useAuth } from '../../auth/AuthContext';
-import { podeCriar } from '../../auth/permissoes';
+import { podeCriar, podeGerenciarUsuario } from '../../auth/permissoes';
 import { BadgeMfa, BadgePerfil } from '../../components/BadgePerfil';
 import { CabecalhoDaPagina } from '../../components/CabecalhoDaPagina';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
@@ -68,11 +68,11 @@ export function ListaDeUsuarios() {
                 onChange={(evento) => setPerfilSelecionado(evento.target.value)}
               >
                 <option value="">Todos</option>
-                <option value="admin">Admin</option>
-                <option value="gestor">Gestor</option>
-                <option value="vistoriador">Vistoriador</option>
-                <option value="visualizador">Visualizador</option>
-                <option value="locatario">Locatário</option>
+                {PERFIS.map((perfil) => (
+                  <option key={perfil} value={perfil}>
+                    {ROTULO_DO_PERFIL[perfil]}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-auto">
@@ -119,13 +119,17 @@ export function ListaDeUsuarios() {
                         </td>
                         <td style={{ fontSize: 12, color: '#6b7fa3' }}>{formatarData(itemDaLista.created_at as string)}</td>
                         <td>
-                          <Link
-                            to={`/usuarios/${itemDaLista.id}/editar`}
-                            className="btn btn-outline-secondary btn-sm py-0 px-2"
-                            title="Editar"
-                          >
-                            <i className="bi bi-pencil" />
-                          </Link>
+                          {itemDaLista.id === usuario?.id ? (
+                            <Link to="/usuarios/perfil" className="btn btn-outline-secondary btn-sm py-0 px-2" title="Meu perfil">
+                              <i className="bi bi-person" />
+                            </Link>
+                          ) : (
+                            podeGerenciarUsuario(usuario, itemDaLista) && (
+                              <Link to={`/usuarios/${itemDaLista.id}/editar`} className="btn btn-outline-secondary btn-sm py-0 px-2" title="Editar">
+                                <i className="bi bi-pencil" />
+                              </Link>
+                            )
+                          )}
                         </td>
                       </tr>
                     ))}

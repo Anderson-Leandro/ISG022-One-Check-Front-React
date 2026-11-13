@@ -13,15 +13,24 @@ const usuario = (role: string, id = `id-${role}`): Usuario => ({ id, nome: role,
 const checklist = (status: string, vistoriadorId = 'id-vistoriador'): Checklist => ({ id: 'c1', contrato_id: 'k1', status, vistoriador_id: vistoriadorId });
 
 describe('permissoesDaVistoria (regras confirmadas contra a API)', () => {
-  it('vistoriador designado edita e submete em preenchimento, mas não envia para aceite', () => {
-    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('vistoriador'))).toEqual({ excluir: false, editarItens: true, submeter: true, enviarParaAceite: false, aceitarOuRejeitar: false });
+  it('vistoriador designado edita e submete em preenchimento', () => {
+    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('vistoriador'))).toEqual({ excluir: false, editarItens: true, submeter: true, aceitarOuRejeitar: false });
+  });
+  it('uma só ação de envio: admin e gestor submetem, e não existe "enviar para aceite" (TK-007)', () => {
+    for (const perfil of ['admin', 'gestor']) {
+      const pode = permissoesDaVistoria(checklist('em_preenchimento'), usuario(perfil));
+      expect(pode.submeter).toBe(true);
+      expect(pode).not.toHaveProperty('enviarParaAceite');
+    }
+    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('vistoriador', 'outro')).submeter).toBe(false);
+    expect(permissoesDaVistoria(checklist('pendente_aceite'), usuario('gestor')).submeter).toBe(false);
   });
   it('outro vistoriador não edita', () => {
     expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('vistoriador', 'outro')).editarItens).toBe(false);
   });
   it('locatário só aceita/rejeita quando pendente de aceite', () => {
     expect(permissoesDaVistoria(checklist('pendente_aceite'), usuario('locatario')).aceitarOuRejeitar).toBe(true);
-    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('locatario'))).toEqual({ excluir: false, editarItens: false, submeter: false, enviarParaAceite: false, aceitarOuRejeitar: false });
+    expect(permissoesDaVistoria(checklist('em_preenchimento'), usuario('locatario'))).toEqual({ excluir: false, editarItens: false, submeter: false, aceitarOuRejeitar: false });
   });
   it('quem fez a vistoria não aceita nem rejeita a própria vistoria, mesmo sendo gestor', () => {
     expect(permissoesDaVistoria(checklist('pendente_aceite', 'id-gestor'), usuario('gestor')).aceitarOuRejeitar).toBe(false);

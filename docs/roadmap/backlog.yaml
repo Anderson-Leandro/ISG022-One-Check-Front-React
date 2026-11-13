@@ -1,0 +1,1909 @@
+version: 1
+items:
+- id: EP-001
+  type: epic
+  title: Fundação e processo
+  epic: null
+  story: ''
+  description: Repositório, CI, README, acordo de trabalho e gestão por backlog e sprints.
+  acceptance_criteria: []
+  priority: must
+  rank: 10
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F0
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-002
+  type: epic
+  title: Autenticação, MFA e sessão
+  epic: null
+  story: ''
+  description: Login, MFA, troca obrigatória de senha, renovação e encerramento de sessão.
+  acceptance_criteria: []
+  priority: must
+  rank: 20
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F3
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-003
+  type: epic
+  title: Usuários e perfis
+  epic: null
+  story: ''
+  description: Gestão de usuários, perfil próprio e regras de acesso por perfil na interface.
+  acceptance_criteria: []
+  priority: must
+  rank: 30
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F3
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-004
+  type: epic
+  title: Imóveis, cômodos e mapa
+  epic: null
+  story: ''
+  description: Cadastro de imóveis, cômodos, histórico e mapa.
+  acceptance_criteria: []
+  priority: must
+  rank: 40
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-005
+  type: epic
+  title: Contratos e agendamentos
+  epic: null
+  story: ''
+  description: Contratos de locação e agenda de vistorias.
+  acceptance_criteria: []
+  priority: must
+  rank: 50
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-006
+  type: epic
+  title: Vistorias
+  epic: null
+  story: ''
+  description: Checklist, fotos, comparativo, aceite e laudo.
+  acceptance_criteria: []
+  priority: must
+  rank: 60
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-007
+  type: epic
+  title: Problemas
+  epic: null
+  story: ''
+  description: Registro e acompanhamento de problemas do imóvel.
+  acceptance_criteria: []
+  priority: must
+  rank: 70
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-008
+  type: epic
+  title: Painéis e auditoria
+  epic: null
+  story: ''
+  description: Painéis por perfil e tela de logs de auditoria.
+  acceptance_criteria: []
+  priority: must
+  rank: 80
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-009
+  type: epic
+  title: Área do locatário
+  epic: null
+  story: ''
+  description: Tela inicial e navegação próprias do locatário.
+  acceptance_criteria: []
+  priority: must
+  rank: 90
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-010
+  type: epic
+  title: Segurança e conformidade
+  epic: null
+  story: ''
+  description: Auditoria, LGPD, proteção de sessão e cabeçalhos de segurança.
+  acceptance_criteria: []
+  priority: must
+  rank: 100
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F2
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-011
+  type: epic
+  title: Qualidade e experiência de uso
+  epic: null
+  story: ''
+  description: Testes de tela, robustez do cliente da API, usabilidade e organização do código.
+  acceptance_criteria: []
+  priority: must
+  rank: 110
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: EP-012
+  type: epic
+  title: Entrega e operação
+  epic: null
+  story: ''
+  description: Deploy, origens de produção, releases e corte do front antigo.
+  acceptance_criteria: []
+  priority: must
+  rank: 120
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F7
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-001
+  type: story
+  title: Entrar com e-mail, senha e MFA e manter a sessão
+  epic: EP-002
+  story: Como usuário da OneCheck, quero entrar com e-mail, senha e código do autenticador, para acessar o sistema
+    com a sessão protegida.
+  description: Entrega reconstruída do histórico na adoção do roadmap (2026-11-13).
+  acceptance_criteria:
+  - Dado credenciais válidas e MFA exigido, quando informo o código, então entro na página inicial do meu perfil.
+  - Dado um login ou código recusado, quando a API responde 401, então a tela mostra o erro e não renova a sessão
+    nem repete o envio.
+  - Dado a senha fora da política, quando entro, então sou levado à troca obrigatória de senha.
+  - Dado o refresh recusado, quando qualquer rota responde 401, então a sessão é encerrada com aviso na tela de
+    login.
+  priority: must
+  rank: 130
+  estimate: 8
+  status: done
+  sprint: null
+  phase: F3
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: bf07170..1406db1
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - src/auth/AuthContext.tsx
+  - src/api/client.ts
+  - src/auth/armazenamentoDeTokens.ts
+  - src/pages/auth/
+  - src/__testes__/client.test.ts
+  - src/__testes__/ConfigurarMfa.test.tsx
+  - src/__testes__/mensagens.test.tsx
+  - commit bf07170
+  - commit dc14298
+  - commit 42476d8
+  - 'PR #1'
+  - 'PR #3'
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: done
+- id: US-002
+  type: story
+  title: Gerir usuários e o próprio perfil conforme o perfil de acesso
+  epic: EP-003
+  story: Como admin ou gestor, quero cadastrar, editar e desativar usuários dentro do que meu perfil permite, para
+    controlar quem acessa o sistema.
+  description: Entrega reconstruída do histórico na adoção do roadmap (2026-11-13).
+  acceptance_criteria:
+  - Dado um gestor, quando abre a gestão de usuários, então só gerencia vistoriador e locatário.
+  - Dado qualquer usuário, quando tenta gerenciar a própria conta pela gestão, então a ação não é oferecida.
+  - Dado uma senha nova fora da política ou um CPF inválido, quando envio, então o erro aparece no campo.
+  priority: must
+  rank: 140
+  estimate: 8
+  status: done
+  sprint: null
+  phase: F3
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: cc86b35..c96821c
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - src/pages/usuarios/
+  - src/api/usuarios.ts
+  - src/auth/permissoes.ts
+  - src/utils/senha.ts
+  - src/utils/cpf.ts
+  - src/__testes__/regras.test.ts
+  - commit cc86b35
+  - commit 51339d1
+  - commit c96821c
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: done
+- id: US-003
+  type: story
+  title: Cadastrar imóveis, cômodos e ver o histórico e o mapa
+  epic: EP-004
+  story: Como admin ou gestor, quero cadastrar imóveis com endereço e cômodos e vê-los no mapa, para manter a carteira
+    organizada.
+  description: Entrega reconstruída do histórico na adoção do roadmap (2026-11-13).
+  acceptance_criteria:
+  - Dado um imóvel, quando abro o detalhe, então vejo endereço, cômodos, contratos e o histórico.
+  - Dado um imóvel locado, quando tento excluir, então a ação fica bloqueada.
+  priority: must
+  rank: 150
+  estimate: 8
+  status: done
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: a019646..f8d2b7d
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - src/pages/imoveis/
+  - src/api/imoveis.ts
+  - src/components/mapa/
+  - src/__testes__/mapa.test.ts
+  - src/__testes__/regras.test.ts
+  - commit a019646
+  - commit 68c6e40
+  - commit f8d2b7d
+  - 'PR #2'
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: done
+- id: US-004
+  type: story
+  title: Gerir contratos e agendar vistorias
+  epic: EP-005
+  story: Como admin ou gestor, quero criar contratos e agendar as vistorias, para acompanhar cada locação.
+  description: Entrega reconstruída do histórico na adoção do roadmap (2026-11-13).
+  acceptance_criteria:
+  - Dado um contrato ativo, quando abro o detalhe, então vejo agendamentos, vistorias e problemas.
+  - Dado um contrato com vistoria ou problema, quando tento excluir, então a ação fica desabilitada.
+  priority: must
+  rank: 160
+  estimate: 5
+  status: done
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: b7af71f..68c6e40
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - src/pages/contratos/
+  - src/api/contratos.ts
+  - src/__testes__/regras.test.ts
+  - commit b7af71f
+  - commit 68c6e40
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: done
+- id: US-005
+  type: story
+  title: Realizar a vistoria com checklist, fotos, aceite e laudo
+  epic: EP-006
+  story: Como vistoriador, quero preencher o checklist com fotos e submeter a vistoria, para que o locatário ou
+    a gestão aceite ou rejeite.
+  description: Entrega reconstruída do histórico na adoção do roadmap (2026-11-13).
+  acceptance_criteria:
+  - Dado o vistoriador designado, quando a vistoria está em preenchimento, então ele edita e submete.
+  - Dado quem fez a vistoria, quando ela está pendente de aceite, então os botões de aceitar e rejeitar não aparecem.
+  - Dado uma foto fora de JPEG, PNG ou WebP ou acima de 10 MB, quando escolho o arquivo, então ele é recusado antes
+    do envio.
+  priority: must
+  rank: 170
+  estimate: 13
+  status: done
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: b0714b5..7f16b15
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - src/pages/vistorias/
+  - src/api/vistorias.ts
+  - src/__testes__/regras.test.ts
+  - commit b0714b5
+  - commit 7f16b15
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: done
+- id: US-006
+  type: story
+  title: Registrar e acompanhar problemas do imóvel
+  epic: EP-007
+  story: Como locatário ou gestor, quero registrar um problema e acompanhar as atualizações, para que ele seja resolvido.
+  description: Entrega reconstruída do histórico na adoção do roadmap (2026-11-13).
+  acceptance_criteria:
+  - Dado um vistoriador, quando navega, então não vê links nem telas de problemas.
+  - Dado o locatário dono do contrato, quando o problema não está resolvido nem fechado, então ele pode comentar.
+  priority: must
+  rank: 180
+  estimate: 5
+  status: done
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: d5ae3cc..68c6e40
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - src/pages/problemas/
+  - src/api/problemas.ts
+  - src/__testes__/regras.test.ts
+  - commit d5ae3cc
+  - commit 68c6e40
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: done
+- id: US-007
+  type: story
+  title: Acompanhar os painéis por perfil e os logs de auditoria
+  epic: EP-008
+  story: Como admin, gestor ou vistoriador, quero painéis com os números do meu recorte, e como admin quero os logs
+    de auditoria, para acompanhar a operação.
+  description: Entrega reconstruída do histórico na adoção do roadmap (2026-11-13).
+  acceptance_criteria:
+  - Dado um total que o perfil não acessa, quando a API devolve null, então o cartão não é exibido.
+  - Dado um gestor, quando navega, então não vê a tela nem o item de menu de logs.
+  priority: must
+  rank: 190
+  estimate: 8
+  status: done
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: 7907789..68c6e40
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - src/pages/dashboard/
+  - src/api/painel.ts
+  - src/__testes__/regras.test.ts
+  - commit 7907789
+  - commit 7f16b15
+  - commit 68c6e40
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: done
+- id: US-008
+  type: story
+  title: Área do locatário com contrato, vistorias, problemas e agenda
+  epic: EP-009
+  story: Como locatário, quero uma área própria com meu contrato, vistorias, problemas e próximas vistorias agendadas,
+    para acompanhar minha locação.
+  description: Entrega reconstruída do histórico na adoção do roadmap (2026-11-13).
+  acceptance_criteria:
+  - Dado um locatário, quando entra, então cai na área dele, com o layout próprio.
+  - Dado um contrato ativo, quando há agendamentos futuros, então as datas aparecem na área.
+  priority: must
+  rank: 200
+  estimate: 5
+  status: done
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: 8f42256..68c6e40
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - src/pages/locatario/AreaDoLocatario.tsx
+  - src/api/locatario.ts
+  - src/layouts/LayoutLocatario.tsx
+  - commit 8f42256
+  - commit 68c6e40
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: done
+- id: TK-001
+  type: task
+  title: Adotar a gestão por roadmap e instalar o sprint-executor
+  epic: EP-001
+  story: ''
+  description: 'Mesmo processo da OneCheck API: docs/roadmap como fonte da verdade, branch por mudança a partir
+    da dev, execução item a item com a DoD conferida por script.'
+  acceptance_criteria:
+  - Dado o repositório, quando abro docs/roadmap, então existem projeto, visão, roadmap, backlog, sprints, acordo
+    de trabalho, maturidade e mapa de funcionalidades.
+  - Dado um item concluído, quando rodo python3 scripts/dod_check.py <ID>, então a Definition of Done é conferida.
+  - Dado um comando que lê o arquivo de segredos ou commita direto na dev ou na main, quando o Claude tenta executá-lo,
+    então o hook bloqueia.
+  priority: must
+  rank: 210
+  estimate: 3
+  status: review
+  sprint: 0
+  phase: F0
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Backlog/roadmap estruturado
+  links:
+    trello_card: null
+    gh_issue: null
+    prs:
+    - 7
+  evidence:
+  - 'PR #7'
+  - docs/roadmap/execucao/TK-001.md
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: in_progress
+  - date: '2026-11-13'
+    status: review
+- id: DEBT-001
+  type: debt
+  title: CI rodando build, lint e testes em todo PR
+  epic: EP-001
+  story: ''
+  description: Hoje a verificação é manual (npm run build && npm run lint && npm test).
+  acceptance_criteria:
+  - Dado um PR para dev ou main, quando ele é aberto ou atualizado, então o GitHub Actions roda npm ci, build, lint
+    e testes.
+  - Dado um teste falhando, quando o CI roda, então o check fica vermelho.
+  priority: must
+  rank: 220
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F0
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: CI rodando testes/lint
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-002
+  type: debt
+  title: README do projeto e script único de verificação
+  epic: EP-001
+  story: ''
+  description: O README ainda é o modelo do Vite, em inglês (E3 do plano de melhorias).
+  acceptance_criteria:
+  - Dado um clone novo, quando sigo o README, então consigo instalar, configurar o ambiente e rodar o front contra
+    a API local.
+  - Dado o projeto, quando rodo npm run verificar, então build, lint e testes rodam em sequência.
+  - Dado o README, quando leio, então encontro o status do projeto e o link para docs/roadmap.
+  priority: must
+  rank: 230
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F0
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: E3
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-003
+  type: debt
+  title: Proteger as branches main e dev no GitHub
+  epic: EP-001
+  story: ''
+  description: 'Sem ruleset: hoje o GitHub aceita push direto, force-push e exclusão das duas branches.'
+  acceptance_criteria:
+  - Dado um push direto na main ou na dev, quando enviado, então o GitHub recusa.
+  - Dado um PR com o check do CI vermelho, quando tento mesclar, então o merge é bloqueado.
+  - Dado o repositório, quando abro .github/rulesets, então a regra está versionada.
+  priority: must
+  rank: 240
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F0
+  depends_on:
+  - DEBT-001
+  security:
+    impact: medium
+    refs:
+    - STRIDE:T
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Proteção de branches
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: SEC-001
+  type: security
+  title: Executar a auditoria de segurança completa do front
+  epic: EP-010
+  story: ''
+  description: Não há docs/security nem threat model. A auditoria não foi rodada na adoção por decisão do usuário
+    (2026-11-13).
+  acceptance_criteria:
+  - Dado o repositório, quando a /security-audit full termina, então docs/security tem o relatório, o modelo de
+    ameaças e os achados em JSON.
+  - Dado um achado confirmado, quando a auditoria é importada, então ele vira item SEC no backlog com prioridade.
+  priority: must
+  rank: 250
+  estimate: 3
+  status: backlog
+  sprint: null
+  phase: F2
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP ASVS
+    - STRIDE
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Auditoria de segurança recente
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-004
+  type: debt
+  title: Atualização automática de dependências e análise no CI
+  epic: EP-010
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Dado o repositório, quando há atualização de dependência, então o Dependabot abre PR para a dev.
+  - Dado um PR, quando o CI roda, então npm audit falha com vulnerabilidade alta ou crítica em dependência de produção.
+  priority: should
+  rank: 260
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on:
+  - DEBT-001
+  security:
+    impact: medium
+    refs:
+    - OWASP A06:2021
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Atualização de dependências automatizada
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-005
+  type: debt
+  title: Revisar o inventário de ativos e o registro de riscos
+  epic: EP-010
+  story: ''
+  description: A adoção gravou um rascunho em docs/risks; falta a revisão com o PO e a ligação com os achados da
+    auditoria.
+  acceptance_criteria:
+  - Dado o inventário, quando reviso, então cada ativo tem dono e avaliação C/I/D/A confirmados.
+  - Dado um risco de nível alto, quando registrado, então tem tratamento e item de backlog ligado.
+  priority: should
+  rank: 270
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F1
+  depends_on:
+  - SEC-001
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Documentação de segurança
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-006
+  type: debt
+  title: Documentar a arquitetura e as decisões principais
+  epic: EP-001
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Dado docs/architecture, quando leio, então entendo as camadas (cliente da API, autenticação, rotas, páginas)
+    e as fronteiras de confiança.
+  - Dado docs/adr, quando leio, então há ADR para a guarda dos tokens, a geração dos tipos pelo OpenAPI e o controle
+    de acesso só de interface.
+  priority: should
+  rank: 280
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F2
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Documentação de arquitetura
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-007
+  type: debt
+  title: CHANGELOG, Conventional Commits e primeira tag de release
+  epic: EP-012
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Dado o repositório, quando abro o CHANGELOG, então as entregas até aqui estão descritas.
+  - Dado um marco, quando é entregue, então há tag SemVer na main.
+  - Dado um commit novo, quando escrito, então segue Conventional Commits com o ID do item.
+  priority: should
+  rank: 290
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: CHANGELOG, releases e Conventional Commits
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-008
+  type: debt
+  title: Definir a licença do repositório
+  epic: EP-001
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Dado o repositório, quando o PO decide a licença, então o arquivo LICENSE existe ou o README diz que o código
+    é de uso restrito.
+  priority: could
+  rank: 300
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F0
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Licença definida
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-009
+  type: story
+  title: 'Meus dados: baixar os próprios dados e excluir a conta'
+  epic: EP-010
+  story: Como titular dos dados, quero baixar meus dados e excluir minha conta pela tela, para exercer meus direitos
+    da LGPD sem depender de atendimento.
+  description: 'Item da API: SEC-028 (rotas GET /usuarios/me/dados e POST /usuarios/me/anonimizar). Linha 46 do
+    registro de mudanças de contrato.'
+  acceptance_criteria:
+  - Dado um usuário logado, quando clica em baixar meus dados, então recebe o arquivo JSON.
+  - Dado a exclusão da conta, quando confirmo digitando a palavra pedida, a senha e o código (se houver autenticador),
+    então a conta é anonimizada e a sessão termina.
+  - Dado senha ou código errado (403), último admin ativo (409) ou muitas tentativas (429), quando envio, então
+    a mensagem aparece e a conta continua.
+  - Dado outro usuário, quando navego, então não existe caminho para exportar ou excluir a conta dele.
+  priority: must
+  rank: 310
+  estimate: 5
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - LGPD art. 18
+    - STRIDE:R
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: B4
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: TK-002
+  type: task
+  title: Exibir fotos por URL assinada quando a API mudar o acesso aos uploads
+  epic: EP-010
+  story: ''
+  description: 'Itens da API: SEC-026 e TK-018 (Sprint 15). A URL da foto passa a ter validade e deixa de poder
+    ser guardada. Só começa quando o contrato novo estiver definido.'
+  acceptance_criteria:
+  - Dado uma foto de vistoria ou problema, quando a tela abre, então a imagem aparece usando a URL devolvida pela
+    API naquele momento.
+  - Dado uma URL vencida, quando a imagem falha, então a tela busca uma URL nova em vez de mostrar imagem quebrada.
+  - Dado um usuário sem acesso ao registro, quando tenta abrir a foto, então não recebe URL.
+  priority: should
+  rank: 320
+  estimate: 3
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP A01:2021
+    risk_id: null
+  source:
+    kind: pendencias
+    file: MUDANCAS_DE_CONTRATO.md
+    ref: seção 6
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: TK-003
+  type: task
+  title: Conferir no navegador os três pontos de contrato não verificados
+  epic: EP-011
+  story: ''
+  description: 'Achados 2, 8 e 14 da revisão: nada foi exercitado contra a API real.'
+  acceptance_criteria:
+  - Dado seis senhas erradas no login, quando chega o 429, então a mensagem traz os minutos de espera.
+  - Dado o primeiro acesso de um vistoriador novo, quando abre a configuração do MFA, então o QR Code e a chave
+    manual aparecem.
+  - Dado um gestor que preencheu e submeteu a vistoria de outro vistoriador, quando abre a vistoria, então o resultado
+    de aceitar é registrado; se der 403, vira BUG.
+  priority: should
+  rank: 330
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: ACHADOS_PENDENTES_DA_REVISAO.md
+    ref: itens 2, 8 e 14
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-009
+  type: debt
+  title: Testes de tela dos fluxos de autenticação
+  epic: EP-011
+  story: ''
+  description: Só ConfigurarMfa tem teste de tela (E1; achado 12). Fetch simulado, no molde de ConfigurarMfa.test.tsx,
+    com um apoio comum de montagem.
+  acceptance_criteria:
+  - Dado o login, quando há sucesso, MFA exigido ou 429, então cada caminho tem teste.
+  - Dado um usuário com senha_expirada, quando abre qualquer rota, então o teste confirma o redirecionamento para
+    a troca e a liberação depois dela.
+  - Dado o locatário, quando desabilita o MFA, então o teste confirma senha e código no corpo e a sessão nova gravada.
+  - Dado admin, gestor ou vistoriador, quando abre o perfil, então o teste confirma que desabilitar o MFA não é
+    oferecido.
+  priority: must
+  rank: 340
+  estimate: 5
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: ACHADOS_PENDENTES_DA_REVISAO.md
+    ref: item 12; PLANO_MELHORIAS.md E1
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-010
+  type: debt
+  title: Testes de tela de exclusões, comentários, histórico, logs e área do locatário
+  epic: EP-011
+  story: ''
+  description: Fluxos da Etapa 5 só têm build, lint e testes de regras puras (achado 19).
+  acceptance_criteria:
+  - Dado contrato, vistoria, problema e imóvel, quando a exclusão é permitida ou bloqueada, então há teste do botão
+    e do 409.
+  - Dado o locatário, quando o problema está aberto ou resolvido, então há teste do campo de comentário presente
+    e ausente.
+  - Dado a tela de logs, quando o filtro tem 'até' antes de 'de', então há teste da mensagem do campo.
+  - Dado um vistoriador ou locatário, quando tenta uma rota de outro perfil, então há teste do bloqueio.
+  priority: should
+  rank: 350
+  estimate: 5
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on:
+  - DEBT-009
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: ACHADOS_PENDENTES_DA_REVISAO.md
+    ref: item 19
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-011
+  type: debt
+  title: Cliente da API sem dependências frágeis
+  epic: EP-011
+  story: ''
+  description: 'C6: Retry-After em formato de data, renovação única entre abas sem navigator.locks e senha expirada
+    detectada pelo texto do 403 (achados 3, 5 e 6).'
+  acceptance_criteria:
+  - Dado um Retry-After em data HTTP, quando chega o 429, então o tempo de espera é calculado.
+  - Dado um navegador sem navigator.locks, quando duas abas recebem 401 juntas, então só uma envia o refresh.
+  - Dado um 403 com usuário logado, quando a mensagem da política mudar de texto, então a senha expirada ainda é
+    detectada.
+  priority: should
+  rank: 360
+  estimate: 3
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - STRIDE:D
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: C6
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: BUG-001
+  type: bug
+  title: Listas e painéis param em 100 contratos sem avisar
+  epic: EP-011
+  story: ''
+  description: 'C3: vistorias, problemas, painéis e área do locatário buscam por_pagina 100; o que passa disso some
+    sem aviso. Causa também do achado 15.'
+  acceptance_criteria:
+  - Dado mais de 100 contratos, quando abro a lista de vistorias ou de problemas, então todos aparecem.
+  - Dado os cartões do painel, quando há mais de 100 imóveis, então o total vem de paginacao.total.
+  - Dado uma base muito grande, quando a busca passa do teto de segurança, então a tela avisa que a lista está incompleta.
+  priority: should
+  rank: 370
+  estimate: 3
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: C3
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-010
+  type: story
+  title: Registrar problema com foto e cômodo
+  epic: EP-007
+  story: Como locatário, quero anexar uma foto e indicar o cômodo ao registrar um problema, para a equipe entender
+    o que aconteceu sem idas e vindas.
+  description: 'B3: a API aceita foto (multipart) e comodo_id no problema e foto nas atualizações.'
+  acceptance_criteria:
+  - Dado o formulário de problema, quando escolho cômodo e foto, então os dois são enviados e aparecem no detalhe.
+  - Dado uma atualização com foto, quando abro a linha do tempo, então a foto aparece.
+  - Dado um arquivo fora de JPEG, PNG ou WebP ou acima de 10 MB, quando escolho, então é recusado antes do envio.
+  - Dado o detalhe do problema, quando há cômodo, então aparece o nome, e não o identificador.
+  priority: should
+  rank: 380
+  estimate: 5
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A04:2021
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: B3
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-011
+  type: story
+  title: Voltar à página pedida depois do login
+  epic: EP-011
+  story: Como usuário com a sessão vencida, quero voltar à página que pedi depois de entrar, para que links e favoritos
+    funcionem.
+  description: ''
+  acceptance_criteria:
+  - Dado um link direto sem sessão, quando entro (com ou sem MFA), então chego à página pedida.
+  - Dado um destino que meu perfil não acessa, quando entro, então vou para a página inicial do perfil.
+  - Dado um destino externo ou malformado, quando entro, então ele é ignorado.
+  priority: should
+  rank: 390
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-601
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: C2
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-012
+  type: story
+  title: Diálogos de confirmação e de motivo no lugar dos do navegador
+  epic: EP-011
+  story: Como usuário, quero confirmar ações destrutivas e escrever o motivo de uma rejeição em diálogos do próprio
+    sistema, para não agir por engano.
+  description: ''
+  acceptance_criteria:
+  - Dado uma exclusão, quando clico, então um diálogo do sistema descreve a ação e destaca o botão destrutivo.
+  - Dado a rejeição de uma vistoria, quando informo o motivo, então há área de texto com validação.
+  - Dado o código, quando procuro window.confirm e window.prompt, então não há usos.
+  priority: should
+  rank: 400
+  estimate: 3
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: D1
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-013
+  type: story
+  title: Editar cômodo
+  epic: EP-004
+  story: Como gestor, quero corrigir a descrição ou o tipo de um cômodo, para não precisar removê-lo e criá-lo de
+    novo.
+  description: ''
+  acceptance_criteria:
+  - Dado um cômodo, quando edito e salvo, então a lista mostra os dados novos.
+  - Dado um cômodo usado em vistoria, quando edito, então a edição funciona mesmo sem poder excluí-lo.
+  priority: could
+  rank: 410
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: B5
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-014
+  type: story
+  title: Bloco e andar no endereço do imóvel
+  epic: EP-004
+  story: Como gestor, quero informar bloco e andar do apartamento, para o endereço ficar completo.
+  description: ''
+  acceptance_criteria:
+  - Dado o formulário de imóvel, quando preencho bloco e andar, então são gravados e aparecem no resumo do endereço.
+  priority: could
+  rank: 420
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: B6
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-015
+  type: story
+  title: Filtrar os logs por usuário
+  epic: EP-008
+  story: Como admin, quero filtrar os logs por usuário, para ver o que uma pessoa fez.
+  description: ''
+  acceptance_criteria:
+  - Dado a tela de logs, quando escolho um usuário, então só os eventos dele aparecem.
+  priority: could
+  rank: 430
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: B7
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-016
+  type: story
+  title: Paginação utilizável em listas grandes
+  epic: EP-011
+  story: Como usuário, quero uma paginação com janela de páginas, para navegar em listas longas.
+  description: ''
+  acceptance_criteria:
+  - Dado uma lista com 100 páginas, quando abro, então vejo primeira, vizinhas da atual, última, anterior e próxima.
+  priority: could
+  rank: 440
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: C4
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-017
+  type: story
+  title: Título da aba por página
+  epic: EP-011
+  story: Como usuário com várias abas, quero o nome da página no título, para saber qual é qual.
+  description: ''
+  acceptance_criteria:
+  - Dado uma página, quando abro, então o título da aba é 'Título — OneCheck'.
+  priority: could
+  rank: 450
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: D3
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: US-018
+  type: story
+  title: Página não encontrada
+  epic: EP-011
+  story: Como usuário, quero ser avisado quando o endereço não existe, em vez de ser redirecionado em silêncio.
+  description: ''
+  acceptance_criteria:
+  - Dado uma rota inexistente, quando abro, então vejo 'Página não encontrada' com link para o início.
+  priority: could
+  rank: 460
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: D4
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-012
+  type: debt
+  title: Organização do código apontada na revisão
+  epic: EP-011
+  story: ''
+  description: 'E4: campo de código MFA duplicado no perfil, consulta extra a /usuarios/me, regra ''vê problemas''
+    repetida, JSX sem reindentação e erro silencioso nas vistorias do contrato (achados 10, 11, 16, 17 e 18).'
+  acceptance_criteria:
+  - Dado cada um dos cinco achados, quando reviso o código, então a duplicação ou o erro silencioso foi removido
+    e os testes passam.
+  priority: could
+  rank: 470
+  estimate: 3
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: E4
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-013
+  type: debt
+  title: Estilos em linha para classes
+  epic: EP-011
+  story: ''
+  description: 'E2: 95 ocorrências de style em linha, muitas repetindo as mesmas cores.'
+  acceptance_criteria:
+  - Dado uma cor repetida em linha, quando procuro no código, então ela vem de uma classe ou variável de src/styles/style.css.
+  priority: could
+  rank: 480
+  estimate: 5
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: E2
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: DEBT-014
+  type: debt
+  title: Fonte única para os tipos gerados da API
+  epic: EP-011
+  story: ''
+  description: 'Achado 1: gen:api:referencia lê uma pasta fora do git e pode divergir de gen:api.'
+  acceptance_criteria:
+  - Dado o package.json, quando gero os tipos, então há um único script, com a origem documentada no README.
+  priority: could
+  rank: 490
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: ACHADOS_PENDENTES_DA_REVISAO.md
+    ref: item 1
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: TK-004
+  type: task
+  title: 'Publicar o front: servir o build com fallback de SPA'
+  epic: EP-012
+  story: ''
+  description: 'Fase 6 da migração. O blueprint do Render (render.yaml: site estático a partir da main, fallback
+    de SPA, cabeçalhos básicos e cache) entrou pelo PR #5 em 2026-11-13. Falta criar o serviço pelo Blueprint, definir
+    VITE_API_URL e validar o endereço publicado.'
+  acceptance_criteria:
+  - Dado o endereço de produção, quando abro uma rota interna direto, então a aplicação carrega (fallback para index.html).
+  - Dado o servidor, quando responde, então envia os cabeçalhos de segurança definidos no SEC-003.
+  - Dado o build, quando publicado, então nenhum arquivo de segredos nem mapa de código-fonte fica exposto.
+  priority: must
+  rank: 500
+  estimate: 5
+  status: backlog
+  sprint: null
+  phase: F7
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MIGRACAO.md
+    ref: Fase 6
+  links:
+    trello_card: null
+    gh_issue: null
+    prs:
+    - 5
+  evidence:
+  - 'PR #5'
+  - render.yaml
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: SEC-003
+  type: security
+  title: CSP e cabeçalhos de segurança no servidor do front
+  epic: EP-010
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Dado a resposta do index.html, quando inspeciono, então há Content-Security-Policy, X-Content-Type-Options,
+    Referrer-Policy e proteção contra frame.
+  - Dado um script em linha injetado, quando a página carrega, então a CSP o bloqueia.
+  - Dado o mapa, os gráficos e as fotos, quando a CSP está ativa, então continuam funcionando.
+  priority: should
+  rank: 510
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on:
+  - TK-004
+  security:
+    impact: medium
+    refs:
+    - OWASP A05:2021
+    - CWE-79
+    - CWE-1021
+    risk_id: null
+  source:
+    kind: maturity
+    ref: 'Perfil web: XSS, CSP'
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: TK-005
+  type: task
+  title: Informar as origens de produção do front para o CORS da API
+  epic: EP-012
+  story: ''
+  description: 'Linha 19 do registro de mudanças de contrato: só as origens em CORS_ORIGINS chamam a API pelo navegador.'
+  acceptance_criteria:
+  - Dado o endereço publicado, quando o front chama a API, então não há erro de CORS.
+  - Dado uma origem fora da lista, quando chama a API, então o navegador bloqueia.
+  priority: must
+  rank: 520
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F7
+  depends_on:
+  - TK-004
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MIGRACAO.md
+    ref: Fase 6
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: TK-006
+  type: task
+  title: Aposentar o front PHP
+  epic: EP-012
+  story: ''
+  description: 'Só depois do deploy: o front PHP é o publicado hoje e tem alterações não commitadas no git dele.'
+  acceptance_criteria:
+  - Dado o front React publicado e validado pelo PO, quando o PHP é retirado, então o endereço antigo leva ao front
+    novo.
+  priority: could
+  rank: 530
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F7
+  depends_on:
+  - TK-004
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MIGRACAO.md
+    ref: Fase 6
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+- id: SEC-002
+  type: security
+  title: Refresh token fora do alcance de scripts
+  epic: EP-010
+  story: ''
+  description: 'O refresh token fica na localStorage, exposto a um eventual XSS. A proteção de verdade é cookie
+    httpOnly, que depende de um item na API (ainda não criado: hoje ela não aceita credenciais de navegador no CORS).'
+  acceptance_criteria:
+  - Dado a decisão registrada em ADR, quando a API oferecer cookie httpOnly, então o front deixa de guardar o refresh
+    token na localStorage.
+  - Dado um script injetado, quando lê o armazenamento do navegador, então não encontra o refresh token.
+  priority: could
+  rank: 540
+  estimate: 5
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP A07:2021
+    - CWE-922
+    - STRIDE:I
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PLANO_MELHORIAS.md
+    ref: Fora do alcance do front
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog

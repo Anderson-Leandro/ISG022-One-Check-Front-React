@@ -1,0 +1,14 @@
+# Histórico de sprints. Mantido por sprint.py (plan/close).
+sprints:
+- number: 0
+  goal: Front adotado na gestão por roadmap, com o mesmo processo da API
+  start: '2026-11-13'
+  end: '2026-11-14'
+  status: active
+  capacity: 20
+  committed:
+  - TK-001
+  committed_points: 3
+  completed_points: null
+  completed: []
+  carried_over: []

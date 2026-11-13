@@ -2,7 +2,7 @@
 
 Interface web do **OneCheck**, sistema de gestão de vistorias imobiliárias e locações. Este projeto consome a
 [OneCheck API](https://github.com/Anderson-Leandro/ISG022-One-Check-API-Python) (FastAPI) e mostra a cada perfil
-só o que ele pode fazer. Substitui o front antigo em PHP.
+só o que ele pode fazer.
 
 ## Funcionalidades
 
@@ -97,5 +97,5 @@ pasta `dist/` e reescrita de qualquer rota para o `index.html`. Ao criar o servi
 
 ## Projeto
 
-Trabalho da disciplina ISG022. Time: Gabriel Henrique Santana (PO), Anderson Mendes Leandro (Tech Lead),
+Trabalho do projeto integrador. Time: Gabriel Henrique Santana (PO), Anderson Mendes Leandro (Tech Lead),
 Ismael Alves de Almeida e Luiz Felipe dos Santos (desenvolvimento).

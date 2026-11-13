@@ -697,7 +697,7 @@ items:
   priority: must
   rank: 210
   estimate: 3
-  status: in_progress
+  status: review
   sprint: 0
   phase: F0
   depends_on: []
@@ -711,13 +711,18 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
-  evidence: []
+    prs:
+    - 7
+  evidence:
+  - 'PR #7'
+  - docs/roadmap/execucao/TK-001.md
   created: '2026-11-13'
   updated: '2026-11-13'
   history:
   - date: '2026-11-13'
     status: in_progress
+  - date: '2026-11-13'
+    status: review
 - id: DEBT-001
   type: debt
   title: CI rodando build, lint e testes em todo PR

@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, ErroApi, extrairMensagemDeErro, obterDados } from './client';
+import { api, criarErroDaResposta, ErroApi, obterDados } from './client';
 import type { components } from './schema';
 import type { Comodo } from './imoveis';
 import type { Contrato } from './contratos';
+import { useInvalidarAposExcluir } from './exclusao';
 import type { Usuario } from '../auth/tipos';
+import { useAuth } from '../auth/AuthContext';
+import { podeListarUsuarios } from '../auth/permissoes';
 import { ROTULO_DO_COMODO } from '../config/imoveis';
 
 export interface FotoDoItem {
@@ -55,7 +58,6 @@ export const STATUS_DA_VISTORIA: Record<string, { rotulo: string; classe: string
   pendente_aceite: { rotulo: 'Pendente aceite', classe: 'bg-info text-dark' },
   aceito: { rotulo: 'Aceito', classe: 'bg-success' },
   rejeitado: { rotulo: 'Rejeitado', classe: 'bg-danger' },
-  pendente_revisao: { rotulo: 'Pendente revisão', classe: 'bg-warning text-dark' },
 };
 
 /** Estados de item com estilo próprio em style.css (.oc-estado-*). */
@@ -131,17 +133,19 @@ export function useCatalogoDeItens() {
 }
 
 export function useVistoriadores() {
+  const { usuario } = useAuth();
   return useQuery({
     queryKey: ['usuarios', 'vistoriadores'],
     queryFn: () => obterDados<Usuario[]>(api.GET('/api/v1/usuarios', { params: { query: { role: 'vistoriador', por_pagina: 100 } } })),
     retry: false,
+    enabled: podeListarUsuarios(usuario),
   });
 }
 
 function useInvalidarVistorias() {
   const clienteDeConsultas = useQueryClient();
-  // checklists também aparecem nos detalhes do contrato
-  return () => Promise.all([chaves.todos, ['contratos']].map((queryKey) => clienteDeConsultas.invalidateQueries({ queryKey })));
+  // checklists também aparecem nos detalhes do contrato e no histórico do imóvel
+  return () => Promise.all([chaves.todos, ['contratos'], ['imoveis', 'historico']].map((queryKey) => clienteDeConsultas.invalidateQueries({ queryKey })));
 }
 
 export function useCriarVistoria() {
@@ -149,6 +153,15 @@ export function useCriarVistoria() {
   return useMutation({
     mutationFn: ({ contratoId, dados }: { contratoId: string; dados: components['schemas']['ChecklistCreate'] }) =>
       obterDados<Checklist>(api.POST('/api/v1/contratos/{contrato_id}/checklists', { params: { path: { contrato_id: contratoId } }, body: dados })),
+    onSuccess: invalidar,
+  });
+}
+
+/** Exclusão lógica (admin e gestor), só enquanto a vistoria está em preenchimento; fora disso a API responde 409. */
+export function useExcluirVistoria(id: string) {
+  const invalidar = useInvalidarAposExcluir(id);
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/checklists/{checklist_id}', caminhoDoChecklist(id))),
     onSuccess: invalidar,
   });
 }
@@ -231,7 +244,7 @@ export async function baixarPdfDaVistoria(id: string): Promise<Blob> {
   const { data, error, response } = await api.GET('/api/v1/checklists/{checklist_id}/download-pdf', { ...caminhoDoChecklist(id), parseAs: 'blob' });
   if (!response.ok || !(data instanceof Blob)) {
     const corpo = error ?? (await response.clone().json().catch(() => null));
-    throw new ErroApi(extrairMensagemDeErro(corpo, response.status), response.status, corpo);
+    throw criarErroDaResposta(corpo, response);
   }
   return data;
 }
@@ -240,23 +253,39 @@ export function useBaixarPdf() {
   return useMutation({ mutationFn: baixarPdfDaVistoria });
 }
 
+/** Só JPEG, PNG e WebP (a API confere pelo conteúdo) e até 10 MB por foto, uma por requisição. */
+export const TIPOS_DE_FOTO_ACEITOS = ['image/jpeg', 'image/png', 'image/webp'];
+export const TAMANHO_MAXIMO_DA_FOTO = 10 * 1024 * 1024;
+
+/** Confere a foto antes do envio; devolve a mensagem ou null. */
+export function validarFoto(arquivo: { type: string; size: number }): string | null {
+  // alguns navegadores e câmeras entregam o arquivo sem tipo (ou como image/jpg): nesses casos quem decide é a API
+  const tipoDeclarado = arquivo.type === 'image/jpg' ? 'image/jpeg' : arquivo.type;
+  if (tipoDeclarado && !TIPOS_DE_FOTO_ACEITOS.includes(tipoDeclarado)) return 'Formato não aceito. Envie uma foto JPEG, PNG ou WebP (fotos HEIC do iPhone precisam ser convertidas antes).';
+  if (arquivo.size > TAMANHO_MAXIMO_DA_FOTO) return 'A foto passa de 10 MB. Reduza o tamanho e envie de novo.';
+  return null;
+}
+
 /**
- * Fluxo confirmado em teste contra a API:
+ * Fluxo da API:
  * em_preenchimento --submeter (≥1 item)--> pendente_aceite --aceitar|rejeitar--> aceito | rejeitado (finais).
- * enviar-para-aceite (admin/gestor) também leva de em_preenchimento/pendente_revisao para pendente_aceite.
+ * enviar-para-aceite (admin/gestor) também leva de em_preenchimento para pendente_aceite.
+ * Quem fez a vistoria não aceita nem rejeita a própria vistoria (403), mesmo sendo admin ou gestor.
  */
 export function permissoesDaVistoria(checklist: Checklist | undefined, usuario: Usuario | null) {
   const perfil = String(usuario?.role ?? '').toLowerCase();
   const status = checklist?.status ?? '';
   const ehGestao = perfil === 'admin' || perfil === 'gestor';
   const ehVistoriadorDesignado = perfil === 'vistoriador' && Boolean(usuario?.id) && checklist?.vistoriador_id === usuario?.id;
-  const emEdicao = status === 'em_preenchimento' || status === 'pendente_revisao';
+  const emEdicao = status === 'em_preenchimento';
+  const fezAVistoria = Boolean(usuario?.id) && checklist?.vistoriador_id === usuario?.id;
 
   return {
+    excluir: emEdicao && ehGestao,
     editarItens: emEdicao && (ehGestao || ehVistoriadorDesignado),
     submeter: status === 'em_preenchimento' && (ehGestao || ehVistoriadorDesignado),
     enviarParaAceite: emEdicao && ehGestao,
-    aceitarOuRejeitar: status === 'pendente_aceite' && (ehGestao || perfil === 'locatario'),
+    aceitarOuRejeitar: status === 'pendente_aceite' && (ehGestao || perfil === 'locatario') && !fezAVistoria,
   };
 }
 

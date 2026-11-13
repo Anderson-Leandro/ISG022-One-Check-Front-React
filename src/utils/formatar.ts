@@ -5,7 +5,8 @@ export function formatarMoeda(valor: number | string | null | undefined): string
   return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-function paraData(valor: string | null | undefined): Date | null {
+/** Interpreta a data da API; "AAAA-MM-DD" sozinho vale como data local. */
+export function paraData(valor: string | null | undefined): Date | null {
   if (!valor) return null;
   // "YYYY-MM-DD" puro é tratado como data local, não UTC (evita voltar um dia)
   const data = /^\d{4}-\d{2}-\d{2}$/.test(valor) ? new Date(`${valor}T00:00:00`) : new Date(valor);

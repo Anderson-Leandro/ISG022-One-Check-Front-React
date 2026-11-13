@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { ROTULO_DO_STATUS_DO_PROBLEMA, textoDaAtualizacao, useAtualizacoesDoProblema, useRegistrarAtualizacao } from '../../api/problemas';
+import { ROTULO_DO_STATUS_DO_PROBLEMA, TAMANHO_MINIMO_DA_ATUALIZACAO, textoDaAtualizacao, useAtualizacoesDoProblema, useRegistrarAtualizacao } from '../../api/problemas';
 import { useNomeDoUsuario } from '../../api/usuarios';
 import { BadgeStatus } from '../../components/BadgeStatus';
 import { EstadoDaConsulta } from '../../components/EstadoDaConsulta';
@@ -19,7 +19,10 @@ export function LinhaDoTempoDoProblema({ problemaId, podeComentar }: { problemaI
 
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault();
-    if (!texto.trim()) return;
+    if (texto.trim().length < TAMANHO_MINIMO_DA_ATUALIZACAO) {
+      definirFlash('erro', `Descreva o andamento com pelo menos ${TAMANHO_MINIMO_DA_ATUALIZACAO} caracteres.`);
+      return;
+    }
     try {
       await registrarAtualizacao.mutateAsync(texto.trim());
       setTexto('');

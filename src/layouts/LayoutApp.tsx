@@ -1,28 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Offcanvas } from 'react-bootstrap';
 import { useAuth } from '../auth/AuthContext';
 import { itensDeMenuPara, rotaInicial } from '../auth/permissoes';
 import { SuspenseDaPagina } from '../components/CarregandoPagina';
-import { ExibirFlash, useFlash } from '../components/Flash';
+import { ExibirFlash } from '../components/Flash';
+import { useSairDaConta } from '../auth/useSairDaConta';
 import { Marca } from '../components/Marca';
 
 /** Equivalente a includes/header.php + navbar.php + sidebar.php + footer.php. */
 export function LayoutApp() {
-  const { usuario, iniciais, sair } = useAuth();
-  const navegar = useNavigate();
+  const { usuario, iniciais } = useAuth();
+  const aoSair = useSairDaConta();
   const { pathname } = useLocation();
-  const { limparFlash } = useFlash();
   const [menuMobileAberto, setMenuMobileAberto] = useState(false);
   const itensDeMenu = itensDeMenuPara(usuario);
 
   useEffect(() => setMenuMobileAberto(false), [pathname]);
-
-  async function aoSair() {
-    limparFlash();
-    await sair();
-    navegar('/login?logout=1', { replace: true });
-  }
 
   const navegacao = (
     <nav className="nav flex-column">

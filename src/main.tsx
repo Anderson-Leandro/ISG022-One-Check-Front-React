@@ -9,6 +9,13 @@ import { App } from './App';
 import { ProvedorDeAutenticacao } from './auth/AuthContext';
 import { ProvedorDeFlash } from './components/Flash';
 import { ErroApi } from './api/client';
+import { LimiteDeErro } from './components/LimiteDeErro';
+import { recarregarAposNovaVersao } from './utils/recarregarAposNovaVersao';
+
+// o Vite avisa quando não consegue baixar um arquivo de página (comum depois de um deploy): recarrega uma vez
+window.addEventListener('vite:preloadError', (evento) => {
+  if (recarregarAposNovaVersao()) evento.preventDefault();
+});
 
 const clienteDeConsultas = new QueryClient({
   defaultOptions: {
@@ -23,6 +30,8 @@ const clienteDeConsultas = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    {/* último recurso, fora do roteador: um erro nos provedores ou nos layouts não deixa a tela em branco */}
+    <LimiteDeErro>
     <QueryClientProvider client={clienteDeConsultas}>
       <BrowserRouter>
         <ProvedorDeFlash>
@@ -32,5 +41,6 @@ createRoot(document.getElementById('root')!).render(
         </ProvedorDeFlash>
       </BrowserRouter>
     </QueryClientProvider>
+    </LimiteDeErro>
   </StrictMode>,
 );

@@ -66,13 +66,8 @@ export function ConfigurarMfaNoLogin() {
           <i className="bi bi-exclamation-triangle me-2" />
           Não foi possível gerar o QR Code: {configuracao.error.message}
         </div>
-      ) : urlDoQr ? (
-        <QrCodeMfa urlDoQr={urlDoQr} segredo={segredo} />
       ) : (
-        <div className="alert alert-warning mb-3">
-          <i className="bi bi-exclamation-triangle me-2" />
-          Não foi possível carregar o QR Code. Tente fazer login novamente.
-        </div>
+        <QrCodeMfa urlDoQr={urlDoQr} segredo={segredo} />
       )}
 
       <form onSubmit={aoEnviar}>

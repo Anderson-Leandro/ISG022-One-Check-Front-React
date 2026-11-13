@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { ExibirFlash } from '../components/Flash';
 import { Marca } from '../components/Marca';
 
 /** Moldura comum às telas de login/MFA (classes login-wrap/login-card do style.css). */
@@ -9,6 +10,7 @@ export function LayoutLogin({ children, larguraMaxima }: { children: ReactNode; 
         <div className="login-logo mb-2">
           <Marca tamanho={larguraMaxima ? 24 : 28} />
         </div>
+        <ExibirFlash />
         {children}
       </div>
     </div>

@@ -1907,3 +1907,241 @@ items:
   history:
   - date: '2026-11-13'
     status: backlog
+- id: TK-007
+  type: task
+  title: Um só botão para enviar a vistoria ao aceite
+  epic: EP-006
+  story: ''
+  description: Pedido do usuário em 2026-11-13. Na vistoria em preenchimento, admin e gestor veem 'Submeter' e 'Enviar
+    para aceite', que levam ao mesmo status. Fica só 'Submeter'. Sem mudança na API.
+  acceptance_criteria:
+  - Dado um admin, um gestor ou o vistoriador designado numa vistoria em preenchimento, quando abre o detalhe, então
+    vê um único botão, 'Submeter'.
+  - Dado o código, quando procuro a ação 'enviar-para-aceite', então ela não existe mais na interface nem em permissoesDaVistoria.
+  - Dado outro vistoriador ou o locatário, quando abre a vistoria em preenchimento, então não vê o botão.
+  priority: must
+  rank: 1
+  estimate: 1
+  status: ready
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: US-022
+  type: story
+  title: Locatário com mais de um imóvel escolhe qual ver na página inicial
+  epic: EP-009
+  story: Como locatário com mais de um contrato ativo, quero escolher o imóvel num seletor da página inicial, para
+    ver as informações de um imóvel por vez.
+  description: Pedido do usuário em 2026-11-13. Hoje a área do locatário mostra todos os contratos ativos em sequência.
+    Sem mudança na API.
+  acceptance_criteria:
+  - Dado um locatário com um contrato ativo, quando abre a página inicial, então a tela fica como hoje, sem seletor.
+  - Dado um locatário com dois contratos ativos, quando abre a página inicial, então vê um seletor com os imóveis
+    e os dados só do escolhido.
+  - Dado uma vistoria aguardando aceite em um imóvel que não está selecionado, quando abre a página inicial, então
+    um aviso aponta para esse imóvel.
+  - Dado a página, quando listo os contratos, então só aparecem os do próprio locatário, que é o que a API devolve.
+  priority: must
+  rank: 2
+  estimate: 2
+  status: ready
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: US-023
+  type: story
+  title: Mapa do cadastro de imóvel vai para perto do endereço ao buscar o CEP
+  epic: EP-004
+  story: Como gestor, quero que o mapa do cadastro se aproxime do endereço quando busco um CEP válido, para marcar
+    a localização sem procurar a cidade no mapa.
+  description: 'Pedido do usuário em 2026-11-13. Depois de preencher o endereço pelo CEP, tentar a geocodificação
+    (geocodificarEndereco, já usada no mapa de imóveis) e centralizar o SeletorDeLocalizacao. A tentativa é silenciosa:
+    se falhar, o formulário segue como hoje. Sem mudança na API.'
+  acceptance_criteria:
+  - Dado um CEP válido, quando clico em Buscar, então o endereço é preenchido e o mapa se aproxima dele.
+  - Dado que a geocodificação falha ou não acha o endereço, quando clico em Buscar, então o endereço é preenchido
+    e nenhum erro aparece.
+  - Dado coordenadas já informadas no formulário, quando busco o CEP, então elas não são trocadas sem a pessoa pedir.
+  - Dado um CEP inválido, quando clico em Buscar, então a mensagem de CEP inválido aparece e o mapa não muda.
+  priority: must
+  rank: 3
+  estimate: 2
+  status: ready
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: US-019
+  type: story
+  title: Cadastro de contrato sem data retroativa e com duração mínima de 30 dias
+  epic: EP-005
+  story: Como gestor, quero que o formulário de contrato impeça início no passado e prazo menor que 30 dias, para
+    não errar as datas da locação.
+  description: 'Pedido do usuário em 2026-11-13. Item da API: US-021 (POST /contratos responde 422 com erros.data_inicio
+    e erros.data_fim).'
+  acceptance_criteria:
+  - Dado o formulário de contrato, quando escolho o início, então o campo não aceita data anterior a hoje.
+  - Dado um início escolhido, quando escolho o fim, então o campo só aceita datas a partir de 30 dias depois do
+    início.
+  - Dado um 422 da API, quando envio, então a mensagem aparece no campo da data correspondente.
+  priority: must
+  rank: 4
+  estimate: 2
+  status: ready
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: US-020
+  type: story
+  title: Cadastro de vistoria sem data retroativa
+  epic: EP-006
+  story: Como gestor, quero que o formulário de vistoria impeça data anterior a hoje, para não agendar vistoria
+    no passado.
+  description: 'Pedido do usuário em 2026-11-13. Item da API: US-022 (POST /contratos/{id}/checklists responde 422
+    com erros.data_vistoria).'
+  acceptance_criteria:
+  - Dado o formulário de nova vistoria, quando escolho a data, então o campo não aceita data anterior a hoje.
+  - Dado um 422 da API, quando envio, então a mensagem aparece no campo da data.
+  priority: must
+  rank: 5
+  estimate: 1
+  status: ready
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: US-021
+  type: story
+  title: Só o locatário vê o botão de aceitar a vistoria; a gestão visualiza e pode rejeitar
+  epic: EP-006
+  story: Como locatário, quero ser o único a aceitar a vistoria do meu contrato, para que o aceite registrado seja
+    meu.
+  description: 'Pedido do usuário em 2026-11-13. Item da API: US-023 (aceitar só do locatário do contrato, 403 para
+    admin e gestor; rejeitar continua com locatário, admin e gestor; quem fez a vistoria não aceita nem rejeita).'
+  acceptance_criteria:
+  - Dado o locatário do contrato numa vistoria pendente de aceite, quando abre a vistoria, então vê Aceitar e Rejeitar.
+  - Dado um admin ou gestor que não fez a vistoria, quando abre a vistoria pendente de aceite, então vê Rejeitar
+    e não vê Aceitar.
+  - Dado quem fez a vistoria ou outro vistoriador, quando abre a vistoria pendente de aceite, então não vê nenhum
+    dos dois botões.
+  - Dado um 403 da API ao aceitar, quando acontece, então a mensagem aparece na tela.
+  priority: must
+  rank: 6
+  estimate: 2
+  status: ready
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP A01:2021
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready

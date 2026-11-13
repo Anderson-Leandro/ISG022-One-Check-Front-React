@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { api, obterDados } from '../api/client';
 import { armazenamentoDeTokens } from './armazenamentoDeTokens';
@@ -40,13 +40,18 @@ export function ProvedorDeAutenticacao({ children }: { children: ReactNode }) {
   const [autenticado, setAutenticado] = useState<boolean>(estaAutenticado);
 
   const clienteDeConsultas = useQueryClient();
+  const idDoUsuarioAtual = useRef(usuario?.id ?? null);
   useEffect(
     () =>
       armazenamentoDeTokens.aoMudar(() => {
-        setUsuario(armazenamentoDeTokens.obterUsuario());
+        const guardado = armazenamentoDeTokens.obterUsuario();
+        setUsuario(guardado);
         setAutenticado(estaAutenticado());
-        // dados em cache são de quem estava logado: o próximo usuário da aba não pode herdá-los
-        if (!estaAutenticado()) clienteDeConsultas.clear();
+        // dados em cache são de quem estava logado: o próximo usuário da aba (ou a conta que entrou em outra aba) não pode herdá-los
+        const idNovo = guardado?.id ?? null;
+        const trocouDeConta = idDoUsuarioAtual.current !== null && idNovo !== null && idNovo !== idDoUsuarioAtual.current;
+        if (!estaAutenticado() || trocouDeConta) clienteDeConsultas.clear();
+        if (idNovo !== null) idDoUsuarioAtual.current = idNovo;
       }),
     [clienteDeConsultas],
   );

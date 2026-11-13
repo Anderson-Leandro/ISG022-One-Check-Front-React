@@ -100,6 +100,24 @@ export function useAtualizarUsuario(id: string) {
 }
 
 /**
+ * Desativa a conta de outro usuário (DELETE /usuarios/{id}): ele perde o acesso na hora, porque a API encerra
+ * as sessões dele. A API recusa o próprio ID, e o gestor não desativa admin nem gestor.
+ * As listas de usuários são recarregadas, mas não o detalhe de quem saiu, que poderia responder 404 com a tela aberta.
+ */
+export function useDesativarUsuario(id: string) {
+  const clienteDeConsultas = useQueryClient();
+  return useMutation({
+    mutationFn: () => obterDados(api.DELETE('/api/v1/usuarios/{usuario_id}', { params: { path: { usuario_id: id } } })),
+    // as listas (gestão, nomes, locatários, vistoriadores), mas não o detalhe de quem saiu nem a própria conta (/usuarios/me)
+    onSuccess: () => {
+      void clienteDeConsultas.invalidateQueries({
+        predicate: ({ queryKey }) => queryKey[0] === 'usuarios' && queryKey[1] !== 'me' && !queryKey.includes(id),
+      });
+    },
+  });
+}
+
+/**
  * MFA de outro usuário (usuarios/editar.php). Ninguém vê nem escolhe o segredo de outra pessoa:
  * "exigir" só liga a exigência, e "resetar" apaga o autenticador. Nos dois casos o próprio usuário
  * configura o autenticador no próximo login, e as sessões dele são encerradas.

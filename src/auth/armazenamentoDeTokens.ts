@@ -26,6 +26,56 @@ function gravar(armazenamento: Storage, chave: string, valor: string | null): vo
   }
 }
 
+function idDoUsuarioGuardado(bruto: string | null): string | null {
+  if (!bruto) return null;
+  try {
+    return (JSON.parse(bruto) as Usuario).id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Esquece só o que é desta aba (sessionStorage); o que é compartilhado já foi trocado pela outra aba. */
+function descartarSessaoDestaAba(aviso: string | null): void {
+  gravar(sessionStorage, CHAVE_ACCESS, null);
+  gravar(sessionStorage, CHAVE_TEMP_MFA, null);
+  if (aviso) gravar(sessionStorage, CHAVE_AVISO, aviso);
+  ouvintes.forEach((ouvinte) => ouvinte());
+}
+
+export const AVISO_DE_SAIDA_EM_OUTRA_ABA = 'Sua sessão foi encerrada em outra aba.';
+
+/**
+ * O refresh token e o usuário ficam na localStorage, compartilhada entre as abas; o access token fica na
+ * sessionStorage de cada aba. Sem isto, sair numa aba deixaria as outras funcionando até o access token vencer.
+ * O evento "storage" só chega às outras abas, nunca à que fez a mudança.
+ */
+function sincronizarComOutrasAbas(evento: StorageEvent): void {
+  if (evento.storageArea !== localStorage) return;
+  // outra aba saiu (ou o armazenamento foi limpo): esta aba sai também e avisa no login.
+  // O logout apaga o refresh token e o usuário; olhar os dois cobre também a sessão que veio sem refresh token
+  const saiuEmOutraAba = !ler(localStorage, CHAVE_REFRESH) && !ler(localStorage, CHAVE_USUARIO);
+  if ((evento.key === CHAVE_REFRESH || evento.key === CHAVE_USUARIO || evento.key === null) && saiuEmOutraAba) {
+    const estavaLogada = Boolean(ler(sessionStorage, CHAVE_ACCESS) || evento.oldValue);
+    descartarSessaoDestaAba(estavaLogada ? AVISO_DE_SAIDA_EM_OUTRA_ABA : null);
+    return;
+  }
+  if (evento.key === CHAVE_USUARIO) {
+    const idAnterior = idDoUsuarioGuardado(evento.oldValue);
+    const idNovo = idDoUsuarioGuardado(evento.newValue);
+    // outra conta entrou neste navegador: o refresh token compartilhado agora é dela, então esta aba passa a
+    // usar essa conta. O access token desta aba ainda é da conta anterior e é descartado (o AuthContext limpa o cache)
+    if (idAnterior && idNovo && idAnterior !== idNovo) {
+      descartarSessaoDestaAba(null);
+      return;
+    }
+    // login em outra aba, ou o mesmo usuário com dados novos (nome, marca de senha expirada…): só atualiza a tela
+    ouvintes.forEach((ouvinte) => ouvinte());
+  }
+}
+
+if (typeof window !== 'undefined') window.addEventListener('storage', sincronizarComOutrasAbas);
+
 /**
  * Substitui $_SESSION['api_token' | 'api_refresh_token' | 'user' | 'mfa_temp_token'].
  * Access token e temp token MFA ficam na sessionStorage (somem ao fechar a aba);

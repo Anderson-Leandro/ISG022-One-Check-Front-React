@@ -19,7 +19,7 @@ function OuvirCliques({ aoEscolher }: Pick<Propriedades, 'aoEscolher'>) {
 function SeguirPonto({ latitude, longitude }: { latitude: number | null; longitude: number | null }) {
   const mapa = useMap();
   useEffect(() => {
-    if (latitude !== null && longitude !== null) mapa.panTo([latitude, longitude]);
+    if (latitude !== null && longitude !== null) mapa.setView([latitude, longitude], Math.max(mapa.getZoom(), 15));
   }, [mapa, latitude, longitude]);
   return null;
 }

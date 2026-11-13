@@ -3,7 +3,7 @@ import type { components } from '../../api/schema';
 import { codigoCurto, imovelTemGaragem, type Imovel } from '../../api/imoveis';
 import { ROTULO_DO_STATUS_DO_IMOVEL, STATUS_EDITAVEIS_DO_IMOVEL, TIPOS_DE_IMOVEL } from '../../config/imoveis';
 import { SeletorDeLocalizacao } from '../../components/mapa/SeletorDeLocalizacao';
-import { buscarCep, montarPayloadDeEndereco, ruaDoEndereco, type CamposDeEndereco, type Endereco } from '../../utils/endereco';
+import { buscarCep, buscarCoordenadasDoCep, montarPayloadDeEndereco, ruaDoEndereco, type CamposDeEndereco, type Endereco } from '../../utils/endereco';
 
 export interface DadosDoFormularioDeImovel {
   imovel: components['schemas']['ImovelCreate'];
@@ -66,6 +66,12 @@ export function FormularioDeImovel({ modo, imovel, endereco, enviando, aoEnviar,
     alterarEndereco({ latitude: latitude.toFixed(6), longitude: longitude.toFixed(6) });
   }
 
+  /** Tenta levar o mapa para perto do endereço do CEP. Se nada for achado, o mapa fica como está e a pessoa marca o ponto. */
+  async function aproximarMapaDoEndereco(endereco: { rua: string; bairro: string; cidade: string; estado: string }) {
+    const coordenadas = await buscarCoordenadasDoCep({ ...endereco, cep: campos.endereco.cep });
+    if (coordenadas) definirCoordenadas(coordenadas.latitude, coordenadas.longitude);
+  }
+
   async function aoBuscarCep() {
     setBuscandoCep(true);
     try {
@@ -75,6 +81,7 @@ export function FormularioDeImovel({ modo, imovel, endereco, enviando, aoEnviar,
         return;
       }
       alterarEndereco({ rua: resultado.logradouro, bairro: resultado.bairro, cidade: resultado.cidade, estado: resultado.estado });
+      await aproximarMapaDoEndereco({ rua: resultado.logradouro, bairro: resultado.bairro, cidade: resultado.cidade, estado: resultado.estado });
     } catch {
       window.alert('Erro ao buscar CEP.');
     } finally {

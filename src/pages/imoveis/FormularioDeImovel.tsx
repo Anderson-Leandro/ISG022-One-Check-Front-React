@@ -3,7 +3,7 @@ import type { components } from '../../api/schema';
 import { codigoCurto, imovelTemGaragem, type Imovel } from '../../api/imoveis';
 import { ROTULO_DO_STATUS_DO_IMOVEL, STATUS_EDITAVEIS_DO_IMOVEL, TIPOS_DE_IMOVEL } from '../../config/imoveis';
 import { SeletorDeLocalizacao } from '../../components/mapa/SeletorDeLocalizacao';
-import { buscarCep, geocodificarEndereco, montarPayloadDeEndereco, ruaDoEndereco, type CamposDeEndereco, type Endereco } from '../../utils/endereco';
+import { buscarCep, buscarCoordenadasDoCep, montarPayloadDeEndereco, ruaDoEndereco, type CamposDeEndereco, type Endereco } from '../../utils/endereco';
 
 export interface DadosDoFormularioDeImovel {
   imovel: components['schemas']['ImovelCreate'];
@@ -66,14 +66,10 @@ export function FormularioDeImovel({ modo, imovel, endereco, enviando, aoEnviar,
     alterarEndereco({ latitude: latitude.toFixed(6), longitude: longitude.toFixed(6) });
   }
 
-  /** Tenta levar o mapa para perto do endereço do CEP: primeiro a rua, depois só a cidade. Se falhar, o mapa fica como está. */
-  async function aproximarMapaDoEndereco(endereco: Endereco) {
-    try {
-      const coordenadas = (await geocodificarEndereco(endereco)) ?? (await geocodificarEndereco({ cidade: endereco.cidade, estado: endereco.estado }));
-      if (coordenadas) definirCoordenadas(coordenadas.latitude, coordenadas.longitude);
-    } catch {
-      // a busca de coordenadas é só uma ajuda: sem ela, a pessoa marca o ponto no mapa
-    }
+  /** Tenta levar o mapa para perto do endereço do CEP. Se nada for achado, o mapa fica como está e a pessoa marca o ponto. */
+  async function aproximarMapaDoEndereco(endereco: { rua: string; bairro: string; cidade: string; estado: string }) {
+    const coordenadas = await buscarCoordenadasDoCep({ ...endereco, cep: campos.endereco.cep });
+    if (coordenadas) definirCoordenadas(coordenadas.latitude, coordenadas.longitude);
   }
 
   async function aoBuscarCep() {

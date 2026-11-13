@@ -111,3 +111,30 @@ export async function geocodificarEndereco(endereco: Endereco): Promise<Coordena
   if (!Array.isArray(lista) || lista.length === 0) return null;
   return { latitude: Number(lista[0].lat), longitude: Number(lista[0].lon) };
 }
+
+async function consultarNominatim(parametros: Record<string, string>): Promise<Coordenadas | null> {
+  const consulta = new URLSearchParams({ ...parametros, format: 'json', limit: '1', countrycodes: 'br' });
+  const resposta = await fetch(`https://nominatim.openstreetmap.org/search?${consulta}`, { headers: { Accept: 'application/json' } });
+  if (!resposta.ok) return null;
+  const lista = await resposta.json();
+  if (!Array.isArray(lista) || lista.length === 0) return null;
+  return { latitude: Number(lista[0].lat), longitude: Number(lista[0].lon) };
+}
+
+/**
+ * Coordenadas para aproximar o mapa depois da busca do CEP, da tentativa mais precisa para a menos:
+ * rua com bairro, rua só com a cidade (o bairro do CEP nem sempre é o do mapa), o próprio CEP e, por fim, a cidade.
+ */
+export async function buscarCoordenadasDoCep(endereco: { rua: string; bairro: string; cidade: string; estado: string; cep: string }): Promise<Coordenadas | null> {
+  const { rua, bairro, cidade, estado, cep } = endereco;
+  const tentativas: Record<string, string>[] = [];
+  if (rua && bairro) tentativas.push({ q: [rua, bairro, cidade, estado, 'Brasil'].join(', ') });
+  if (rua) tentativas.push({ street: rua, city: cidade, state: estado, country: 'Brasil' });
+  if (apenasDigitos(cep).length === 8) tentativas.push({ postalcode: apenasDigitos(cep).replace(/(\d{5})(\d{3})/, '$1-$2'), country: 'Brasil' });
+  tentativas.push({ city: cidade, state: estado, country: 'Brasil' });
+  for (const parametros of tentativas) {
+    const coordenadas = await consultarNominatim(parametros).catch(() => null);
+    if (coordenadas) return coordenadas;
+  }
+  return null;
+}

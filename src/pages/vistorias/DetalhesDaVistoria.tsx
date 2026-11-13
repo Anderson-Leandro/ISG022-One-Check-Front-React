@@ -24,7 +24,6 @@ import { BadgeEstadoDoItem, BadgeStatusDaVistoria, BadgeTipoDaVistoria } from '.
 
 const MENSAGEM_DE_SUCESSO: Record<AcaoDeStatus, string> = {
   submeter: 'Vistoria submetida — aguardando aceite do locatário.',
-  'enviar-para-aceite': 'Vistoria enviada para aceite.',
   aceitar: 'Vistoria aceita com sucesso.',
   rejeitar: 'Vistoria rejeitada.',
 };
@@ -186,21 +185,14 @@ export function DetalhesDaVistoria() {
                 </div>
               </div>
 
-              {(pode.submeter || pode.enviarParaAceite) && (
+              {pode.submeter && (
                 <div className="card border-0 shadow-sm mb-3">
                   <div className="card-header fw-semibold">Ações</div>
                   <div className="card-body d-flex flex-column gap-2">
-                    {pode.submeter && (
-                      <button type="button" className="btn btn-primary btn-sm w-100" onClick={() => executar('submeter')} disabled={mudarStatus.isPending || !checklist.itens?.length}>
-                        Submeter
-                      </button>
-                    )}
-                    {pode.enviarParaAceite && (
-                      <button type="button" className="btn btn-warning btn-sm w-100" onClick={() => executar('enviar-para-aceite')} disabled={mudarStatus.isPending}>
-                        Enviar para aceite
-                      </button>
-                    )}
-                    {pode.submeter && !checklist.itens?.length && <small className="text-muted">Preencha ao menos um item antes de submeter.</small>}
+                    <button type="button" className="btn btn-primary btn-sm w-100" onClick={() => executar('submeter')} disabled={mudarStatus.isPending || !checklist.itens?.length}>
+                      Submeter
+                    </button>
+                    {!checklist.itens?.length && <small className="text-muted">Preencha ao menos um item antes de submeter.</small>}
                   </div>
                 </div>
               )}

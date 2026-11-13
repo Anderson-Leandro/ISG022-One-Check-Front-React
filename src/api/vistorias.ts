@@ -64,7 +64,7 @@ export const STATUS_DA_VISTORIA: Record<string, { rotulo: string; classe: string
 export const ESTADOS_DO_ITEM = ['otimo', 'bom', 'regular', 'ruim'] as const;
 export const ROTULO_DO_ESTADO: Record<string, string> = { otimo: 'Ótimo', bom: 'Bom', regular: 'Regular', ruim: 'Ruim' };
 
-export type AcaoDeStatus = 'submeter' | 'enviar-para-aceite' | 'aceitar' | 'rejeitar';
+export type AcaoDeStatus = 'submeter' | 'aceitar' | 'rejeitar';
 
 const chaves = {
   todos: ['vistorias'] as const,
@@ -166,7 +166,7 @@ export function useExcluirVistoria(id: string) {
   });
 }
 
-/** submeter / enviar-para-aceite / aceitar / rejeitar — todos PATCH na API (o PHP usava POST em aceitar/rejeitar). */
+/** submeter / aceitar / rejeitar — todos PATCH na API (o PHP usava POST em aceitar/rejeitar). */
 export function useMudarStatusDaVistoria(id: string) {
   const invalidar = useInvalidarVistorias();
   return useMutation({
@@ -175,8 +175,6 @@ export function useMudarStatusDaVistoria(id: string) {
       switch (acao) {
         case 'submeter':
           return obterDados(api.PATCH('/api/v1/checklists/{checklist_id}/submeter', caminho));
-        case 'enviar-para-aceite':
-          return obterDados(api.PATCH('/api/v1/checklists/{checklist_id}/enviar-para-aceite', caminho));
         case 'aceitar':
           return obterDados(api.PATCH('/api/v1/checklists/{checklist_id}/aceitar', caminho));
         case 'rejeitar':
@@ -269,7 +267,7 @@ export function validarFoto(arquivo: { type: string; size: number }): string | n
 /**
  * Fluxo da API:
  * em_preenchimento --submeter (≥1 item)--> pendente_aceite --aceitar|rejeitar--> aceito | rejeitado (finais).
- * enviar-para-aceite (admin/gestor) também leva de em_preenchimento para pendente_aceite.
+ * A API tem também enviar-para-aceite (admin/gestor), que leva ao mesmo status; a interface usa só submeter (TK-007).
  * Quem fez a vistoria não aceita nem rejeita a própria vistoria (403), mesmo sendo admin ou gestor.
  */
 export function permissoesDaVistoria(checklist: Checklist | undefined, usuario: Usuario | null) {
@@ -284,7 +282,6 @@ export function permissoesDaVistoria(checklist: Checklist | undefined, usuario: 
     excluir: emEdicao && ehGestao,
     editarItens: emEdicao && (ehGestao || ehVistoriadorDesignado),
     submeter: status === 'em_preenchimento' && (ehGestao || ehVistoriadorDesignado),
-    enviarParaAceite: emEdicao && ehGestao,
     aceitarOuRejeitar: status === 'pendente_aceite' && (ehGestao || perfil === 'locatario') && !fezAVistoria,
   };
 }

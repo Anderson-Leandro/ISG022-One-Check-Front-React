@@ -1,0 +1,40 @@
+# Blueprint do Render: publica o front como site estático (TK-004).
+# No painel: New > Blueprint > este repositório. O Render pede o valor de VITE_API_URL ao criar.
+services:
+  - type: web
+    name: onecheck-front
+    runtime: static
+    branch: main
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
+    envVars:
+      # URL pública da API, sem barra no fim (ex.: https://<servico-da-api>.onrender.com).
+      # Vai para o código publicado: não é segredo. Mudou o valor, é preciso um novo deploy.
+      - key: VITE_API_URL
+        sync: false
+      - key: NODE_VERSION
+        value: "24"
+    routes:
+      # SPA: qualquer rota interna devolve o index.html (arquivos que existem são servidos antes)
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      # o index.html não fica em cache, para um deploy novo valer na hora
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      # os arquivos de /assets têm hash no nome: cache longo
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable

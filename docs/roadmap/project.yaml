@@ -1,0 +1,78 @@
+# Configuração do projeto. Lida por todas as skills de roadmap.
+# Schema completo: ~/.claude/skills/_roadmap-shared/references/schema.md
+project:
+  name: OneCheck Front
+  slug: onecheck-front
+  description: 'Interface web da OneCheck (vistorias e locações imobiliárias): imóveis, contratos, vistorias com
+    fotos, problemas, painéis e área do locatário, consumindo a OneCheck API com controle de acesso por perfil.'
+  profile: web
+  start_date: '2026-10-24'
+  language: pt-BR
+team:
+  mode: team
+  members:
+  - name: Gabriel Henrique Santana
+    roles:
+    - PO
+    github: null
+    trello: null
+  - name: Anderson Mendes Leandro
+    roles:
+    - TL
+    github: Anderson-Leandro
+    trello: null
+  - name: Ismael Alves de Almeida
+    roles:
+    - Dev
+    github: null
+    trello: null
+  - name: Luiz Felipe dos Santos
+    roles:
+    - Dev
+    github: null
+    trello: null
+scrum:
+  sprint_length_days: 14
+  estimation: points
+  scale:
+  - 1
+  - 2
+  - 3
+  - 5
+  - 8
+  - 13
+  tshirt_points:
+    P: 1
+    M: 3
+    G: 5
+    GG: 8
+  max_item_size: 8
+  capacity: 20
+  current_sprint: 0
+security:
+  profile: standard
+  personal_data: true
+  audit_skill: security-audit
+board:
+  provider: github
+  trello:
+    board_id: null
+    lists: {}
+    labels: {}
+  github:
+    repo: Anderson-Leandro/ISG022-One-Check-Front-React
+    use_milestones: true
+roadmap:
+  current_phase: F0
+# Usado pelo /sprint-executor (skill global). As regras que são só deste projeto ficam em docs/roadmap/executor.md
+executor:
+  branch_base: dev
+  branch_release: main
+  testes: "bash scripts/verificar_na_copia.sh {scratchpad}/testes"
+  dod: "python3 scripts/dod_check.py"
+  pastas_codigo: [src/]
+  pastas_testes: [src/__testes__/]
+  notas_locais: [MUDANCAS_DE_CONTRATO.md, PENDENCIAS_API.md, PLANO_MIGRACAO.md, PLANO_ADEQUACAO_API.md, PLANO_MELHORIAS.md,
+    ACHADOS_PENDENTES_DA_REVISAO.md]
+  atribuicao_commit: "Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>"
+  atribuicao_pr: "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
